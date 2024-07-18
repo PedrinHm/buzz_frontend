@@ -1,3 +1,4 @@
+import 'package:buzz/screens/ForgotPassword_Screen.dart';
 import 'package:flutter/material.dart'; 
 
 //widgets
@@ -39,7 +40,10 @@ class LoginScreen extends StatelessWidget {
             TextLinkButton(
               text: 'Esqueceu a senha?',
               onPressed: () {
-                print('Esqueceu a senha clicado!');  
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                );    
               },
             ),
           ],
