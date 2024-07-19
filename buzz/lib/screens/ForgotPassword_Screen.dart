@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 //widgets
 import 'package:buzz/widgets/CustomInputField.dart';
 import 'package:buzz/widgets/CustomElevatedButton.dart';
-import 'package:buzz/widgets/TextLinkButton';
+import 'package:buzz/widgets/TextLinkButton.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   @override
