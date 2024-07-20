@@ -3,7 +3,6 @@ import 'package:buzz/screens/Student/student_profile_screen.dart';
 import 'package:buzz/screens/Student/student_trip_screen.dart';
 import 'package:buzz/widgets/Geral/Nav_Bar.dart';
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 
 void main() {
@@ -35,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
     StudentTripScreen(),
     StudentHomeScreen(),
     StudentProfileScreen(
-      imagePath: 'lib/assets/profliepic.jpeg',
+      imagePath: 'assets/images/profliepic.jpeg',
       studentName: 'Pedro Henrique Mendes',
       email: 'pedro@email.com',
       cpf: '111.111.111-00',

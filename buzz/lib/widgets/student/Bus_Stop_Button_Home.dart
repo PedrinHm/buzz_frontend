@@ -51,7 +51,7 @@ class CustomBusStopButton extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(

@@ -42,7 +42,7 @@ class StudentProfileScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -98,7 +98,7 @@ class StudentProfileScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontFamily: 'Inter',
           ),
         ),

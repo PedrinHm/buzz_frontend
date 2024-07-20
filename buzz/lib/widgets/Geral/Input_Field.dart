@@ -20,7 +20,7 @@ class CustomInputField extends StatelessWidget {
           labelText,
           style: TextStyle(
             fontFamily: 'Inter',
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 16.0,
           ),
         ),

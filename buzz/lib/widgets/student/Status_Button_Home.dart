@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 
 class CustomStatus extends StatelessWidget {
   final VoidCallback onPressed;
@@ -53,7 +53,7 @@ class CustomStatus extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(

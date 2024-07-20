@@ -17,7 +17,7 @@ class TextLinkButton extends StatelessWidget {
         foregroundColor: Colors.black.withOpacity(0.7), 
         textStyle: TextStyle(
           fontSize: 16,  
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
         ),
       ),
       child: Text(text),

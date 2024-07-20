@@ -20,7 +20,7 @@ class CustomTitleWidget extends StatelessWidget {
         style: TextStyle(
           color: Colors.white,
           fontSize: 16,
-          fontWeight: FontWeight.normal, // semibold
+          fontWeight: FontWeight.w600, // semiw600
           fontFamily: 'Inter', // Certifique-se de ter a fonte 'Inter' incluída no seu projeto
         ),
         textAlign: TextAlign.center,
