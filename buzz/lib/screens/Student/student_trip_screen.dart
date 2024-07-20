@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 //widgets
-import 'package:buzz/widgets/Student/Nav_Bar_Student.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:buzz/widgets/Geral/button_one.dart'; // Importa o botão
-import 'package:buzz/widgets/Geral/nav_bar.dart'; // Importa a barra de navegação
+import 'package:buzz/widgets/Geral/button_one.dart'; // Importa o botão // Importa a barra de navegação
 
 class DriverHomeScreen extends StatelessWidget {
   @override
