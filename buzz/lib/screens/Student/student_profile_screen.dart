@@ -1,16 +1,8 @@
-import 'package:buzz/widgets/Custom_Bus_Button.dart';
-import 'package:buzz/widgets/Custom_Bus_Stop_Button.dart';
-import 'package:buzz/widgets/Custom_Status.dart';
-import 'package:buzz/widgets/FullScreenMessage.dart';
-import 'package:buzz/widgets/StudentProfile.dart';
 import 'package:flutter/material.dart'; 
 
 //widgets
-import 'package:buzz/widgets/CustomInputField.dart';
-import 'package:buzz/widgets/CustomElevatedButton.dart';
-import 'package:buzz/widgets/TextLinkButton.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '/widgets/bottom_nav_bar.dart';
+import 'package:buzz/widgets/Geral/Nav_Bar.dart';
+import 'package:buzz/widgets/student/Student_Profile.dart';
 
 class studentProfileScreen extends StatelessWidget {
   @override

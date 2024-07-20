@@ -1,10 +1,10 @@
-import 'package:buzz/screens/login_screen.dart';
+import 'package:buzz/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart'; 
 
 //widgets
-import 'package:buzz/widgets/CustomInputField.dart';
-import 'package:buzz/widgets/CustomElevatedButton.dart';
-import 'package:buzz/widgets/TextLinkButton.dart';
+import 'package:buzz/widgets/Geral/Input_Field.dart';
+import 'package:buzz/widgets/Geral/One_Button.dart';
+import 'package:buzz/widgets/Geral/Text_Button.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   @override

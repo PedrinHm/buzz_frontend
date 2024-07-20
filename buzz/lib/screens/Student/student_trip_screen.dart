@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:buzz/widgets/CustomTitleWidget.dart';
-import '/widgets/bottom_nav_bar.dart';
-import '/widgets/TripBusStop.dart'; // Importa o novo componente
+
+//widgets
+import 'package:buzz/widgets/Geral/Nav_Bar.dart';
+import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
+import 'package:buzz/widgets/Geral/Title.dart';
 
 class StudentTripScreen extends StatelessWidget {
   @override
