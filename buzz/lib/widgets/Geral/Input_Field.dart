@@ -8,7 +8,7 @@ class CustomInputField extends StatelessWidget {
   CustomInputField({
     required this.labelText,
     this.keyboardType = TextInputType.text,
-    this.obscureText = false,
+    this.obscureText = false, required controller,
   });
 
   @override

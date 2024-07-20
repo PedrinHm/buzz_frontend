@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomElevatedButton extends StatelessWidget {
+class ButtonTwo extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
 
-  CustomElevatedButton({
+  ButtonTwo({
     required this.buttonText,
     required this.onPressed,
   });
@@ -19,8 +19,7 @@ class CustomElevatedButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),  // Arredondamento das bordas
         ),
-        padding: EdgeInsets.symmetric(horizontal: 48, vertical: 24),  // Espaçamento interno
-        minimumSize: Size(160, 48),  // Tamanho mínimo para o botão
+        fixedSize: Size(320, 70),  // Tamanho fixo do botão (largura x altura)
       ),
       child: Text(
         buttonText,  // Texto do botão passado como parâmetro

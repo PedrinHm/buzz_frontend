@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart'; 
 
 //screens
-import 'package:buzz/screens/auth/forgot_password_screen.dart';
+import 'package:buzz/screens/Auth/forgot_password_screen.dart';
 
 //widgets
 import 'package:buzz/widgets/Geral/Input_Field.dart';
-import 'package:buzz/widgets/Geral/One_Button.dart';
+import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -22,18 +22,18 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   CustomInputField(
                     labelText: 'Login',
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.emailAddress, controller: null,
                   ),
                   SizedBox(height: 20),
                   CustomInputField(
                     labelText: 'Senha',
-                    obscureText: true,
+                    obscureText: true, controller: null,
                   ),
                   SizedBox(height: 20),
                 ],
               ),
             ),
-            CustomElevatedButton(
+            Button_One(
               buttonText: 'Realizar Login',
               onPressed: () {
                 print('Botão pressionado!');  

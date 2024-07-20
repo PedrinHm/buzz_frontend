@@ -1,9 +1,7 @@
-import 'package:buzz/screens/Student/student_home_screen.dart';
-import 'package:buzz/screens/Student/student_profile_screen.dart';
-import 'package:buzz/screens/Student/student_trip_screen.dart';
-import 'package:buzz/widgets/Geral/Nav_Bar.dart';
+import 'package:buzz/screens/Admin/admin_home_screen.dart';
+import 'package:buzz/screens/Admin/admin_profile_screen.dart';
+import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';
 import 'package:flutter/material.dart';
-
 
 void main() {
   runApp(MyApp());
@@ -16,30 +14,37 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'Inter', // Defina a família de fontes padrão como Inter
       ),
-      home: MainScreen(),
+      home: AdminMainScreen(),
+      routes: {
+        '/adminHome': (context) => AdminHomeScreen(),
+        '/adminProfile': (context) => AdminProfileScreen(
+          imagePath: 'assets/images/profliepic.jpeg',
+          adminName: 'Admin Name',
+          email: 'admin@email.com',
+          cpf: '123.456.789-00',
+        ),
+      },
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
+class AdminMainScreen extends StatefulWidget {
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _AdminMainScreenState createState() => _AdminMainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 1;
+class _AdminMainScreenState extends State<AdminMainScreen> {
+  int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    StudentTripScreen(),
-    StudentHomeScreen(),
-    StudentProfileScreen(
+    AdminHomeScreen(),
+    AdminProfileScreen(
       imagePath: 'assets/images/profliepic.jpeg',
-      studentName: 'Pedro Henrique Mendes',
-      email: 'pedro@email.com',
-      cpf: '111.111.111-00',
-      course: 'Eng. Software',
-      university: 'Universidade de Rio Verde',
+      adminName: 'Admin Name',
+      email: 'admin@email.com',
+      cpf: '123.456.789-00',
     ),
   ];
 
@@ -56,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: NavBarAdmin(
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
       ),

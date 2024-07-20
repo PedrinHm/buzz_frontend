@@ -1,9 +1,9 @@
-import 'package:buzz/screens/auth/login_screen.dart';
+import 'package:buzz/screens/Auth/login_screen.dart';
 import 'package:flutter/material.dart'; 
 
 //widgets
 import 'package:buzz/widgets/Geral/Input_Field.dart';
-import 'package:buzz/widgets/Geral/One_Button.dart';
+import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -20,13 +20,14 @@ class ForgotPasswordScreen extends StatelessWidget {
                 children: [
                   CustomInputField(
                     labelText: 'CPF',
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.number, 
+                    controller: null,
                   ),
                 ],
               ),
             ),
             SizedBox(height: 20),
-            CustomElevatedButton(
+            Button_One(
               buttonText: 'Enviar para meu e-mail',
               onPressed: () {
                 print('Botão pressionado!');  

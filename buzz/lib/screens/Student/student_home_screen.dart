@@ -3,10 +3,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 //widgets
 import 'package:buzz/widgets/Geral/Nav_Bar.dart';
-import 'package:buzz/widgets/student/Bus_Button_Home.dart';
-import 'package:buzz/widgets/student/Bus_Stop_Button_Home.dart';
-import 'package:buzz/widgets/student/Status_Button_Home.dart';
-import 'package:buzz/widgets/student/Message_Home.dart';
+import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
+import 'package:buzz/widgets/Student/Bus_Stop_Button_Home.dart';
+import 'package:buzz/widgets/Student/Status_Button_Home.dart';
+import 'package:buzz/widgets/Student/Message_Home.dart';
 
 class StudentHomeScreen extends StatelessWidget {
   @override
