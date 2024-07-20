@@ -1,5 +1,5 @@
 import 'package:buzz/widgets/Custom_Bus_Button.dart';
-import 'package:buzz/widgets/Custom_Bus_Stop_Button%20copy.dart';
+import 'package:buzz/widgets/Custom_Bus_Stop_Button.dart';
 import 'package:buzz/widgets/Custom_Status.dart';
 import 'package:buzz/widgets/FullScreenMessage.dart';
 import 'package:flutter/material.dart'; 
@@ -26,7 +26,7 @@ class studentHomeScreen extends StatelessWidget {
             onPressed: () {
               // Defina o que acontece quando o botão é pressionado
             },
-            busStopName: 'Nome da Parada',
+            StatusName: 'Em aula',
             iconData: PhosphorIcons.chalkboardTeacher, // Aqui você passa o ícone desejado
           ),
           SizedBox(height: 10),

@@ -3,12 +3,12 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CustomStatus extends StatelessWidget {
   final VoidCallback onPressed;
-  final String busStopName;
+  final String StatusName;
   final IconData iconData; // Adiciona um campo para o ícone
 
   CustomStatus({
     required this.onPressed,
-    required this.busStopName,
+    required this.StatusName,
     required this.iconData, // Passa o ícone como parâmetro
   });
 
@@ -57,7 +57,7 @@ class CustomStatus extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Status atual: $busStopName', 
+                  'Status atual: $StatusName', 
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,

@@ -1,4 +1,4 @@
-import 'package:buzz/screens/ForgotPassword_Screen.dart';
+import 'package:buzz/screens/forgotPassword_Screen.dart';
 import 'package:buzz/widgets/TextLinkButton.dart';
 import 'package:flutter/material.dart'; 
 
