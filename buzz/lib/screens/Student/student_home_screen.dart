@@ -8,13 +8,13 @@ import 'package:buzz/widgets/student/Bus_Stop_Button_Home.dart';
 import 'package:buzz/widgets/student/Status_Button_Home.dart';
 import 'package:buzz/widgets/student/Message_Home.dart';
 
-class studentHomeScreen extends StatelessWidget {
+class StudentHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(children: [
-          SizedBox(height: 10),
+          SizedBox(height: 40),
           FullScreenMessage(
             message: 'Existem ônibus em viagem de ida, está participando?',
           ),
@@ -45,7 +45,6 @@ class studentHomeScreen extends StatelessWidget {
         ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
