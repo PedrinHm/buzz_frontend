@@ -49,7 +49,12 @@ class _MainScreenState extends State<MainScreen> {
         return [
           DriverTripScreen(),
           DriverHomeScreen(), // Home Screen
-          DriverProfileScreen(),
+          DriverProfileScreen(
+            imagePath: 'assets/images/profliepic.jpeg',
+            adminName: 'Admin Name',
+            email: 'admin@email.com',
+            cpf: '123.456.789-00',
+          ),
         ];
       case 'admin':
         return [

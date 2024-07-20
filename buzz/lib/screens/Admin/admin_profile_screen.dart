@@ -33,7 +33,7 @@ class AdminProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Dados do Admin',
+                    'Dados do Administrador',
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,
