@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class BottomNavBar extends StatelessWidget {
+class DriverNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  BottomNavBar({required this.currentIndex, required this.onTap});
+  DriverNavBar({required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

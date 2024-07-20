@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart'; 
-
-//screens
+import 'package:flutter/material.dart';
 import 'package:buzz/screens/Auth/forgot_password_screen.dart';
-
-//widgets
+import 'package:buzz/screens/main_screen.dart';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
+import 'package:buzz/models/usuario.dart'; // Importação da classe Usuario
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -36,7 +34,12 @@ class LoginScreen extends StatelessWidget {
             Button_One(
               buttonText: 'Realizar Login',
               onPressed: () {
-                print('Botão pressionado!');  
+                // Simulação de autenticação
+                Usuario usuario = Usuario(tipoUsuario: 'driver'); // Altere para 'driver' ou 'admin' para testar
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen(usuario: usuario)),
+                );
               },
             ),             
             TextLinkButton(

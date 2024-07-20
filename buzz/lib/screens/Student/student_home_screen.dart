@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 //widgets
-import 'package:buzz/widgets/Geral/Nav_Bar.dart';
+import 'package:buzz/widgets/Student/Nav_Bar_Student.dart';
 import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
 import 'package:buzz/widgets/Student/Bus_Stop_Button_Home.dart';
 import 'package:buzz/widgets/Student/Status_Button_Home.dart';
