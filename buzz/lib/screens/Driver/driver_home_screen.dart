@@ -23,7 +23,7 @@ class DriverHomeScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 100.0, // Ajuste esta altura conforme necessário
+            bottom: 20.0, // Ajuste esta altura conforme necessário
             left: 0,
             right: 0,
             child: Center(

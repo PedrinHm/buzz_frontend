@@ -4,7 +4,7 @@ import 'package:buzz/screens/main_screen.dart';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
-import 'package:buzz/models/usuario.dart'; // Importação da classe Usuario
+import 'package:buzz/models/usuario.dart'; 
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
               buttonText: 'Realizar Login',
               onPressed: () {
                 // Simulação de autenticação
-                Usuario usuario = Usuario(tipoUsuario: 'student'); // Altere para 'driver' ou 'admin' para testar
+                Usuario usuario = Usuario(tipoUsuario: 'admin'); // Altere para 'driver' ou 'admin' para testar
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MainScreen(usuario: usuario)),
