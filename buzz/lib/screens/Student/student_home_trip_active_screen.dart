@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Student/bus_details_button.dart';
+import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 
 class StudentHomeTripActiveScreen extends StatefulWidget {
   @override
@@ -13,11 +14,18 @@ class StudentHomeTripActiveScreen extends StatefulWidget {
 }
 
 class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScreen> {
-  bool _showOverlay = false;
+  bool _showBusOverlay = false;
+  bool _showBusStopOverlay = false;
 
-  void _toggleOverlay() {
+  void _toggleBusOverlay() {
     setState(() {
-      _showOverlay = !_showOverlay;
+      _showBusOverlay = !_showBusOverlay;
+    });
+  }
+
+  void _toggleBusStopOverlay() {
+    setState(() {
+      _showBusStopOverlay = !_showBusStopOverlay;
     });
   }
 
@@ -43,14 +51,12 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
                 ),
                 SizedBox(height: 10),
                 CustomBusStopButton(
-                  onPressed: () {
-                    print("Botão pressionado");
-                  },
+                  onPressed: _toggleBusStopOverlay,
                   busStopName: "ABC-1234",
                 ),
                 SizedBox(height: 10),
                 CustomBusButton(
-                  onPressed: _toggleOverlay,
+                  onPressed: _toggleBusOverlay,
                   busNumber: "ABC-1234",
                   driverName: "Nome Do Motorista",
                 ),
@@ -58,35 +64,49 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
               ],
             ),
           ),
-          if (_showOverlay)
-            Container(
-              color: Colors.black.withOpacity(0.9),
-              child: Column(
-                children: [
-                  SizedBox(height: 40),
-                  Text(
-                    'Defina seu ônibus atual',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: _buildBusList(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ButtonThree(
-                      buttonText: 'Cancelar',
-                      backgroundColor: Colors.red,
-                      onPressed: _toggleOverlay,
-                    ),
-                  ),
-                ],
-              ),
+          if (_showBusOverlay)
+            _buildOverlay(
+              'Defina seu ônibus atual',
+              _buildBusList(),
+              _toggleBusOverlay,
             ),
+          if (_showBusStopOverlay)
+            _buildOverlay(
+              'Defina seu ponto de ônibus atual',
+              _buildBusStopList(),
+              _toggleBusStopOverlay,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverlay(String title, Widget content, VoidCallback onCancel) {
+    return Container(
+      color: Colors.black.withOpacity(0.9),
+      child: Column(
+        children: [
+          SizedBox(height: 40),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 20),
+          Expanded(
+            child: content,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ButtonThree(
+              buttonText: 'Cancelar',
+              backgroundColor: Colors.red,
+              onPressed: onCancel,
+            ),
+          ),
         ],
       ),
     );
@@ -108,13 +128,46 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
           child: BusDetailsButton(
             onPressed: () {
               print("Selecionado ônibus: ${bus['busNumber']}");
-              _toggleOverlay();
+              _toggleBusOverlay();
             },
             busNumber: bus['busNumber'],
             driverName: bus['driverName'],
             capacity: bus['capacity'],
             availableSeats: bus['availableSeats'],
             color: bus['available'] ? Color(0xFF395BC7) : Color(0xFFFFBA18),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBusStopList() {
+    final List<Map<String, String>> busStopList = [
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'No ponto'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Próximo ponto'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
+      // Adicione mais pontos conforme necessário
+    ];
+
+    return ListView.builder(
+      itemCount: busStopList.length,
+      itemBuilder: (context, index) {
+        final busStop = busStopList[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: TripBusStop(
+            onPressed: () {
+              print("Selecionado ponto de ônibus: ${busStop['name']}");
+              _toggleBusStopOverlay();
+            },
+            busStopName: busStop['name']!,
+            busStopStatus: busStop['status']!,
           ),
         );
       },
