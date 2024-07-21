@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Student/bus_details_button.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
+import 'package:buzz/widgets/Student/status_button.dart'; // Importa o novo componente
 
 class StudentHomeTripActiveScreen extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class StudentHomeTripActiveScreen extends StatefulWidget {
 class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScreen> {
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
+  bool _showStatusOverlay = false; // Flag para a sobreposição de status
 
   void _toggleBusOverlay() {
     setState(() {
@@ -26,6 +28,12 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   void _toggleBusStopOverlay() {
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
+    });
+  }
+
+  void _toggleStatusOverlay() {
+    setState(() {
+      _showStatusOverlay = !_showStatusOverlay;
     });
   }
 
@@ -43,9 +51,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
                 ),
                 SizedBox(height: 10),
                 CustomStatus(
-                  onPressed: () {
-                    // Defina o que acontece quando o botão é pressionado
-                  },
+                  onPressed: _toggleStatusOverlay,
                   StatusName: 'Em aula',
                   iconData: PhosphorIcons.chalkboardTeacher, // Aqui você passa o ícone desejado
                 ),
@@ -75,6 +81,12 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
               'Defina seu ponto de ônibus atual',
               _buildBusStopList(),
               _toggleBusStopOverlay,
+            ),
+          if (_showStatusOverlay)
+            _buildOverlay(
+              'Defina seu status atual',
+              _buildStatusList(),
+              _toggleStatusOverlay,
             ),
         ],
       ),
@@ -146,12 +158,6 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'No ponto'},
       {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Próximo ponto'},
       {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-      {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
       // Adicione mais pontos conforme necessário
     ];
 
@@ -168,6 +174,35 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
             },
             busStopName: busStop['name']!,
             busStopStatus: busStop['status']!,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusList() {
+    final List<Map<String, dynamic>> statusList = [
+      {'statusText': 'Em aula', 'color': Color(0xFF395BC7), 'icon': PhosphorIcons.chalkboardTeacher},
+      {'statusText': 'Aguardando ônibus', 'color': Color(0xFFB0E64C), 'icon': PhosphorIcons.bus},
+      {'statusText': 'Presente', 'color': Color(0xFF3E9B4F), 'icon': PhosphorIcons.check},
+      {'statusText': 'Não voltará', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
+      // Adicione mais status conforme necessário
+    ];
+
+    return ListView.builder(
+      itemCount: statusList.length,
+      itemBuilder: (context, index) {
+        final status = statusList[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: StatusButton(
+            onPressed: () {
+              print("Selecionado status: ${status['statusText']}");
+              _toggleStatusOverlay();
+            },
+            statusText: status['statusText'],
+            color: status['color'],
+            icon: status['icon'],
           ),
         );
       },
