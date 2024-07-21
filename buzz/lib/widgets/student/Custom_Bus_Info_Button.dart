@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class CustomBusButton extends StatelessWidget {
+class CustomBusInfoButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String busNumber;
   final String driverName;
-  final Color color; // Adiciona o parâmetro de cor
 
-  CustomBusButton({
+  CustomBusInfoButton({
     required this.onPressed,
     required this.busNumber,
     required this.driverName,
-    this.color = const Color(0xFF395BC7), // Define uma cor padrão
   });
 
   @override
@@ -20,17 +18,17 @@ class CustomBusButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * (150 / 938),
-        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+        height: 100, // Ajustar a altura para evitar estouro de pixels
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         decoration: BoxDecoration(
-          color: color, // Usa a cor passada como parâmetro
+          color: Color(0xFF395BC7),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(10), // Ajustar padding interno
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(10),

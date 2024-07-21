@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TripController extends ChangeNotifier {
-  bool _hasActiveTrip = false;
+  bool _hasActiveTrip = true;
 
   bool get hasActiveTrip => _hasActiveTrip;
 
