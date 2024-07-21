@@ -1,16 +1,17 @@
 import 'package:buzz/screens/Driver/driver_bus_stop_screen_controller.dart';
 import 'package:buzz/screens/Driver/driver_student_screen_controller.dart';
+import 'package:buzz/screens/Student/StudentTripActiveScreen.dart';
+import 'package:buzz/screens/Student/student_trip_screen_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:buzz/screens/Student/student_home_screen_controller.dart';
 import 'package:buzz/utils/navbar_helper.dart';
-import 'package:buzz/screens/Student/student_home_screen.dart';
-import 'package:buzz/screens/Student/student_trip_screen.dart';
+import 'package:buzz/screens/Student/student_home_trip_active_screen.dart';
 import 'package:buzz/screens/Student/student_profile_screen.dart';
-import 'package:buzz/screens/Driver/driver_bus_stop_inactive_screen.dart.dart';
-import 'package:buzz/screens/Driver/driver_student_active_screen.dart';
 import 'package:buzz/screens/Driver/driver_profile_screen.dart';
 import 'package:buzz/screens/Admin/admin_home_screen.dart';
 import 'package:buzz/screens/Admin/admin_profile_screen.dart';
 import 'package:buzz/models/usuario.dart';
+
 
 class MainScreen extends StatefulWidget {
   final Usuario usuario;
@@ -36,8 +37,8 @@ class _MainScreenState extends State<MainScreen> {
     switch (tipoUsuario) {
       case 'student':
         return [
-          StudentTripScreen(),
-          StudentHomeScreen(), // Home Screen
+          StudentTripScreenController(), // Tela de viagem
+          StudentHomeScreenController(), // Tela principal
           StudentProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg', 
             studentName: 'Pedro Henrique Mendes',

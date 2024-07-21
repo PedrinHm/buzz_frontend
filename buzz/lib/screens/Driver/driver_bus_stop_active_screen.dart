@@ -3,10 +3,10 @@ import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:flutter/material.dart';
 
-class DriverActiveTripScreen extends StatelessWidget {
+class DriverBusStopActiveScreen extends StatelessWidget {
   final VoidCallback endTrip;
 
-  DriverActiveTripScreen({required this.endTrip});
+  DriverBusStopActiveScreen({required this.endTrip});
 
   final List<Map<String, String>> tripBusStops = [
     {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},

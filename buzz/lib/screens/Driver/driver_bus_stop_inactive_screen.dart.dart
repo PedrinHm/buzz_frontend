@@ -1,10 +1,10 @@
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 
-class DriverHomeScreen extends StatelessWidget {
+class DriverBusStopInactiveScreen extends StatelessWidget {
   final VoidCallback startTrip;
 
-  DriverHomeScreen({required this.startTrip});
+  DriverBusStopInactiveScreen({required this.startTrip});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 
-class StudentTripScreen extends StatelessWidget {
+class StudentTripActiveScreen  extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Dados simulados

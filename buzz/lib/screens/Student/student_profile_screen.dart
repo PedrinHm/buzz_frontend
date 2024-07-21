@@ -1,4 +1,3 @@
-import 'package:buzz/widgets/Student/Nav_Bar_Student.dart';
 import 'package:flutter/material.dart';
 
 class StudentProfileScreen extends StatelessWidget {

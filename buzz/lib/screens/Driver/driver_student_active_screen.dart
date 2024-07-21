@@ -3,10 +3,10 @@ import 'package:buzz/widgets/Driver/Bus_stop_status.dart';
 import 'package:buzz/widgets/Driver/student_status.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 
-class DriverTripScreen extends StatelessWidget {
+class DriverStudentActiveScreen extends StatelessWidget {
   final VoidCallback endTrip;
 
-  DriverTripScreen({required this.endTrip});
+  DriverStudentActiveScreen({required this.endTrip});
 
   final List<Map<String, String>> busStops = [
     {'name': 'Ponto 1', 'status': 'Já passou'},

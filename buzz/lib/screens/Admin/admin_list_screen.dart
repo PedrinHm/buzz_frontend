@@ -1,4 +1,4 @@
-import 'package:buzz/screens/Admin/form_screen.dart';
+import 'package:buzz/screens/Admin/admin_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';

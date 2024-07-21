@@ -10,7 +10,7 @@ class DriverStudentScreenController extends StatelessWidget {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
         return tripController.hasActiveTrip
-            ? DriverTripScreen(endTrip: tripController.endTrip)
+            ? DriverStudentActiveScreen(endTrip: tripController.endTrip)
             : DriverStudentInactiveScreen(startTrip: tripController.startTrip);
       },
     );
