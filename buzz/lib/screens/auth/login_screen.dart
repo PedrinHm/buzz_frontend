@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
               buttonText: 'Realizar Login',
               onPressed: () {
                 // Simulação de autenticação
-                Usuario usuario = Usuario(tipoUsuario: 'admin'); // Altere para 'driver' ou 'admin' para testar
+                Usuario usuario = Usuario(tipoUsuario: 'driver'); // Altere para 'driver' ou 'admin' para testar
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MainScreen(usuario: usuario)),

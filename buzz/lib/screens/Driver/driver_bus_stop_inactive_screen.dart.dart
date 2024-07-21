@@ -1,8 +1,11 @@
+import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:buzz/widgets/Geral/button_one.dart'; // Importa o botão // Importa a barra de navegação
 
 class DriverHomeScreen extends StatelessWidget {
+  final VoidCallback startTrip;
+
+  DriverHomeScreen({required this.startTrip});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,16 +26,14 @@ class DriverHomeScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 20.0, // Ajuste esta altura conforme necessário
+            bottom: 20.0,
             left: 0,
             right: 0,
             child: Center(
-              child: Button_One(
+              child: ButtonThree(
                 buttonText: 'Iniciar Viagem',
-                onPressed: () {
-                  print('Iniciar Viagem Pressionado');
-                  // Adicione a lógica para iniciar a viagem aqui
-                },
+                onPressed: startTrip,
+                backgroundColor: Colors.blue,
               ),
             ),
           ),

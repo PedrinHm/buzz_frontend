@@ -4,6 +4,10 @@ import 'package:buzz/widgets/Driver/student_status.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 
 class DriverTripScreen extends StatelessWidget {
+  final VoidCallback endTrip;
+
+  DriverTripScreen({required this.endTrip});
+
   final List<Map<String, String>> busStops = [
     {'name': 'Ponto 1', 'status': 'Já passou'},
     {'name': 'Ponto 2', 'status': 'No ponto'},
@@ -17,13 +21,13 @@ class DriverTripScreen extends StatelessWidget {
       'imagePath': 'assets/images/profliepic.jpeg',
       'busStop': 'Ponto 1',
     },
-     {
+    {
       'name': 'Pedro Henrique Mendes',
       'status': 'Presente',
       'imagePath': 'assets/images/profliepic.jpeg',
       'busStop': 'Ponto 1',
     },
-     {
+    {
       'name': 'Pedro Henrique Mendes',
       'status': 'Presente',
       'imagePath': 'assets/images/profliepic.jpeg',
@@ -35,13 +39,13 @@ class DriverTripScreen extends StatelessWidget {
       'imagePath': 'assets/images/profliepic.jpeg',
       'busStop': 'Ponto 2',
     },
-     {
+    {
       'name': 'Pedro Henrique Mendes',
       'status': 'Presente',
       'imagePath': 'assets/images/profliepic.jpeg',
       'busStop': 'Ponto 2',
     },
-     {
+    {
       'name': 'Pedro Henrique Mendes',
       'status': 'Presente',
       'imagePath': 'assets/images/profliepic.jpeg',
@@ -53,7 +57,7 @@ class DriverTripScreen extends StatelessWidget {
       'imagePath': 'assets/images/profliepic.jpeg',
       'busStop': 'Ponto 3',
     },
-     {
+    {
       'name': 'Pedro Henrique Mendes',
       'status': 'Presente',
       'imagePath': 'assets/images/profliepic.jpeg',
@@ -102,7 +106,7 @@ class DriverTripScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            CustomTitleWidget(title: 'Viagem Atual'),
+            CustomTitleWidget(title: 'Viagem Atual - Alunos'),
             SizedBox(height: 20),
             ..._buildBusStopSections(),
           ],
