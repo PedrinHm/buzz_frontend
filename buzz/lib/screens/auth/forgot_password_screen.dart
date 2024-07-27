@@ -7,10 +7,13 @@ import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
+  final TextEditingController cpfController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -20,8 +23,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                 children: [
                   CustomInputField(
                     labelText: 'CPF',
-                    keyboardType: TextInputType.number, 
-                    controller: null,
+                    keyboardType: TextInputType.number,
+                    controller: cpfController,
                   ),
                 ],
               ),
@@ -30,16 +33,16 @@ class ForgotPasswordScreen extends StatelessWidget {
             Button_One(
               buttonText: 'Enviar para meu e-mail',
               onPressed: () {
-                print('Botão pressionado!');  
+                print('Botão pressionado! CPF: ${cpfController.text}');
               },
-            ),             
+            ),
             TextLinkButton(
               text: 'Voltar',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
-                );  
+                );
               },
             ),
           ],

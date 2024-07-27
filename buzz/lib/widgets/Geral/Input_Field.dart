@@ -4,11 +4,13 @@ class CustomInputField extends StatelessWidget {
   final String labelText;
   final TextInputType keyboardType;
   final bool obscureText;
+  final TextEditingController controller;
 
   CustomInputField({
     required this.labelText,
     this.keyboardType = TextInputType.text,
-    this.obscureText = false, required controller,
+    this.obscureText = false,
+    required this.controller,
   });
 
   @override
@@ -27,6 +29,7 @@ class CustomInputField extends StatelessWidget {
         FractionallySizedBox(
           widthFactor: 0.8,
           child: TextField(
+            controller: controller,  // Certifique-se de usar o controlador aqui
             obscureText: obscureText,
             keyboardType: keyboardType,
             decoration: InputDecoration(
