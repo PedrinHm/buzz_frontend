@@ -60,6 +60,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ];
       case 'admin':
+        _currentIndex = 0;
         return [
           AdminHomeScreen(), // Home Screen
           AdminProfileScreen(

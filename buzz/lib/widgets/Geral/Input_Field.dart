@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomInputField extends StatelessWidget {
+class CustomInputField extends StatefulWidget {
   final String labelText;
   final TextInputType keyboardType;
   final bool obscureText;
@@ -14,12 +14,25 @@ class CustomInputField extends StatelessWidget {
   });
 
   @override
+  _CustomInputFieldState createState() => _CustomInputFieldState();
+}
+
+class _CustomInputFieldState extends State<CustomInputField> {
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.obscureText;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          labelText,
+          widget.labelText,
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
@@ -29,9 +42,9 @@ class CustomInputField extends StatelessWidget {
         FractionallySizedBox(
           widthFactor: 0.8,
           child: TextField(
-            controller: controller,  // Certifique-se de usar o controlador aqui
-            obscureText: obscureText,
-            keyboardType: keyboardType,
+            controller: widget.controller,
+            obscureText: _obscureText,
+            keyboardType: widget.keyboardType,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFFD9D9D9),
@@ -43,6 +56,22 @@ class CustomInputField extends StatelessWidget {
                 borderSide: BorderSide(color: Color(0xFFD9D9D9), width: 2),
                 borderRadius: BorderRadius.circular(10),
               ),
+              suffixIcon: widget.obscureText
+                  ? IconButton(
+                      icon: Opacity(
+                        opacity: 0.5, // Define a opacidade do ícone
+                        child: Icon(
+                          _obscureText ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.black,
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                  : null,
             ),
           ),
         ),
