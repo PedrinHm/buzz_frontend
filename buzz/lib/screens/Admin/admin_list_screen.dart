@@ -31,13 +31,13 @@ class ListScreen extends StatelessWidget {
           {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
           {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
           {'label': 'Curso', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
+          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
         ];
         break;
       case 'Cadastro de Pontos de Ônibus':
         fields = [
           {'label': 'Nome do Ponto', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
+          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
         ];
         break;
       case 'Cadastro de Ônibus':
@@ -67,7 +67,7 @@ class ListScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 40), // Espaço antes do título
+          SizedBox(height: 40),
           CustomTitleWidget(title: title),
           Expanded(
             child: ListView.builder(
@@ -100,8 +100,7 @@ class ListScreen extends StatelessWidget {
       bottomNavigationBar: NavBarAdmin(
         currentIndex: 1,
         onTap: (index) {
-          // Lógica de navegação para a tela inicial do admin
-          Navigator.pop(context); // Volta para a tela anterior (AdminHomeScreen)
+          Navigator.pop(context);
         },
       ),
     );
