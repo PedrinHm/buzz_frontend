@@ -1,5 +1,5 @@
-import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';
 import 'package:flutter/material.dart';
+import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
@@ -118,7 +118,14 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       _showSnackbar('Cadastro realizado com sucesso!', Colors.green);
       Navigator.pop(context);
     } else {
-      _showSnackbar('Erro ao realizar o cadastro: ${response.body}', Colors.red);
+      final responseBody = json.decode(response.body);
+      String errorMessage = 'Erro ao realizar o cadastro';
+      if (responseBody is Map && responseBody.containsKey('detail')) {
+        if (responseBody['detail'] is List && responseBody['detail'].isNotEmpty) {
+          errorMessage = responseBody['detail'][0]['msg'];
+        }
+      }
+      _showSnackbar(errorMessage, Colors.red);
     }
   }
 
