@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
+import 'package:buzz/widgets/Geral/CustomDropdownField.dart';  // Importa o novo componente
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -19,6 +20,7 @@ class GenericFormScreen extends StatefulWidget {
 class _GenericFormScreenState extends State<GenericFormScreen> {
   List<Map<String, dynamic>> faculties = [];
   int? selectedFacultyId;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -42,6 +44,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   }
 
   Future<void> _saveForm() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     String apiUrl;
     Map<String, dynamic> body = {};
 
@@ -53,8 +59,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           'email': widget.fields[1]['controller'].text,
           'cpf': widget.fields[2]['controller'].text,
           'phone': widget.fields[3]['controller'].text,
-          'user_type_id': 2, 
-          'password': widget.fields[2]['controller'].text, 
+          'user_type_id': 2,
+          'password': widget.fields[2]['controller'].text,
         };
         break;
       case 'Cadastro de Aluno':
@@ -66,8 +72,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           'phone': widget.fields[3]['controller'].text,
           'course': widget.fields[4]['controller'].text,
           'faculty_id': selectedFacultyId,
-          'user_type_id': 1, 
-          'password': widget.fields[2]['controller'].text, 
+          'user_type_id': 1,
+          'password': widget.fields[2]['controller'].text,
         };
         break;
       case 'Cadastro de Pontos de Ônibus':
@@ -92,6 +98,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         };
         break;
       default:
+        setState(() {
+          _isLoading = false;
+        });
         return;
     }
 
@@ -100,6 +109,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
       body: jsonEncode(body),
     );
+
+    setState(() {
+      _isLoading = false;
+    });
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       _showSnackbar('Cadastro realizado com sucesso!', Colors.green);
@@ -122,61 +135,64 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 40),
-            CustomTitleWidget(title: widget.title),
-            SizedBox(height: 20),
-            ...widget.fields.map((field) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: CustomInputField(
-                  labelText: field['label'],
-                  keyboardType: field['keyboardType'],
-                  controller: field['controller'],
-                ),
-              );
-            }).toList(),
-            if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno')
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(labelText: 'Faculdade'),
-                value: selectedFacultyId,
-                items: faculties.map((faculty) {
-                  return DropdownMenuItem<int>(
-                    value: faculty['id'],
-                    child: Text(faculty['name']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedFacultyId = value;
-                  });
-                },
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 40),
+                  CustomTitleWidget(title: widget.title),
+                  SizedBox(height: 20),
+                  ...widget.fields.where((field) => field['label'] != 'Faculdade').map((field) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: CustomInputField(
+                        labelText: field['label'],
+                        keyboardType: field['keyboardType'],
+                        controller: field['controller'],
+                      ),
+                    );
+                  }).toList(),
+                  if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno')
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: CustomDropdownField(
+                        labelText: 'Faculdade',
+                        value: selectedFacultyId,
+                        items: faculties.map((faculty) {
+                          return DropdownMenuItem<int>(
+                            value: faculty['id'],
+                            child: Text(faculty['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedFacultyId = value;
+                          });
+                        },
+                      ),
+                    ),
+                  Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ButtonThree(
+                        buttonText: 'Cancelar',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        backgroundColor: Color(0xFFDD4425),
+                      ),
+                      ButtonThree(
+                        buttonText: 'Salvar',
+                        onPressed: _saveForm,
+                        backgroundColor: Color(0xFF395BC7),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ButtonThree(
-                  buttonText: 'Cancelar',
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  backgroundColor: Color(0xFFDD4425),
-                ),
-                ButtonThree(
-                  buttonText: 'Salvar',
-                  onPressed: () {
-                    _saveForm();
-                  },
-                  backgroundColor: Color(0xFF395BC7),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-          ],
-        ),
       ),
       bottomNavigationBar: NavBarAdmin(
         currentIndex: 1,
