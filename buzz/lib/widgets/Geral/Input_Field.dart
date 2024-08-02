@@ -5,12 +5,14 @@ class CustomInputField extends StatefulWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final TextEditingController controller;
+  final bool enabled;
 
   CustomInputField({
     required this.labelText,
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     required this.controller,
+    this.enabled = true,
   });
 
   @override
@@ -45,6 +47,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
             controller: widget.controller,
             obscureText: _obscureText,
             keyboardType: widget.keyboardType,
+            enabled: widget.enabled,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFFD9D9D9),

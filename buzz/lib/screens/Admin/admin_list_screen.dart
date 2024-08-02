@@ -17,7 +17,7 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  List<Map<String, String>> items = [];
+  List<Map<String, dynamic>> items = [];
   bool _isLoading = true;
 
   @override
@@ -64,11 +64,8 @@ class _ListScreenState extends State<ListScreen> {
           } else {
             return true;
           }
-        }).map<Map<String, String>>((item) {
-          return {
-            'primary': item['name'] ?? '',
-            'secondary': item.containsKey('email') ? item['email'] : '',
-          };
+        }).map<Map<String, dynamic>>((item) {
+          return item as Map<String, dynamic>;
         }).toList();
         _isLoading = false;
       });
@@ -87,17 +84,17 @@ class _ListScreenState extends State<ListScreen> {
     switch (widget.title) {
       case 'Cadastro de Motorista':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
+          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
           {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController()},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
+          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
           {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
         ];
         break;
       case 'Cadastro de Aluno':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
+          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
           {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController()},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
+          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
           {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
           {'label': 'Curso', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
           {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
@@ -112,8 +109,8 @@ class _ListScreenState extends State<ListScreen> {
       case 'Cadastro de Ônibus':
         fields = [
           {'label': 'Modelo', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Placa', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Capacidade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
+          {'label': 'Placa', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
+          {'label': 'Capacidade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
         ];
         break;
       case 'Cadastro de Faculdades':
@@ -128,6 +125,60 @@ class _ListScreenState extends State<ListScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => GenericFormScreen(title: widget.title, fields: fields)),
+    );
+
+    if (result == true) {
+      _fetchItems();
+    }
+  }
+
+  void _navigateToEditForm(BuildContext context, Map<String, dynamic> item) async {
+    List<Map<String, dynamic>> fields;
+
+    switch (widget.title) {
+      case 'Cadastro de Motorista':
+        fields = [
+          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? ''), 'enabled': false},
+          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController(text: item['email'] ?? '')},
+          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['cpf'] ?? ''), 'enabled': false},
+          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController(text: item['phone'] ?? '')},
+        ];
+        break;
+      case 'Cadastro de Aluno':
+        fields = [
+          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? ''), 'enabled': false},
+          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController(text: item['email'] ?? '')},
+          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['cpf'] ?? ''), 'enabled': false},
+          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController(text: item['phone'] ?? '')},
+          {'label': 'Curso', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['course'] ?? '')},
+          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['faculty_id'] != null ? item['faculty_id'].toString() : '')},
+        ];
+        break;
+      case 'Cadastro de Pontos de Ônibus':
+        fields = [
+          {'label': 'Nome do Ponto', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
+          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['faculty_id'] != null ? item['faculty_id'].toString() : '')},
+        ];
+        break;
+      case 'Cadastro de Ônibus':
+        fields = [
+          {'label': 'Modelo', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
+          {'label': 'Placa', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['registration_number'] ?? ''), 'enabled': false},
+          {'label': 'Capacidade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['capacity'] != null ? item['capacity'].toString() : ''), 'enabled': false},
+        ];
+        break;
+      case 'Cadastro de Faculdades':
+        fields = [
+          {'label': 'Nome da Faculdade', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
+        ];
+        break;
+      default:
+        fields = [];
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => GenericFormScreen(title: widget.title, fields: fields, isEdit: true, id: item['id'])),
     );
 
     if (result == true) {
@@ -150,13 +201,19 @@ class _ListScreenState extends State<ListScreen> {
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final item = items[index];
+                      String secondaryText;
+                      if (widget.title == 'Cadastro de Pontos de Ônibus') {
+                        secondaryText = item['faculty_name'] ?? 'Faculdade não encontrada';
+                      } else if (widget.title == 'Cadastro de Ônibus') {
+                        secondaryText = item['registration_number'] ?? 'Placa não encontrada';
+                      } else {
+                        secondaryText = item['email'] ?? '';
+                      }
                       return Center(
                         child: ListItem(
-                          primaryText: item['primary']!,
-                          secondaryText: item['secondary']!,
-                          onEdit: () {
-                            // Lógica para editar o item
-                          },
+                          primaryText: item['name'] ?? '',
+                          secondaryText: secondaryText,
+                          onEdit: () => _navigateToEditForm(context, item),
                           onDelete: () {
                             // Lógica para excluir o item
                           },

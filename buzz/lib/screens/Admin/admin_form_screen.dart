@@ -10,8 +10,10 @@ import 'dart:convert';
 class GenericFormScreen extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> fields;
+  final bool isEdit;
+  final int? id;
 
-  GenericFormScreen({required this.title, required this.fields});
+  GenericFormScreen({required this.title, required this.fields, this.isEdit = false, this.id});
 
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
@@ -21,12 +23,24 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   List<Map<String, dynamic>> faculties = [];
   int? selectedFacultyId;
   bool _isLoading = false;
+  bool _isFacultyLoading = true;
 
   @override
   void initState() {
     super.initState();
     if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno') {
-      _fetchFaculties();
+      _fetchFaculties().then((_) {
+        if (widget.isEdit) {
+          selectedFacultyId = widget.fields.firstWhere((field) => field['label'] == 'Faculdade')['controller'].text.isNotEmpty
+              ? int.parse(widget.fields.firstWhere((field) => field['label'] == 'Faculdade')['controller'].text)
+              : null;
+        }
+        setState(() {
+          _isFacultyLoading = false;
+        });
+      });
+    } else {
+      _isFacultyLoading = false;
     }
   }
 
@@ -54,6 +68,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     switch (widget.title) {
       case 'Cadastro de Motorista':
         apiUrl = 'http://127.0.0.1:8000/users/';
+        if (widget.isEdit) {
+          apiUrl += '${widget.id}/';
+        }
         body = {
           'name': widget.fields[0]['controller'].text,
           'email': widget.fields[1]['controller'].text,
@@ -65,6 +82,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case 'Cadastro de Aluno':
         apiUrl = 'http://127.0.0.1:8000/users/';
+        if (widget.isEdit) {
+          apiUrl += '${widget.id}/';
+        }
         body = {
           'name': widget.fields[0]['controller'].text,
           'email': widget.fields[1]['controller'].text,
@@ -78,6 +98,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case 'Cadastro de Pontos de Ônibus':
         apiUrl = 'http://127.0.0.1:8000/bus_stops/';
+        if (widget.isEdit) {
+          apiUrl += '${widget.id}/';
+        }
         body = {
           'name': widget.fields[0]['controller'].text,
           'faculty_id': selectedFacultyId,
@@ -85,6 +108,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case 'Cadastro de Ônibus':
         apiUrl = 'http://127.0.0.1:8000/buses/';
+        if (widget.isEdit) {
+          apiUrl += '${widget.id}/';
+        }
         body = {
           'registration_number': widget.fields[1]['controller'].text,
           'name': widget.fields[0]['controller'].text,
@@ -93,6 +119,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case 'Cadastro de Faculdades':
         apiUrl = 'http://127.0.0.1:8000/faculties/';
+        if (widget.isEdit) {
+          apiUrl += '${widget.id}/';
+        }
         body = {
           'name': widget.fields[0]['controller'].text,
         };
@@ -104,18 +133,24 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         return;
     }
 
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode(body),
-    );
+    final response = await (widget.isEdit
+        ? http.put(
+            Uri.parse(apiUrl),
+            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+            body: jsonEncode(body),
+          )
+        : http.post(
+            Uri.parse(apiUrl),
+            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+            body: jsonEncode(body),
+          ));
 
     setState(() {
       _isLoading = false;
     });
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      _showSnackbar('Cadastro realizado com sucesso!', Colors.green);
+      _showSnackbar(widget.isEdit ? 'Cadastro atualizado com sucesso!' : 'Cadastro realizado com sucesso!', Colors.green);
       Navigator.pop(context, true); // Retorna true para indicar que o cadastro foi bem-sucedido
     } else {
       _showSnackbar('Erro ao realizar o cadastro: ${response.body}', Colors.red);
@@ -135,7 +170,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _isLoading
+        child: _isFacultyLoading || _isLoading
             ? Center(child: CircularProgressIndicator())
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -150,6 +185,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                         labelText: field['label'],
                         keyboardType: field['keyboardType'],
                         controller: field['controller'],
+                        enabled: field['enabled'] ?? true,
                       ),
                     );
                   }).toList(),
