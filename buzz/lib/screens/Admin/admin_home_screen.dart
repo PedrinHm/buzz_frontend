@@ -1,4 +1,3 @@
-import 'package:buzz/models/list_data.dart';
 import 'package:buzz/screens/Admin/admin_list_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,14 +10,13 @@ class AdminHomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             AdminButtonTwo(
-              buttonText: listData[0].title,
+              buttonText: 'Cadastro de Motorista',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ListScreen(
-                      title: listData[0].title,
-                      items: listData[0].items,
+                      title: 'Cadastro de Motorista',
                     ),
                   ),
                 );
@@ -26,14 +24,13 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             AdminButtonTwo(
-              buttonText: listData[1].title,
+              buttonText: 'Cadastro de Aluno',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ListScreen(
-                      title: listData[1].title,
-                      items: listData[1].items,
+                      title: 'Cadastro de Aluno',
                     ),
                   ),
                 );
@@ -41,14 +38,13 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             AdminButtonTwo(
-              buttonText: listData[2].title,
+              buttonText: 'Cadastro de Pontos de Ônibus',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ListScreen(
-                      title: listData[2].title,
-                      items: listData[2].items,
+                      title: 'Cadastro de Pontos de Ônibus',
                     ),
                   ),
                 );
@@ -56,14 +52,13 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             AdminButtonTwo(
-              buttonText: listData[3].title,
+              buttonText: 'Cadastro de Ônibus',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ListScreen(
-                      title: listData[3].title,
-                      items: listData[3].items,
+                      title: 'Cadastro de Ônibus',
                     ),
                   ),
                 );
@@ -71,20 +66,19 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             AdminButtonTwo(
-              buttonText: listData[4].title,
+              buttonText: 'Cadastro de Faculdades',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ListScreen(
-                      title: listData[4].title,
-                      items: listData[4].items,
+                      title: 'Cadastro de Faculdades',
                     ),
                   ),
                 );
               },
             ),
-            // Adicione mais botões para outras listas
+            // Adicione mais botões para outras listas conforme necessário
           ],
         ),
       ),

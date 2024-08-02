@@ -6,23 +6,28 @@ class ListItem extends StatelessWidget {
   final String secondaryText;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final int index;
 
   ListItem({
     required this.primaryText,
     required this.secondaryText,
     required this.onEdit,
     required this.onDelete,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Alterna entre cinza claro e cinza escuro
+    final Color backgroundColor = index % 2 == 0 ? Colors.grey[300]! : Colors.grey[400]!;
+
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.90,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8.0),
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          color: Color(0xFF395BC7),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Row(
@@ -35,7 +40,7 @@ class ListItem extends StatelessWidget {
                   primaryText,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.w600, // SemiBold
                     fontFamily: 'Inter',
                   ),
@@ -45,7 +50,7 @@ class ListItem extends StatelessWidget {
                   secondaryText,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white,
+                    color: Colors.black,
                     fontFamily: 'Inter',
                   ),
                 ),
@@ -54,11 +59,11 @@ class ListItem extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(PhosphorIcons.trashSimple, color: Colors.white),
+                  icon: Icon(PhosphorIcons.trashSimple, color: Colors.black),
                   onPressed: onDelete,
                 ),
                 IconButton(
-                  icon: Icon(PhosphorIcons.pencilSimple, color: Colors.white),
+                  icon: Icon(PhosphorIcons.pencilSimple, color: Colors.black),
                   onPressed: onEdit,
                 ),
               ],
