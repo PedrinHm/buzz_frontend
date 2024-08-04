@@ -62,7 +62,7 @@ class _ListScreenState extends State<ListScreen> {
           } else if (widget.title == 'Cadastro de Aluno') {
             return item['user_type_id'] == 1;
           } else {
-            return true;
+            return item['system_deleted'] == 0; // Filtra itens com system_deleted == 0
           }
         }).map<Map<String, dynamic>>((item) {
           return item as Map<String, dynamic>;
@@ -186,6 +186,46 @@ class _ListScreenState extends State<ListScreen> {
     }
   }
 
+  Future<void> _deleteItem(int id) async {
+    String apiUrl;
+    switch (widget.title) {
+      case 'Cadastro de Motorista':
+        apiUrl = 'http://127.0.0.1:8000/users/$id/';
+        break;
+      case 'Cadastro de Aluno':
+        apiUrl = 'http://127.0.0.1:8000/users/$id/';
+        break;
+      case 'Cadastro de Pontos de Ônibus':
+        apiUrl = 'http://127.0.0.1:8000/bus_stops/$id/';
+        break;
+      case 'Cadastro de Ônibus':
+        apiUrl = 'http://127.0.0.1:8000/buses/$id/';
+        break;
+      case 'Cadastro de Faculdades':
+        apiUrl = 'http://127.0.0.1:8000/faculties/$id/';
+        break;
+      default:
+        return;
+    }
+
+    final response = await http.delete(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      _showSnackbar('Registro excluído com sucesso!', Colors.green);
+      _fetchItems();
+    } else {
+      _showSnackbar('Erro ao excluir registro: ${response.body}', Colors.red);
+    }
+  }
+
+  void _showSnackbar(String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,10 +254,8 @@ class _ListScreenState extends State<ListScreen> {
                           primaryText: item['name'] ?? '',
                           secondaryText: secondaryText,
                           onEdit: () => _navigateToEditForm(context, item),
-                          onDelete: () {
-                            // Lógica para excluir o item
-                          },
-                          index: index, // Passa o índice aqui
+                          onDelete: () => _deleteItem(item['id']),
+                          index: index,
                         ),
                       );
                     },
