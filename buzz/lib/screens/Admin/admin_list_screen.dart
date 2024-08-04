@@ -1,4 +1,5 @@
 import 'package:buzz/screens/Admin/admin_form_screen.dart';
+import 'package:buzz/widgets/Geral/Custom_pop_up';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';
@@ -187,35 +188,52 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Future<void> _deleteItem(int id) async {
-    String apiUrl;
-    switch (widget.title) {
-      case 'Cadastro de Motorista':
-        apiUrl = 'http://127.0.0.1:8000/users/$id/';
-        break;
-      case 'Cadastro de Aluno':
-        apiUrl = 'http://127.0.0.1:8000/users/$id/';
-        break;
-      case 'Cadastro de Pontos de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/bus_stops/$id/';
-        break;
-      case 'Cadastro de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/buses/$id/';
-        break;
-      case 'Cadastro de Faculdades':
-        apiUrl = 'http://127.0.0.1:8000/faculties/$id/';
-        break;
-      default:
-        return;
-    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomPopup(
+          message: 'Deseja realmente excluir este item?',
+          confirmText: 'Confirmar',
+          cancelText: 'Cancelar',
+          onConfirm: () async {
+            String apiUrl;
+            switch (widget.title) {
+              case 'Cadastro de Motorista':
+                apiUrl = 'http://127.0.0.1:8000/users/$id/';
+                break;
+              case 'Cadastro de Aluno':
+                apiUrl = 'http://127.0.0.1:8000/users/$id/';
+                break;
+              case 'Cadastro de Pontos de Ônibus':
+                apiUrl = 'http://127.0.0.1:8000/bus_stops/$id/';
+                break;
+              case 'Cadastro de Ônibus':
+                apiUrl = 'http://127.0.0.1:8000/buses/$id/';
+                break;
+              case 'Cadastro de Faculdades':
+                apiUrl = 'http://127.0.0.1:8000/faculties/$id/';
+                break;
+              default:
+                return;
+            }
 
-    final response = await http.delete(Uri.parse(apiUrl));
+            final response = await http.delete(Uri.parse(apiUrl));
 
-    if (response.statusCode == 200) {
-      _showSnackbar('Registro excluído com sucesso!', Colors.green);
-      _fetchItems();
-    } else {
-      _showSnackbar('Erro ao excluir registro: ${response.body}', Colors.red);
-    }
+            if (response.statusCode == 200) {
+              _showSnackbar('Registro excluído com sucesso!', Colors.green);
+              _fetchItems();
+            } else {
+              _showSnackbar('Erro ao excluir registro: ${response.body}', Colors.red);
+            }
+
+            Navigator.of(context).pop(); // Fecha o diálogo após a exclusão
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Fecha o diálogo sem excluir
+          },
+        );
+      },
+    );
   }
 
   void _showSnackbar(String message, Color color) {
