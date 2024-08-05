@@ -32,19 +32,20 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = _getScreensForUser(widget.usuario.tipoUsuario);
-
-    // Verifica se o motorista tem uma viagem ativa
-    if (widget.usuario.tipoUsuario == 'driver') {
-      Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
-    }
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      // Verifica se o motorista tem uma viagem ativa ao inicializar a tela
+      if (widget.usuario.tipoUsuario == 'driver') {
+        Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
+      }
+    });
   }
 
   List<Widget> _getScreensForUser(String tipoUsuario) {
     switch (tipoUsuario) {
       case 'student':
         return [
-          StudentTripScreenController(),
-          StudentHomeScreenController(),
+          StudentTripScreenController(), // Tela de viagem
+          StudentHomeScreenController(), // Tela principal
           StudentProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             studentName: 'Pedro Henrique Mendes',
@@ -56,11 +57,8 @@ class _MainScreenState extends State<MainScreen> {
         ];
       case 'driver':
         return [
-          DriverStudentScreenController(),
-          DriverScreenController(
-            driverId: widget.usuario.id,
-            busId: 1, // Substitua pelo ID real do ônibus
-          ),
+          DriverStudentScreenController(driverId: widget.usuario.id),
+          DriverScreenController(driverId: widget.usuario.id),
           DriverProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
@@ -71,7 +69,7 @@ class _MainScreenState extends State<MainScreen> {
       case 'admin':
         _currentIndex = 0;
         return [
-          AdminHomeScreen(),
+          AdminHomeScreen(), // Home Screen
           AdminProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
