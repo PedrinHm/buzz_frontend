@@ -1,4 +1,4 @@
-import 'package:buzz/widgets/Driver/Bus_Selection_Dialog';
+import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 
@@ -52,7 +52,7 @@ class DriverStudentInactiveScreen extends StatelessWidget {
               child: ButtonThree(
                 buttonText: 'Iniciar Viagem',
                 onPressed: () => _showBusSelectionDialog(context),
-                backgroundColor: Colors.blue,
+                backgroundColor: Color(0xFF395BC7),
               ),
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
+import 'package:buzz/widgets/Student/bus_details_button.dart'; // Importe o componente personalizado
 
 class BusSelectionDialog extends StatelessWidget {
   final Function(int) onBusSelected;
@@ -22,8 +23,12 @@ class BusSelectionDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent, // Ajuste na cor de fundo
       child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85), // Ajuste na opacidade
+          borderRadius: BorderRadius.circular(16), // Bordas arredondadas para o container
+        ),
         padding: EdgeInsets.all(16.0),
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _fetchAvailableBuses(),
@@ -51,12 +56,13 @@ class BusSelectionDialog extends StatelessWidget {
                         final bus = buses[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
-                          child: ListTile(
-                            title: Text(bus['registration_number']),
-                            subtitle: Text('Driver: ${bus['name']}'),
-                            onTap: () {
-                              onBusSelected(bus['id']);
-                            },
+                          child: BusDetailsButton(
+                            onPressed: () => onBusSelected(bus['id']),
+                            busNumber: bus['registration_number'],
+                            driverName: 'Driver: ${bus['name']}',
+                            capacity: 56, 
+                            availableSeats: 10, 
+                            color: Color(0xFF395BC7), 
                           ),
                         );
                       },

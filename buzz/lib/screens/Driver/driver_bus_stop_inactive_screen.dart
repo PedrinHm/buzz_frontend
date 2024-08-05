@@ -1,10 +1,29 @@
+import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 
 class DriverBusStopInactiveScreen extends StatelessWidget {
-  final VoidCallback startTrip;
+  final Future<void> Function(int driverId, int busId) startTrip;
+  final int driverId;
 
-  DriverBusStopInactiveScreen({required this.startTrip});
+  DriverBusStopInactiveScreen({required this.startTrip, required this.driverId});
+
+  Future<void> _showBusSelectionDialog(BuildContext context) async {
+    final busId = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return BusSelectionDialog(
+          onBusSelected: (selectedBusId) {
+            Navigator.of(context).pop(selectedBusId);
+          },
+        );
+      },
+    );
+
+    if (busId != null) {
+      await startTrip(driverId, busId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +51,8 @@ class DriverBusStopInactiveScreen extends StatelessWidget {
             child: Center(
               child: ButtonThree(
                 buttonText: 'Iniciar Viagem',
-                onPressed: startTrip,
-                backgroundColor: Colors.blue,
+                onPressed: () => _showBusSelectionDialog(context),
+                backgroundColor: Color(0xFF395BC7),
               ),
             ),
           ),
