@@ -4,7 +4,7 @@ import 'package:buzz/screens/main_screen.dart';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
-import 'package:buzz/models/usuario.dart'; 
+import 'package:buzz/models/usuario.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async'; // Import para usar Timer
@@ -57,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         final String status = responseBody['status'];
         final int userTypeId = responseBody['user_type_id'];
+        final int userId = responseBody['id'];  // Extraindo o ID do usuário da resposta
 
         print('Login successful. User type ID: $userTypeId');
         if (status == 'success') {
@@ -64,16 +65,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
           switch (userTypeId) {
             case 1:
-              usuario = Usuario(tipoUsuario: 'student');
+              usuario = Usuario(tipoUsuario: 'student', id: userId);
               break;
             case 2:
-              usuario = Usuario(tipoUsuario: 'driver');
+              usuario = Usuario(tipoUsuario: 'driver', id: userId);
               break;
             case 3:
-              usuario = Usuario(tipoUsuario: 'admin');
+              usuario = Usuario(tipoUsuario: 'admin', id: userId);
               break;
             default:
-              usuario = Usuario(tipoUsuario: 'unknown');
+              usuario = Usuario(tipoUsuario: 'unknown', id: userId);
           }
 
           Navigator.push(

@@ -11,7 +11,8 @@ import 'package:buzz/screens/Driver/driver_profile_screen.dart';
 import 'package:buzz/screens/Admin/admin_home_screen.dart';
 import 'package:buzz/screens/Admin/admin_profile_screen.dart';
 import 'package:buzz/models/usuario.dart';
-
+import 'package:provider/provider.dart';
+import 'package:buzz/controllers/trip_controller.dart';
 
 class MainScreen extends StatefulWidget {
   final Usuario usuario;
@@ -31,27 +32,35 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = _getScreensForUser(widget.usuario.tipoUsuario);
+
+    // Verifica se o motorista tem uma viagem ativa
+    if (widget.usuario.tipoUsuario == 'driver') {
+      Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
+    }
   }
 
   List<Widget> _getScreensForUser(String tipoUsuario) {
     switch (tipoUsuario) {
       case 'student':
         return [
-          StudentTripScreenController(), // Tela de viagem
-          StudentHomeScreenController(), // Tela principal
+          StudentTripScreenController(),
+          StudentHomeScreenController(),
           StudentProfileScreen(
-            imagePath: 'assets/images/profliepic.jpeg', 
+            imagePath: 'assets/images/profliepic.jpeg',
             studentName: 'Pedro Henrique Mendes',
-            email: 'pedrohm@hotmail.com', 
-            cpf: '11111111111', 
-            course: 'Eng. Software', 
+            email: 'pedrohm@hotmail.com',
+            cpf: '11111111111',
+            course: 'Eng. Software',
             university: 'Universidade de Rio Verde',
           ),
         ];
       case 'driver':
         return [
           DriverStudentScreenController(),
-          DriverScreenController(),
+          DriverScreenController(
+            driverId: widget.usuario.id,
+            busId: 1, // Substitua pelo ID real do ônibus
+          ),
           DriverProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
@@ -62,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
       case 'admin':
         _currentIndex = 0;
         return [
-          AdminHomeScreen(), // Home Screen
+          AdminHomeScreen(),
           AdminProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
