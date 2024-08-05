@@ -6,16 +6,16 @@ class BusDetailsButton extends StatelessWidget {
   final String busNumber;
   final String driverName;
   final int capacity;
-  final int availableSeats;
-  final Color color; // Adiciona o parâmetro de cor
+  final int? availableSeats; // Fazendo este campo opcional
+  final Color color;
 
   BusDetailsButton({
     required this.onPressed,
     required this.busNumber,
     required this.driverName,
     required this.capacity,
-    required this.availableSeats,
-    this.color = const Color(0xFF395BC7), // Define uma cor padrão
+    this.availableSeats, // Removendo o 'required' para tornar opcional
+    this.color = const Color(0xFF395BC7), // Cor padrão
   });
 
   @override
@@ -24,11 +24,11 @@ class BusDetailsButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // Define 90% da largura da tela
-          height: 130, // Altura fixa de 130px
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: 130,
           padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
           decoration: BoxDecoration(
-            color: color, // Usa a cor passada como parâmetro
+            color: color,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -54,7 +54,7 @@ class BusDetailsButton extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
+                children: [
                   Text(
                     'Ônibus',
                     style: TextStyle(
@@ -84,13 +84,14 @@ class BusDetailsButton extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  Text(
-                    'Vagas disponíveis: $availableSeats',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
+                  if (availableSeats != null) // Condicional para exibir ou não as vagas disponíveis
+                    Text(
+                      'Vagas disponíveis: $availableSeats',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],

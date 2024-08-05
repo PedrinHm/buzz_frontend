@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
-import 'package:buzz/widgets/Student/bus_details_button.dart'; // Importe o componente personalizado
+import 'package:buzz/widgets/Student/bus_details_button.dart';
 
 class BusSelectionDialog extends StatelessWidget {
   final Function(int) onBusSelected;
@@ -23,11 +23,11 @@ class BusSelectionDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
-      backgroundColor: Colors.transparent, // Ajuste na cor de fundo
+      backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.85), // Ajuste na opacidade
-          borderRadius: BorderRadius.circular(16), // Bordas arredondadas para o container
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(16),
         ),
         padding: EdgeInsets.all(16.0),
         child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -60,9 +60,8 @@ class BusSelectionDialog extends StatelessWidget {
                             onPressed: () => onBusSelected(bus['id']),
                             busNumber: bus['registration_number'],
                             driverName: 'Driver: ${bus['name']}',
-                            capacity: 56, 
-                            availableSeats: 10, 
-                            color: Color(0xFF395BC7), 
+                            capacity: bus['capacity'], // Usando a capacidade diretamente do objeto bus
+                            color: Color(0xFF395BC7),
                           ),
                         );
                       },
