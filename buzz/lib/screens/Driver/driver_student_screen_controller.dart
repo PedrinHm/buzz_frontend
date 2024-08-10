@@ -13,12 +13,14 @@ class DriverStudentScreenController extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
-        return tripController.hasActiveTrip
-            ? DriverStudentActiveScreen(endTrip: tripController.endTrip)
-            : DriverStudentInactiveScreen(
-                startTrip: tripController.initiateTrip,
-                driverId: driverId,
-              );
+        if (tripController.hasActiveTrip && tripController.activeTripId != null) {
+          return DriverStudentActiveScreen(
+            endTrip: tripController.endTrip,
+            tripId: tripController.activeTripId!, 
+          );
+        } else {
+          return Center(child: Text("No active trip found."));
+        }
       },
     );
   }

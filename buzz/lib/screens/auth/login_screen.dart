@@ -7,7 +7,7 @@ import 'package:buzz/widgets/Geral/Text_Button.dart';
 import 'package:buzz/models/usuario.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async'; // Import para usar Timer
+import 'dart:async'; 
 
 class LoginScreen extends StatefulWidget {
   @override
