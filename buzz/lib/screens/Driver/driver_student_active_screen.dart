@@ -5,39 +5,42 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DriverStudentActiveScreen extends StatelessWidget {
+class DriverStudentActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
-  final int tripId; 
+  final int tripId;
 
   DriverStudentActiveScreen({required this.endTrip, required this.tripId});
 
-  final List<Map<String, String>> busStops = [
-    {'name': 'Ponto 1', 'status': 'Já passou'},
-    {'name': 'Ponto 2', 'status': 'No ponto'},
-    {'name': 'ponto 3', 'status': 'A caminho'},
-  ];
+  @override
+  _DriverStudentActiveScreenState createState() => _DriverStudentActiveScreenState();
+}
+
+class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
+  List<Map<String, String>> busStops = []; // Lista modificável
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: FutureBuilder<List<Map<String, String>>>(
-          future: fetchStudents(tripId),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: fetchData(widget.tripId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text('Erro ao carregar dados.'));
+              return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
             }
 
-            var students = snapshot.data!;
+            var students = snapshot.data!['students'] as List<Map<String, String>>;
+            var busStops = snapshot.data!['busStops'] as List<Map<String, String>>;
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 20),
-                CustomTitleWidget(title: 'Viagem Atual - Alunos'),
+                CustomTitleWidget(title: 'Viagem Atual - Alunos e Pontos de Ônibus'),
                 SizedBox(height: 20),
-                ..._buildBusStopSections(students),
+                ..._buildBusStopSections(busStops, students),
               ],
             );
           },
@@ -46,7 +49,7 @@ class DriverStudentActiveScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildBusStopSections(List<Map<String, String>> students) {
+  List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
     List<Widget> sections = [];
     for (var stop in busStops) {
       sections.add(Column(
@@ -80,6 +83,21 @@ class DriverStudentActiveScreen extends StatelessWidget {
   }
 }
 
+Future<Map<String, dynamic>> fetchData(int tripId) async {
+  var studentsFuture = fetchStudents(tripId);
+  var busStopsFuture = fetchBusStops(tripId);
+
+  try {
+    var results = await Future.wait([studentsFuture, busStopsFuture]);
+    return {
+      'students': results[0],
+      'busStops': results[1],
+    };
+  } catch (e) {
+    throw Exception('Failed to load data: $e');
+  }
+}
+
 Future<List<Map<String, String>>> fetchStudents(int tripId) async {
   var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/details');
   var response = await http.get(url);
@@ -93,5 +111,19 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
     }).toList().cast<Map<String, String>>();  // Forçando o cast para List<Map<String, String>>
   } else {
     throw Exception('Failed to load student trip details');
+  }
+}
+
+Future<List<Map<String, String>>> fetchBusStops(int tripId) async {
+  var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/bus_stops');
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    return data.map((item) => {
+      'name': item['name'] as String,
+      'status': item['status'] as String,
+    }).toList().cast<Map<String, String>>();
+  } else {
+    throw Exception('Failed to load bus stop details');
   }
 }
