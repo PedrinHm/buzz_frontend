@@ -13,18 +13,34 @@ class DriverScreenController extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
-        return tripController.hasActiveTrip
-            ? DriverBusStopActiveScreen(
-                endTrip: () async {
-                  if (tripController.activeTripId != null) {
-                    await tripController.completeTrip(tripController.activeTripId!);
-                  }
-                },
-              )
-            : DriverBusStopInactiveScreen(
-                startTrip: tripController.initiateTrip,
-                driverId: driverId,
-              );
+        if (tripController.hasActiveTrip && tripController.activeTripId != null) {
+          return DriverBusStopActiveScreen(
+            endTrip: () async {
+              try {
+                if (tripController.activeTripId != null) {
+                  await tripController.completeTrip(tripController.activeTripId!);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Trip completed successfully"),
+                  ));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("No active trip ID found"),
+                  ));
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Failed to complete trip: $e"),
+                ));
+              }
+            },
+            tripId: tripController.activeTripId!,  // Passar o tripId para a tela
+          );
+        } else {
+          return DriverBusStopInactiveScreen(
+            startTrip: tripController.initiateTrip,
+            driverId: driverId,
+          );
+        }
       },
     );
   }

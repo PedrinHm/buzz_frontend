@@ -16,14 +16,27 @@ class DriverStudentActiveScreen extends StatefulWidget {
 }
 
 class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
-  List<Map<String, String>> busStops = []; // Lista modificável
+  Future<Map<String, dynamic>>? _futureData;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureData = fetchData(widget.tripId);
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _futureData = fetchData(widget.tripId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
         child: FutureBuilder<Map<String, dynamic>>(
-          future: fetchData(widget.tripId),
+          future: _futureData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -40,7 +53,35 @@ class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
                 SizedBox(height: 20),
                 CustomTitleWidget(title: 'Viagem Atual - Alunos e Pontos de Ônibus'),
                 SizedBox(height: 20),
-                ..._buildBusStopSections(busStops, students),
+                if (busStops.isEmpty && students.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Nenhum ponto de ônibus ou aluno encontrado.',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  )
+                else ...[
+                  if (busStops.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Nenhum ponto de ônibus encontrado.',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  if (students.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Nenhum aluno encontrado.',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  if (busStops.isNotEmpty)
+                    ..._buildBusStopSections(busStops, students),
+                ],
               ],
             );
           },
@@ -84,17 +125,19 @@ class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
 }
 
 Future<Map<String, dynamic>> fetchData(int tripId) async {
-  var studentsFuture = fetchStudents(tripId);
-  var busStopsFuture = fetchBusStops(tripId);
-
   try {
+    var studentsFuture = fetchStudents(tripId);
+    var busStopsFuture = fetchBusStops(tripId);
     var results = await Future.wait([studentsFuture, busStopsFuture]);
     return {
       'students': results[0],
       'busStops': results[1],
     };
   } catch (e) {
-    throw Exception('Failed to load data: $e');
+    return {
+      'students': [],
+      'busStops': [],
+    };
   }
 }
 
@@ -106,9 +149,11 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
     return data.map((item) => {
       'name': item['student_name'] as String,
       'status': item['student_status'] as String,
-      'imagePath': 'assets/images/profilepic.jpeg',  // Assuming this path is correct
+      'imagePath': 'assets/images/profilepic.jpeg',  
       'busStop': item['bus_stop_name'] as String,
-    }).toList().cast<Map<String, String>>();  // Forçando o cast para List<Map<String, String>>
+    }).toList().cast<Map<String, String>>();
+  } else if (response.statusCode == 404) {
+    return [];
   } else {
     throw Exception('Failed to load student trip details');
   }
@@ -123,6 +168,8 @@ Future<List<Map<String, String>>> fetchBusStops(int tripId) async {
       'name': item['name'] as String,
       'status': item['status'] as String,
     }).toList().cast<Map<String, String>>();
+  } else if (response.statusCode == 404) {
+    return [];
   } else {
     throw Exception('Failed to load bus stop details');
   }

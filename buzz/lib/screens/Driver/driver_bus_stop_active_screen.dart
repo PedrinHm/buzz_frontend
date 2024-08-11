@@ -1,24 +1,49 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
-import 'package:flutter/material.dart';
 
-class DriverBusStopActiveScreen extends StatelessWidget {
+class DriverBusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
+  final int tripId;
 
-  DriverBusStopActiveScreen({required this.endTrip});
+  DriverBusStopActiveScreen({required this.endTrip, required this.tripId});
 
-  final List<Map<String, String>> tripBusStops = [
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Já passou'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'No ponto'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'Próximo ponto'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-    {'name': 'Universidade de Rio Verde - Bloco I', 'status': 'A caminho'},
-  ];
+  @override
+  _DriverBusStopActiveScreenState createState() => _DriverBusStopActiveScreenState();
+}
+
+class _DriverBusStopActiveScreenState extends State<DriverBusStopActiveScreen> {
+  List<Map<String, String>> tripBusStops = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBusStops().then((data) {
+      setState(() {
+        tripBusStops = data;
+      });
+    });
+  }
+
+Future<List<Map<String, String>>> fetchBusStops() async {
+  var url = Uri.parse('http://127.0.0.1:8000/trips/${widget.tripId}/bus_stops'); 
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    return data.map((item) => {
+      'name': item['name'] as String,
+      'status': item['status'] as String,
+    }).toList().cast<Map<String, String>>();
+  } else if (response.statusCode == 404) {
+    return [];
+  } else {
+    throw Exception('Failed to load bus stop details');
+  }
+}
+
 
   bool _allStopsPassed() {
     return tripBusStops.every((stop) => stop['status'] == 'Já passou');
@@ -30,29 +55,34 @@ class DriverBusStopActiveScreen extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(height: 20),
-          Center(
-            child: CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
-          ),
+          CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
           SizedBox(height: 20),
           Expanded(
-            child: ListView.builder(
-              itemCount: tripBusStops.length,
-              itemBuilder: (context, index) {
-                final data = tripBusStops[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: TripBusStop(
-                    onPressed: () {
-                      // Adicione a ação a ser executada ao pressionar
+            child: tripBusStops.isEmpty
+                ? Center(
+                    child: Text(
+                      'Nenhum ponto de ônibus encontrado.',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: tripBusStops.length,
+                    itemBuilder: (context, index) {
+                      final stop = tripBusStops[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: TripBusStop(
+                          onPressed: () {
+                            // Add action for each bus stop
+                          },
+                          busStopName: stop['name']!,
+                          busStopStatus: stop['status']!,
+                        ),
+                      );
                     },
-                    busStopName: data['name']!,
-                    busStopStatus: data['status']!,
                   ),
-                );
-              },
-            ),
           ),
-          if (!_allStopsPassed())
+          if (!_allStopsPassed() && tripBusStops.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -64,7 +94,6 @@ class DriverBusStopActiveScreen extends StatelessWidget {
                       backgroundColor: Color(0xFFCBB427),
                       onPressed: () {
                         print('Ônibus com problema Pressionado');
-                        // Adicione a lógica para sinalizar problema no ônibus aqui
                       },
                     ),
                   ),
@@ -75,21 +104,20 @@ class DriverBusStopActiveScreen extends StatelessWidget {
                       backgroundColor: Color(0xFF3E9B4F),
                       onPressed: () {
                         print('Selecionar ponto de ônibus Pressionado');
-                        // Adicione a lógica para selecionar o próximo ponto de ônibus aqui
                       },
                     ),
                   ),
                 ],
               ),
             ),
-          if (_allStopsPassed())
+          if (_allStopsPassed() && tripBusStops.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: ButtonThree(
                   buttonText: 'Encerrar Viagem',
                   backgroundColor: Colors.red,
-                  onPressed: endTrip,
+                  onPressed: widget.endTrip,
                 ),
               ),
             ),
@@ -98,5 +126,3 @@ class DriverBusStopActiveScreen extends StatelessWidget {
     );
   }
 }
-
-
