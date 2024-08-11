@@ -19,25 +19,34 @@ class DriverScreenController extends StatelessWidget {
               try {
                 if (tripController.activeTripId != null) {
                   await tripController.completeTrip(tripController.activeTripId!);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Trip completed successfully"),
-                  ));
+                  if (tripController.tripType == 2) { // Se for VOLTA
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Viagem concluída com sucesso"),
+                    ));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Viagem de ida concluída. Iniciando viagem de volta..."),
+                    ));
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("No active trip ID found"),
+                    content: Text("Nenhum ID de viagem ativa encontrado"),
                   ));
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Failed to complete trip: $e"),
+                  content: Text("Falha ao concluir a viagem: $e"),
                 ));
               }
             },
-            tripId: tripController.activeTripId!,  // Passar o tripId para a tela
+            tripId: tripController.activeTripId!,
+            isReturnTrip: tripController.tripType == 2, // Passando o tripType
           );
         } else {
           return DriverBusStopInactiveScreen(
-            startTrip: tripController.initiateTrip,
+            startTrip: (int driverId, int busId) {
+              return tripController.initiateTrip(driverId, busId, 1); // Aqui, estou assumindo que o tipo de viagem padrão é '1' (IDA)
+            },
             driverId: driverId,
           );
         }
