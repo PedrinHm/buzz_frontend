@@ -58,7 +58,10 @@ class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
                     child: Center(
                       child: Text(
                         'Nenhum ponto de ônibus ou aluno encontrado.',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                    color: Color(0xFF000000).withOpacity(0.70),
+                    fontSize: 16,
+                  ),
                       ),
                     ),
                   )
@@ -68,7 +71,10 @@ class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         'Nenhum ponto de ônibus encontrado.',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                    color: Color(0xFF000000).withOpacity(0.70),
+                    fontSize: 16,
+                  ),
                       ),
                     ),
                   if (students.isEmpty)
@@ -76,7 +82,10 @@ class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         'Nenhum aluno encontrado.',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                    color: Color(0xFF000000).withOpacity(0.70),
+                    fontSize: 16,
+                  ),
                       ),
                     ),
                   if (busStops.isNotEmpty)

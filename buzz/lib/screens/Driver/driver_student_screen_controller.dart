@@ -19,7 +19,14 @@ class DriverStudentScreenController extends StatelessWidget {
             tripId: tripController.activeTripId!, 
           );
         } else {
-          return Center(child: Text("No active trip found."));
+          return Center(
+            child: Text(
+                  'Nenhuma viagem em andamento.',
+                  style: TextStyle(
+                    color: Color(0xFF000000).withOpacity(0.70),
+                    fontSize: 16,
+                  ),
+                ),);
         }
       },
     );

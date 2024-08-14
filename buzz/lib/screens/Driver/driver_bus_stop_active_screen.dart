@@ -143,7 +143,10 @@ class _DriverBusStopActiveScreenState extends State<DriverBusStopActiveScreen> {
                 ? Center(
                     child: Text(
                       'Nenhum ponto de ônibus encontrado.',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(
+                    color: Color(0xFF000000).withOpacity(0.70),
+                    fontSize: 16,
+                  ),
                     ),
                   )
                 : ListView.builder(
