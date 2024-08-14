@@ -32,12 +32,13 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = _getScreensForUser(widget.usuario.tipoUsuario);
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      // Verifica se o motorista tem uma viagem ativa ao inicializar a tela
-      if (widget.usuario.tipoUsuario == 'driver') {
-        Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
-      }
-    });
+  }
+
+  Future<void> _verifyControllers() async {
+    if (widget.usuario.tipoUsuario == 'driver') {
+      await Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
+    }
+    // Adicione mais verificações se necessário
   }
 
   List<Widget> _getScreensForUser(String tipoUsuario) {
@@ -90,12 +91,23 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: getNavBar(widget.usuario.tipoUsuario, _currentIndex, _onItemTapped),
+    return FutureBuilder<void>(
+      future: _verifyControllers(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erro ao carregar os dados.'));
+        } else {
+          return Scaffold(
+            body: IndexedStack(
+              index: _currentIndex,
+              children: _screens,
+            ),
+            bottomNavigationBar: getNavBar(widget.usuario.tipoUsuario, _currentIndex, _onItemTapped),
+          );
+        }
+      },
     );
   }
 }
