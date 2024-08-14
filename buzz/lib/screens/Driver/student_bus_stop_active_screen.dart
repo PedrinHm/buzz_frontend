@@ -5,17 +5,17 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DriverStudentActiveScreen extends StatefulWidget {
+class StudentBusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
 
-  DriverStudentActiveScreen({required this.endTrip, required this.tripId});
+  StudentBusStopActiveScreen({required this.endTrip, required this.tripId});
 
   @override
-  _DriverStudentActiveScreenState createState() => _DriverStudentActiveScreenState();
+  _StudentBusStopActiveScreenState createState() => _StudentBusStopActiveScreenState();
 }
 
-class _DriverStudentActiveScreenState extends State<DriverStudentActiveScreen> {
+class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen> {
   Future<Map<String, dynamic>>? _futureData;
 
   @override

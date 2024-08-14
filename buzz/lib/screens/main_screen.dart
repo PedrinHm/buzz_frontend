@@ -1,15 +1,13 @@
-import 'package:buzz/screens/Driver/driver_bus_stop_screen_controller.dart';
-import 'package:buzz/screens/Driver/driver_student_screen_controller.dart';
-import 'package:buzz/screens/Student/StudentTripActiveScreen.dart';
+import 'package:buzz/screens/Driver/bus_stop_screen_controller.dart';
+import 'package:buzz/screens/Driver/student_bus_stop_screen_controller.dart';
 import 'package:buzz/screens/Student/student_trip_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/screens/Student/student_home_screen_controller.dart';
 import 'package:buzz/utils/navbar_helper.dart';
-import 'package:buzz/screens/Student/student_home_trip_active_screen.dart';
 import 'package:buzz/screens/Student/student_profile_screen.dart';
-import 'package:buzz/screens/Driver/driver_profile_screen.dart';
-import 'package:buzz/screens/Admin/admin_home_screen.dart';
-import 'package:buzz/screens/Admin/admin_profile_screen.dart';
+import 'package:buzz/screens/Driver/profile_driver_screen.dart';
+import 'package:buzz/screens/Admin/home_screen.dart';
+import 'package:buzz/screens/Admin/profile_admin_screen.dart';
 import 'package:buzz/models/usuario.dart';
 import 'package:provider/provider.dart';
 import 'package:buzz/controllers/trip_controller.dart';
@@ -59,8 +57,8 @@ class _MainScreenState extends State<MainScreen> {
       case 'driver':
         return [
           DriverStudentScreenController(driverId: widget.usuario.id),
-          DriverScreenController(driverId: widget.usuario.id),
-          DriverProfileScreen(
+          BusStopScreenController(driverId: widget.usuario.id),
+          ProfileDriverScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
             email: 'admin@email.com',
@@ -70,8 +68,8 @@ class _MainScreenState extends State<MainScreen> {
       case 'admin':
         _currentIndex = 0;
         return [
-          AdminHomeScreen(), // Home Screen
-          AdminProfileScreen(
+          HomeScreen(), // Home Screen
+          ProfileAdminScreen(
             imagePath: 'assets/images/profliepic.jpeg',
             adminName: 'Admin Name',
             email: 'admin@email.com',

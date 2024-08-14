@@ -1,7 +1,7 @@
-import 'package:buzz/screens/Admin/admin_list_screen.dart';
+import 'package:buzz/screens/Admin/list_screen.dart';
 import 'package:flutter/material.dart';
 
-class AdminHomeScreen extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

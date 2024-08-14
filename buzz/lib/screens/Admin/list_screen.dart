@@ -1,4 +1,4 @@
-import 'package:buzz/screens/Admin/admin_form_screen.dart';
+import 'package:buzz/screens/Admin/form_screen.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -125,7 +125,7 @@ class _ListScreenState extends State<ListScreen> {
 
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => GenericFormScreen(title: widget.title, fields: fields)),
+      MaterialPageRoute(builder: (context) => FormScreen(title: widget.title, fields: fields)),
     );
 
     if (result == true) {
@@ -179,7 +179,7 @@ class _ListScreenState extends State<ListScreen> {
 
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => GenericFormScreen(title: widget.title, fields: fields, isEdit: true, id: item['id'])),
+      MaterialPageRoute(builder: (context) => FormScreen(title: widget.title, fields: fields, isEdit: true, id: item['id'])),
     );
 
     if (result == true) {

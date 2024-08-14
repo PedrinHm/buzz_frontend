@@ -6,18 +6,18 @@ import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
 
-class DriverBusStopActiveScreen extends StatefulWidget {
+class BusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
   final bool isReturnTrip;
 
-  DriverBusStopActiveScreen({required this.endTrip, required this.tripId, required this.isReturnTrip});
+  BusStopActiveScreen({required this.endTrip, required this.tripId, required this.isReturnTrip});
 
   @override
-  _DriverBusStopActiveScreenState createState() => _DriverBusStopActiveScreenState();
+  _BusStopActiveScreenState createState() => _BusStopActiveScreenState();
 }
 
-class _DriverBusStopActiveScreenState extends State<DriverBusStopActiveScreen> {
+class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   late int _tripId;
   late bool _isReturnTrip;
   List<Map<String, String>> tripBusStops = [];

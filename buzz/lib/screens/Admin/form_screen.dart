@@ -7,19 +7,19 @@ import 'package:buzz/widgets/Geral/CustomDropdownField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class GenericFormScreen extends StatefulWidget {
+class FormScreen extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> fields;
   final bool isEdit;
   final int? id;
 
-  GenericFormScreen({required this.title, required this.fields, this.isEdit = false, this.id});
+  FormScreen({required this.title, required this.fields, this.isEdit = false, this.id});
 
   @override
-  _GenericFormScreenState createState() => _GenericFormScreenState();
+  _FormScreenState createState() => _FormScreenState();
 }
 
-class _GenericFormScreenState extends State<GenericFormScreen> {
+class _FormScreenState extends State<FormScreen> {
   List<Map<String, dynamic>> faculties = [];
   int? selectedFacultyId;
   bool _isLoading = false;

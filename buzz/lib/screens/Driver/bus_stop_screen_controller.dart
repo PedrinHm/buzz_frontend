@@ -1,20 +1,20 @@
-import 'package:buzz/screens/Driver/driver_bus_stop_inactive_screen.dart';
+import 'package:buzz/screens/Driver/bus_stop_inactive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/trip_controller.dart';
-import 'driver_bus_stop_active_screen.dart';
+import 'bus_stop_active_screen.dart';
 
-class DriverScreenController extends StatelessWidget {
+class BusStopScreenController extends StatelessWidget {
   final int driverId;
 
-  DriverScreenController({required this.driverId});
+  BusStopScreenController({required this.driverId});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
         if (tripController.hasActiveTrip && tripController.activeTripId != null) {
-          return DriverBusStopActiveScreen(
+          return BusStopActiveScreen(
             endTrip: () async {
               try {
                 if (tripController.activeTripId != null) {
@@ -43,7 +43,7 @@ class DriverScreenController extends StatelessWidget {
             isReturnTrip: tripController.tripType == 2, // Passando o tripType
           );
         } else {
-          return DriverBusStopInactiveScreen(
+          return BusStopInactiveScreen(
             startTrip: (int driverId, int busId) {
               return tripController.initiateTrip(driverId, busId, 1); // Aqui, estou assumindo que o tipo de viagem padrão é '1' (IDA)
             },

@@ -2,11 +2,11 @@ import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 
-class DriverStudentInactiveScreen extends StatelessWidget {
+class BusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
   final int driverId;
 
-  DriverStudentInactiveScreen({required this.startTrip, required this.driverId});
+  BusStopInactiveScreen({required this.startTrip, required this.driverId});
 
   Future<void> _showBusSelectionDialog(BuildContext context) async {
     final busId = await showDialog<int>(

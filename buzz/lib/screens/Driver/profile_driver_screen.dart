@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class DriverProfileScreen extends StatelessWidget {
+class ProfileDriverScreen extends StatelessWidget {
   final String imagePath;
   final String adminName;
   final String email;
   final String cpf;
 
-  DriverProfileScreen({
+  ProfileDriverScreen({
     required this.imagePath,
     required this.adminName,
     required this.email,

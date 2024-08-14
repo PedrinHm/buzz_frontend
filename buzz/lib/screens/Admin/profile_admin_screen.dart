@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class AdminProfileScreen extends StatelessWidget {
+class ProfileAdminScreen extends StatelessWidget {
   final String imagePath;
   final String adminName;
   final String email;
   final String cpf;
 
-  AdminProfileScreen({
+  ProfileAdminScreen({
     required this.imagePath,
     required this.adminName,
     required this.email,
