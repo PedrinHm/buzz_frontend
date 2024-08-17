@@ -7,6 +7,16 @@ import 'package:buzz/widgets/Geral/CustomDropdownField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Função utilitária para decodificar as respostas HTTP
+dynamic decodeJsonResponse(http.Response response) {
+  if (response.statusCode == 200) {
+    String responseBody = utf8.decode(response.bodyBytes);
+    return json.decode(responseBody);
+  } else {
+    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
 class FormScreen extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> fields;
@@ -49,7 +59,7 @@ class _FormScreenState extends State<FormScreen> {
 
     if (response.statusCode == 200) {
       setState(() {
-        faculties = List<Map<String, dynamic>>.from(json.decode(response.body));
+        faculties = List<Map<String, dynamic>>.from(decodeJsonResponse(response));
       });
     } else {
       // Handle error

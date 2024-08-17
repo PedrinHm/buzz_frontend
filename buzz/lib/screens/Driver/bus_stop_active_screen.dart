@@ -6,6 +6,16 @@ import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
 
+// Função utilitária para decodificar as respostas HTTP
+dynamic decodeJsonResponse(http.Response response) {
+  if (response.statusCode == 200) {
+    String responseBody = utf8.decode(response.bodyBytes);
+    return json.decode(responseBody);
+  } else {
+    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
 class BusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
@@ -30,6 +40,8 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     fetchBusStops().then((data) {
       setState(() {
         tripBusStops = data;
+        // Ordenar os pontos de ônibus após carregar os dados
+        tripBusStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
       });
     });
   }
@@ -38,7 +50,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/bus_stops');
     var response = await http.get(url);
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = decodeJsonResponse(response);
       return data.map((item) => {
         'name': item['name'] as String,
         'status': item['status'] as String,
@@ -48,6 +60,20 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     } else {
       throw Exception('Failed to load bus stop details');
     }
+  }
+
+  // Função de comparação para ordenar os pontos de ônibus
+  int _compareBusStopStatus(String statusA, String statusB) {
+    const statusOrder = {
+      'No ponto': 2,
+      'Próximo ponto': 3,
+      'A caminho': 1,
+      'Já passou': 4,
+      'Desembarque': 6,
+      'Ônibus com problema': 5,
+    };
+
+    return statusOrder[statusA]?.compareTo(statusOrder[statusB] ?? 0) ?? 0;
   }
 
   bool _allStopsPassed() {
@@ -63,7 +89,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       if (response.statusCode == 200) {
         if (!_isReturnTrip) {
           // Se for uma viagem de ida, começamos automaticamente a viagem de volta
-          final returnTripData = json.decode(response.body);
+          final returnTripData = decodeJsonResponse(response);
           setState(() {
             tripBusStops = []; // Limpa a lista de paradas para a nova viagem
             _tripId = returnTripData['id']; // Define o novo ID da viagem
@@ -73,6 +99,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           fetchBusStops().then((data) {
             setState(() {
               tripBusStops = data; // Carrega os novos pontos de ônibus
+              tripBusStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
             });
           });
         } else {
@@ -144,9 +171,9 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
                     child: Text(
                       'Nenhum ponto de ônibus encontrado.',
                       style: TextStyle(
-                    color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
-                  ),
+                        color: Color(0xFF000000).withOpacity(0.70),
+                        fontSize: 16,
+                      ),
                     ),
                   )
                 : ListView.builder(

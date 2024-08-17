@@ -5,6 +5,16 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Função utilitária para decodificar as respostas HTTP
+dynamic decodeJsonResponse(http.Response response) {
+  if (response.statusCode == 200) {
+    String responseBody = utf8.decode(response.bodyBytes);
+    return json.decode(responseBody);
+  } else {
+    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
 class StudentBusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
@@ -44,8 +54,24 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
               return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
             }
 
-            var students = snapshot.data!['students'] as List<Map<String, String>>;
-            var busStops = snapshot.data!['busStops'] as List<Map<String, String>>;
+            if (!snapshot.hasData || snapshot.data == null) {
+              return Center(child: Text('Nenhum dado encontrado.'));
+            }
+
+            // Convertendo explicitamente para List<Map<String, String>>
+            var students = (snapshot.data!['students'] as List)
+                .map((item) => Map<String, String>.from(item))
+                .toList();
+            var busStops = (snapshot.data!['busStops'] as List)
+                .map((item) => Map<String, String>.from(item))
+                .toList();
+
+            // Ordenando e filtrando os dados antes de exibir
+            busStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
+            students = students
+                .where((student) => student['status'] != 'Fila de espera')
+                .toList();
+            students.sort((a, b) => _compareStudentStatus(a['status']!, b['status']!));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -59,9 +85,9 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
                       child: Text(
                         'Nenhum ponto de ônibus ou aluno encontrado.',
                         style: TextStyle(
-                    color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
-                  ),
+                          color: Color(0xFF000000).withOpacity(0.70),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   )
@@ -72,9 +98,9 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
                       child: Text(
                         'Nenhum ponto de ônibus encontrado.',
                         style: TextStyle(
-                    color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
-                  ),
+                          color: Color(0xFF000000).withOpacity(0.70),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   if (students.isEmpty)
@@ -83,9 +109,9 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
                       child: Text(
                         'Nenhum aluno encontrado.',
                         style: TextStyle(
-                    color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
-                  ),
+                          color: Color(0xFF000000).withOpacity(0.70),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   if (busStops.isNotEmpty)
@@ -102,13 +128,15 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
   List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
     List<Widget> sections = [];
     for (var stop in busStops) {
+      if (stop['name'] == null || stop['status'] == null) continue;
+
       sections.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: 20),
           BusStopStatus(
-            busStopName: stop['name']!,
-            busStopStatus: stop['status']!,
+            busStopName: stop['name'] ?? 'N/A',
+            busStopStatus: stop['status'] ?? 'N/A',
           ),
           Divider(
             color: Colors.black,
@@ -116,20 +144,50 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
           ),
           ...students
               .where((student) => student['busStop'] == stop['name'])
-              .map((student) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: StudentStatus(
-                      studentName: student['name']!,
-                      studentStatus: student['status']!,
-                      imagePath: student['imagePath']!,
-                      busStopName: stop['name']!,
-                    ),
-                  ))
+              .map((student) {
+                if (student['name'] == null || student['status'] == null) return SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: StudentStatus(
+                    studentName: student['name'] ?? 'N/A',
+                    studentStatus: student['status'] ?? 'N/A',
+                    imagePath: student['imagePath'] ?? '',
+                    busStopName: stop['name']!,
+                  ),
+                );
+              })
               .toList(),
         ],
       ));
     }
     return sections;
+  }
+
+  // Mapeamento das labels para os valores numéricos usados na ordenação
+  final Map<String, int> busStopStatusOrder = {
+    'No ponto': 2,
+    'Próximo ponto': 3,
+    'A caminho': 1,
+    'Já passou': 4,
+    'Desembarque': 6,
+    'Ônibus com problema': 5,
+  };
+
+  final Map<String, int> studentStatusOrder = {
+    'Presente': 1,
+    'Aguardando no ponto': 3,
+    'Em aula': 2,
+    'Não voltará': 4,
+  };
+
+  // Função de comparação para ordenar os pontos de ônibus
+  int _compareBusStopStatus(String statusA, String statusB) {
+    return (busStopStatusOrder[statusA] ?? 0).compareTo(busStopStatusOrder[statusB] ?? 0);
+  }
+
+  // Função de comparação para ordenar os alunos
+  int _compareStudentStatus(String statusA, String statusB) {
+    return (studentStatusOrder[statusA] ?? 0).compareTo(studentStatusOrder[statusB] ?? 0);
   }
 }
 
@@ -153,17 +211,24 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
 Future<List<Map<String, String>>> fetchStudents(int tripId) async {
   var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/details');
   var response = await http.get(url);
+
   if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(response.body);
-    return data.map((item) => {
-      'name': item['student_name'] as String,
-      'status': item['student_status'] as String,
-      'imagePath': 'assets/images/profilepic.jpeg',  
-      'busStop': item['bus_stop_name'] as String,
-    }).toList().cast<Map<String, String>>();
+    List<dynamic> data = decodeJsonResponse(response);
+
+    // Printando os dados recebidos
+    print("Dados recebidos: $data");
+
+    return data.map((item) => Map<String, String>.from({
+      'name': item['student_name'] as String?,
+      'status': item['student_status'] as String?,
+      'imagePath': 'assets/images/profliepic.jpeg',
+      'busStop': item['bus_stop_name'] as String?,
+    })).toList();
   } else if (response.statusCode == 404) {
+    print("Nenhum dado encontrado para o tripId: $tripId");
     return [];
   } else {
+    print("Erro ao carregar os detalhes da viagem dos estudantes, status code: ${response.statusCode}");
     throw Exception('Failed to load student trip details');
   }
 }
@@ -172,11 +237,11 @@ Future<List<Map<String, String>>> fetchBusStops(int tripId) async {
   var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/bus_stops');
   var response = await http.get(url);
   if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(response.body);
-    return data.map((item) => {
-      'name': item['name'] as String,
-      'status': item['status'] as String,
-    }).toList().cast<Map<String, String>>();
+    List<dynamic> data = decodeJsonResponse(response);
+    return data.map((item) => Map<String, String>.from({
+      'name': item['name'] as String?,
+      'status': item['status'] as String?,
+    })).toList();
   } else if (response.statusCode == 404) {
     return [];
   } else {

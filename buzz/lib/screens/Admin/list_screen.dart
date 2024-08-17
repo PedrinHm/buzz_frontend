@@ -8,6 +8,16 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Função utilitária para decodificar as respostas HTTP
+dynamic decodeJsonResponse(http.Response response) {
+  if (response.statusCode == 200) {
+    String responseBody = utf8.decode(response.bodyBytes);
+    return json.decode(responseBody);
+  } else {
+    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
 class ListScreen extends StatefulWidget {
   final String title;
 
@@ -55,7 +65,7 @@ class _ListScreenState extends State<ListScreen> {
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = decodeJsonResponse(response);
       setState(() {
         items = data.where((item) {
           if (widget.title == 'Cadastro de Motorista') {
