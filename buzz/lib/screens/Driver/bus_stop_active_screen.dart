@@ -41,7 +41,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       setState(() {
         tripBusStops = data;
         // Ordenar os pontos de ônibus após carregar os dados
-        tripBusStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
+        tripBusStops.sort(_compareBusStopStatus);
       });
     });
   }
@@ -62,18 +62,36 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     }
   }
 
+Future<List<Map<String, String>>> fetchStopsOnTheWay() async {
+    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/pontos_a_caminho/$_tripId');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = decodeJsonResponse(response);
+      return data.map<Map<String, String>>((item) => {
+        'id': item['id'].toString(),
+        'name': item['name'] as String,
+      }).toList();
+    } else {
+      throw Exception('Failed to load stops on the way');
+    }
+}
+
   // Função de comparação para ordenar os pontos de ônibus
-  int _compareBusStopStatus(String statusA, String statusB) {
+  int _compareBusStopStatus(Map<String, String> a, Map<String, String> b) {
     const statusOrder = {
+      'A caminho': 1,
       'No ponto': 2,
       'Próximo ponto': 3,
-      'A caminho': 1,
       'Já passou': 4,
-      'Desembarque': 6,
       'Ônibus com problema': 5,
+      'Desembarque': 6,
     };
 
-    return statusOrder[statusA]?.compareTo(statusOrder[statusB] ?? 0) ?? 0;
+    int statusA = statusOrder[a['status']] ?? 0;
+    int statusB = statusOrder[b['status']] ?? 0;
+
+    return statusA.compareTo(statusB);
   }
 
   bool _allStopsPassed() {
@@ -88,22 +106,19 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       var response = await http.put(url);
       if (response.statusCode == 200) {
         if (!_isReturnTrip) {
-          // Se for uma viagem de ida, começamos automaticamente a viagem de volta
           final returnTripData = decodeJsonResponse(response);
           setState(() {
-            tripBusStops = []; // Limpa a lista de paradas para a nova viagem
-            _tripId = returnTripData['id']; // Define o novo ID da viagem
-            _isReturnTrip = true; // Define que agora é uma viagem de volta
+            tripBusStops = [];
+            _tripId = returnTripData['id'];
+            _isReturnTrip = true;
           });
-          // Recarrega os pontos de ônibus para a nova viagem
           fetchBusStops().then((data) {
             setState(() {
-              tripBusStops = data; // Carrega os novos pontos de ônibus
-              tripBusStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
+              tripBusStops = data;
+              tripBusStops.sort(_compareBusStopStatus);
             });
           });
         } else {
-          // Se for a viagem de volta, simplesmente finaliza a viagem
           widget.endTrip();
         }
       } else {
@@ -112,6 +127,47 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Erro ao finalizar a viagem: $e"),
+      ));
+    }
+  }
+
+  Future<void> _selectNextStop(int stopId) async {
+    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/selecionar_proximo_ponto/$_tripId?new_stop_id=$stopId');
+    var response = await http.put(url);
+
+    if (response.statusCode == 200) {
+      print('Próximo ponto definido com sucesso');
+      fetchBusStops().then((data) {
+        setState(() {
+          tripBusStops = data;
+          tripBusStops.sort(_compareBusStopStatus);
+        });
+      });
+    } else {
+      print('Erro ao definir o próximo ponto: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao definir o próximo ponto: ${response.body}'),
+      ));
+    }
+  }
+
+  Future<void> _updateNextToAtStop() async {
+    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/atualizar_proximo_para_no_ponto/$_tripId');
+    var response = await http.put(url);
+
+    if (response.statusCode == 200) {
+      print('Status atualizado para No ponto');
+      // Recarregar os pontos de ônibus para refletir a mudança
+      fetchBusStops().then((data) {
+        setState(() {
+          tripBusStops = data;
+          tripBusStops.sort(_compareBusStopStatus);
+        });
+      });
+    } else {
+      print('Erro ao atualizar o status: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao atualizar o status do ponto: ${response.body}'),
       ));
     }
   }
@@ -125,12 +181,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           confirmText: "Sim",
           cancelText: "Não",
           onConfirm: () {
-            Navigator.of(context).pop(); // Fechar o popup
+            Navigator.of(context).pop();
             print('Cancelar Viagem Confirmado');
-            // Implementar a lógica para cancelar a viagem aqui
           },
           onCancel: () {
-            Navigator.of(context).pop(); // Fechar o popup
+            Navigator.of(context).pop();
           },
         );
       },
@@ -146,15 +201,52 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           confirmText: "Sim",
           cancelText: "Não",
           onConfirm: () {
-            Navigator.of(context).pop(); // Fechar o popup
-            _finalizeTrip(); // Confirmar finalização da viagem
+            Navigator.of(context).pop();
+            _finalizeTrip();
           },
           onCancel: () {
-            Navigator.of(context).pop(); // Fechar o popup
+            Navigator.of(context).pop();
           },
         );
       },
     );
+  }
+
+  void _showSelectNextStopPopup() {
+    fetchStopsOnTheWay().then((stops) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.black.withOpacity(0.7),
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...stops.map((stop) => TripBusStop(
+                    busStopName: stop['name']!,
+                    busStopStatus: 'A caminho',
+                    onPressed: () {
+                      _selectNextStop(int.parse(stop['id']!));
+                      Navigator.of(context).pop();
+                    },
+                  )).toList(),
+                  SizedBox(height: 20),
+                  ButtonThree(
+                    buttonText: 'Cancelar',
+                    backgroundColor: Colors.red,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
   }
 
   @override
@@ -203,6 +295,12 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   }
 
   Widget _buildReturnTripButtons() {
+    String buttonText = 'Selecionar destino';
+
+    if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
+      buttonText = 'Estou no ponto';
+    }
+
     return Column(
       children: [
         Padding(
@@ -222,10 +320,14 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
               SizedBox(width: 10),
               Expanded(
                 child: ButtonThree(
-                  buttonText: 'Selecionar destino',
+                  buttonText: buttonText,
                   backgroundColor: Color(0xFF3E9B4F),
                   onPressed: () {
-                    print('Selecionar ponto de ônibus Pressionado');
+                    if (buttonText == 'Estou no ponto') {
+                      _updateNextToAtStop();
+                    } else {
+                      _showSelectNextStopPopup();
+                    }
                   },
                 ),
               ),
@@ -239,7 +341,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
               child: ButtonThree(
                 buttonText: 'Encerrar Viagem',
                 backgroundColor: Colors.red,
-                onPressed: _showFinalizeTripPopup, // Mostra o popup de confirmação
+                onPressed: _showFinalizeTripPopup,
               ),
             ),
           ),
@@ -257,7 +359,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             child: ButtonThree(
               buttonText: 'Cancelar Viagem',
               backgroundColor: Colors.grey,
-              onPressed: _showCancelTripPopup, // Mostra o popup de confirmação
+              onPressed: _showCancelTripPopup,
             ),
           ),
           SizedBox(width: 10),
@@ -265,7 +367,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             child: ButtonThree(
               buttonText: 'Finalizar Viagem',
               backgroundColor: Colors.red,
-              onPressed: _showFinalizeTripPopup, // Mostra o popup de confirmação
+              onPressed: _showFinalizeTripPopup,
             ),
           ),
         ],
