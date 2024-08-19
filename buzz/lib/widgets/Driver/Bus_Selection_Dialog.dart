@@ -23,12 +23,8 @@ class BusSelectionDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent,  // Remove o fundo colorido
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.85),
-          borderRadius: BorderRadius.circular(16),
-        ),
         padding: EdgeInsets.all(16.0),
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _fetchAvailableBuses(),
@@ -45,8 +41,8 @@ class BusSelectionDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Selecione um ônibus',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'Defina seu ônibus atual',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   SizedBox(height: 20),
                   Expanded(
@@ -59,7 +55,7 @@ class BusSelectionDialog extends StatelessWidget {
                           child: BusDetailsButton(
                             onPressed: () => onBusSelected(bus['id']),
                             busNumber: bus['registration_number'],
-                            driverName: 'Driver: ${bus['name']}',
+                            driverName: bus['name'], // Usando o nome do motorista diretamente do objeto bus
                             capacity: bus['capacity'], // Usando a capacidade diretamente do objeto bus
                             color: Color(0xFF395BC7),
                           ),
