@@ -15,7 +15,7 @@ class StudentBusStopInactiveScreen extends StatelessWidget {
         return BusSelectionDialog(
           onBusSelected: (selectedBusId) {
             Navigator.of(context).pop(selectedBusId);
-          },
+          }, url: 'http://127.0.0.1:8000/buses/available',
         );
       },
     );

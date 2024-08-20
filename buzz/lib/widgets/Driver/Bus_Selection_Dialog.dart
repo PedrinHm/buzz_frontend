@@ -6,11 +6,12 @@ import 'package:buzz/widgets/Student/bus_details_button.dart';
 
 class BusSelectionDialog extends StatelessWidget {
   final Function(int) onBusSelected;
+  final String url;  // Adicionando o parâmetro URL
 
-  BusSelectionDialog({required this.onBusSelected});
+  BusSelectionDialog({required this.onBusSelected, required this.url});
 
   Future<List<Map<String, dynamic>>> _fetchAvailableBuses() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/buses/available'));
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(json.decode(response.body));
     } else {

@@ -9,7 +9,7 @@ class StudentTripInactiveScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Nenhuma viagem em andamento.',
+              'Você não está em nenhuma viagem atualmente.',
               style: TextStyle(
                 color: Color(0xFF000000).withOpacity(0.70),
                 fontSize: 16,

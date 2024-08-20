@@ -78,4 +78,20 @@ class TripController extends ChangeNotifier {
       throw Exception('Failed to complete trip');
     }
   }
+
+  Future<void> checkActiveStudentTrip(int studentId) async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/active/$studentId'));
+    if (response.statusCode == 200) {
+      final tripData = json.decode(response.body);
+      _activeTripId = tripData['trip_id'];
+      _tripType = tripData['trip_type'] == 'IDA' ? 1 : 2; // Supondo que 'IDA' seja 1 e 'VOLTA' seja 2
+      _hasActiveTrip = true;
+    } else {
+      _hasActiveTrip = false;
+      _activeTripId = null;
+      _tripType = null;
+    }
+    notifyListeners();
+  }
 }
+

@@ -42,18 +42,18 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> _getScreensForUser(String tipoUsuario) {
     switch (tipoUsuario) {
       case 'student':
-        return [
-          StudentTripScreenController(), // Tela de viagem
-          StudentHomeScreenController(), // Tela principal
-          StudentProfileScreen(
-            imagePath: 'assets/images/profliepic.jpeg',
-            studentName: 'Pedro Henrique Mendes',
-            email: 'pedrohm@hotmail.com',
-            cpf: '11111111111',
-            course: 'Eng. Software',
-            university: 'Universidade de Rio Verde',
-          ),
-        ];
+      return [
+        StudentTripScreenController(studentId: widget.usuario.id), // Tela de viagem
+        StudentHomeScreenController(studentId: widget.usuario.id), // Tela principal
+        StudentProfileScreen(
+          imagePath: 'assets/images/profliepic.jpeg',
+          studentName: 'Pedro Henrique Mendes',
+          email: 'pedrohm@hotmail.com',
+          cpf: '11111111111',
+          course: 'Eng. Software',
+          university: 'Universidade de Rio Verde',
+        ),
+      ];
       case 'driver':
         return [
           DriverStudentScreenController(driverId: widget.usuario.id),
