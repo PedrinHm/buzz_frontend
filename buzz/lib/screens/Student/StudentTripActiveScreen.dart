@@ -1,54 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-//widgets
+// Widgets
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 
-class StudentTripActiveScreen  extends StatelessWidget {
+// Função utilitária para decodificar as respostas HTTP
+dynamic decodeJsonResponse(http.Response response) {
+  if (response.statusCode == 200) {
+    String responseBody = utf8.decode(response.bodyBytes);
+    return json.decode(responseBody);
+  } else {
+    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
+class StudentTripActiveScreen extends StatefulWidget {
+  @override
+  _StudentTripActiveScreenState createState() => _StudentTripActiveScreenState();
+}
+
+class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
+  List<Map<String, String>> busStops = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBusStops();
+  }
+
+  Future<void> fetchBusStops() async {
+    final int tripId = 29; // ID da viagem que o aluno está participando
+    final String url = 'http://127.0.0.1:8000/trips/$tripId/bus_stops';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = decodeJsonResponse(response);
+
+        setState(() {
+          busStops = data
+              .map((item) => {
+                    'name': item['name'] as String,
+                    'status': item['status'] as String,
+                  })
+              .toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load bus stops');
+      }
+    } catch (e) {
+      print('Error fetching bus stops: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  List<Widget> _generateTripBusStopWidgets() {
+    return busStops.map((data) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        child: TripBusStop(
+          onPressed: () {
+            // Adicione a ação a ser executada ao pressionar
+          },
+          busStopName: data['name']!,
+          busStopStatus: data['status']!,
+        ),
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Dados simulados
-    final List<Map<String, String>> simulatedData = [
-      {'name': 'Bloco I - Universidade de Rio Verde', 'status': 'Já passou'},
-      {'name': 'Bloco VI - Universidade de Rio Verde', 'status': 'Já passou'},
-      {'name': 'UniRV Centro - Universidade de Rio Verde', 'status': 'Já passou'},
-      {'name': 'IF - Instituto Federal', 'status': 'No ponto'},
-      {'name': 'Ponto C', 'status': 'Proximo ponto'},
-      {'name': 'Ponto D', 'status': 'A caminho'},
-      {'name': 'Ponto E', 'status': 'A caminho'},
-      //{'name': 'Ponto E', 'status': 'Ônibus com problema'},
-    ];
-
-    // Função para gerar widgets dinamicamente
-    List<Widget> _generateTripBusStopWidgets() {
-      return simulatedData.map((data) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: TripBusStop(
-            onPressed: () {
-              // Adicione a ação a ser executada ao pressionar
-            },
-            busStopName: data['name']!,
-            busStopStatus: data['status']!,
-          ),
-        );
-      }).toList();
-    }
-
     return Scaffold(
       body: Center(
-        child: Column(
-          children: [
-            SizedBox(height: 40),
-            CustomTitleWidget(title: 'Viagem atual'),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView(
-                children: _generateTripBusStopWidgets(),
+        child: isLoading
+            ? CircularProgressIndicator() // Exibe o loading enquanto os dados são carregados
+            : Column(
+                children: [
+                  SizedBox(height: 40),
+                  CustomTitleWidget(title: 'Viagem atual'),
+                  SizedBox(height: 10),
+                  Expanded(
+                    child: ListView(
+                      children: _generateTripBusStopWidgets(),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
