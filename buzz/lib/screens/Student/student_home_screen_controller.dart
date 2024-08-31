@@ -5,7 +5,7 @@ import 'student_home_trip_active_screen.dart';
 import 'student_home_trip_inactive_screen.dart';
 
 class StudentHomeScreenController extends StatefulWidget {
-  final int studentId; // Adicione o ID do aluno se necessário
+  final int studentId;
 
   StudentHomeScreenController({Key? key, required this.studentId}) : super(key: key);
 
@@ -17,7 +17,6 @@ class _StudentHomeScreenControllerState extends State<StudentHomeScreenControlle
   @override
   void initState() {
     super.initState();
-    // Chama a verificação de viagem ativa para o aluno quando o widget é construído
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final tripController = Provider.of<TripController>(context, listen: false);
       tripController.checkActiveStudentTrip(widget.studentId);
@@ -30,7 +29,7 @@ class _StudentHomeScreenControllerState extends State<StudentHomeScreenControlle
       builder: (context, tripController, child) {
         return tripController.hasActiveTrip
             ? StudentHomeTripActiveScreen()
-            : StudentHomeTripInactiveScreen();
+            : StudentHomeTripInactiveScreen(studentId: widget.studentId);
       },
     );
   }
