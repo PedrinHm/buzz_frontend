@@ -111,11 +111,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     String endpoint;
 
     if (action == 'Encerrar viagem de ida') {
-      endpoint = 'trips/$_tripId/finalizar_ida';
-    } else if (action == 'Encerrar viagem de volta') {
       endpoint = 'trip_bus_stops/finalizar_ponto_atual/$_tripId';
-    } else if (action == 'Finalizar viagem') {
+    } else if (action == 'Encerrar viagem de volta') {
       endpoint = 'trips/$_tripId/finalizar_volta';
+    } else if (action == 'Finalizar viagem') {
+       endpoint = 'trips/$_tripId/finalizar_ida';
     } else {
       return;
     }
