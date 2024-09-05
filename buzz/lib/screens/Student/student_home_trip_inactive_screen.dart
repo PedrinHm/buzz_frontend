@@ -22,50 +22,46 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
   int _selectedTripId = 0;  // Armazena o ID da viagem selecionada
   int _selectedBusStopId = 0;  // Armazena o ID do ponto de ônibus selecionado
 
-  void _handleBusSelection(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return BusSelectionDialog(
-          onBusSelected: (int selectedBusId, int selectedTripId, int selectedTripType) {
-            Navigator.pop(context);  // Fechar o diálogo após a seleção
-            print('Ônibus selecionado: $selectedBusId, Viagem: $selectedTripId, Tipo de viagem: $selectedTripType'); // Debug print
-            _selectedTripId = selectedTripId;  // Armazena o tripId selecionado
-            _fetchBusStops(selectedBusId, selectedTripType);  // Busca os pontos de ônibus após a seleção
-          },
-          url: 'http://127.0.0.1:8000/buses/trips/active_trips',
-        );
-      },
+void _handleBusSelection(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return BusSelectionDialog(
+        onBusSelected: (int selectedBusId, int selectedTripId, int selectedTripType) {
+          Navigator.pop(context); // Fechar o diálogo após a seleção
+          print('Ônibus selecionado: $selectedBusId, Viagem: $selectedTripId, Tipo de viagem: $selectedTripType'); // Debug print
+          _selectedTripId = selectedTripId; // Armazena o tripId selecionado
+          _fetchBusStops(widget.studentId); // Passa o ID do estudante para buscar os pontos de ônibus
+        },
+        url: 'http://127.0.0.1:8000/buses/trips/active_trips',
+      );
+    },
+  );
+}
+
+void _fetchBusStops(int studentId) async {
+  // Utiliza o novo endpoint com o ID do estudante e da viagem
+  String url = 'http://127.0.0.1:8000/bus_stops/action/trip?student_id=$studentId&trip_id=$_selectedTripId';
+
+  print('Fetching bus stops from URL: $url'); // Debug print
+
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    print('Dados recebidos dos pontos de ônibus: $responseData'); // Debug print
+
+    setState(() {
+      _busStops = List<Map<String, dynamic>>.from(responseData);
+      _showBusStopSelectionOverlay();
+    });
+  } else {
+    print('Erro ao buscar pontos de ônibus: ${response.reasonPhrase}');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao buscar pontos de ônibus')),
     );
   }
-
-  void _fetchBusStops(int busId, int tripType) async {
-    String url;
-    if (tripType == 1) { // IDA
-      url = 'http://127.0.0.1:8000/bus_stops/ida';
-    } else { // VOLTA
-      url = 'http://127.0.0.1:8000/bus_stops/volta/$_selectedTripId';
-    }
-
-    print('Fetching bus stops from URL: $url'); // Debug print
-
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      print('Dados recebidos dos pontos de ônibus: $responseData'); // Debug print
-
-      setState(() {
-        _busStops = List<Map<String, dynamic>>.from(responseData);
-        _showBusStopSelectionOverlay();
-      });
-    } else {
-      print('Erro ao buscar pontos de ônibus: ${response.reasonPhrase}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao buscar pontos de ônibus')),
-      );
-    }
-  }
+}
 
   void _showBusStopSelectionOverlay() {
     setState(() {

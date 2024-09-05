@@ -17,6 +17,10 @@ dynamic decodeJsonResponse(http.Response response) {
 }
 
 class StudentTripActiveScreen extends StatefulWidget {
+  final int tripId; // Campo para o ID da viagem
+
+  StudentTripActiveScreen({required this.tripId});
+
   @override
   _StudentTripActiveScreenState createState() => _StudentTripActiveScreenState();
 }
@@ -32,8 +36,8 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
   }
 
   Future<void> fetchBusStops() async {
-    final int tripId = 29; // ID da viagem que o aluno está participando
-    final String url = 'http://127.0.0.1:8000/trips/$tripId/bus_stops';
+    // Utilize o tripId fornecido na propriedade do widget
+    final String url = 'http://127.0.0.1:8000/trips/${widget.tripId}/bus_stops';
 
     try {
       final response = await http.get(Uri.parse(url));

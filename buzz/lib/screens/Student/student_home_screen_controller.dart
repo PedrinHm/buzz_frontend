@@ -19,7 +19,7 @@ class _StudentHomeScreenControllerState extends State<StudentHomeScreenControlle
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final tripController = Provider.of<TripController>(context, listen: false);
-      tripController.checkActiveStudentTrip(widget.studentId);
+      tripController.checkActiveTrip(widget.studentId, isStudent: true); 
     });
   }
 
@@ -27,9 +27,25 @@ class _StudentHomeScreenControllerState extends State<StudentHomeScreenControlle
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
-        return tripController.hasActiveTrip
-            ? StudentHomeTripActiveScreen()
-            : StudentHomeTripInactiveScreen(studentId: widget.studentId);
+        if (tripController == null) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!tripController.hasActiveTrip) {
+          return StudentHomeTripInactiveScreen(studentId: widget.studentId);
+        } else {
+          // Verifica se o studentTripId foi definido
+          if (tripController.studentTripId == null) {
+            print("Erro: Student Trip ID não encontrado.");
+            return Center(child: Text("Erro: Student Trip ID não encontrado."));
+          }
+
+          return StudentHomeTripActiveScreen(
+            studentId: widget.studentId,
+            tripId: tripController.activeTripId ?? 0, 
+            studentTripId: tripController.studentTripId!, 
+          );
+        }
       },
     );
   }

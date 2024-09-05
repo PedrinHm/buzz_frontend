@@ -6,10 +6,14 @@ class TripController extends ChangeNotifier {
   bool _hasActiveTrip = false;
   int? _activeTripId;
   int? _tripType;
+  bool _isStudent = false;
+  int? _studentTripId;
 
   bool get hasActiveTrip => _hasActiveTrip;
   int? get activeTripId => _activeTripId;
   int? get tripType => _tripType;
+  bool get isStudent => _isStudent;
+  int? get studentTripId => _studentTripId;
 
   void startTrip(int tripId, int tripType) {
     _hasActiveTrip = true;
@@ -22,10 +26,25 @@ class TripController extends ChangeNotifier {
     _hasActiveTrip = false;
     _activeTripId = null;
     _tripType = null;
+    _isStudent = false;
+    _studentTripId = null; // Reseta o studentTripId ao finalizar a viagem
     notifyListeners();
   }
 
-  Future<void> checkActiveTrip(int driverId) async {
+  Future<void> checkActiveTrip(int userId, {bool isStudent = false}) async {
+    _isStudent = isStudent;
+
+    if (isStudent) {
+      // Se for aluno, verifica a viagem ativa associada ao student_trip
+      await checkActiveStudentTrip(userId);
+      print('Student Trip ID obtido: $_studentTripId');
+    } else {
+      // Se for motorista, verifica a viagem ativa associada ao motorista
+      await checkActiveDriverTrip(userId);
+    }
+  }
+
+  Future<void> checkActiveDriverTrip(int driverId) async {
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/trips/active/$driverId'));
     if (response.statusCode == 200) {
       final tripData = json.decode(response.body);
@@ -36,6 +55,32 @@ class TripController extends ChangeNotifier {
       _hasActiveTrip = false;
       _activeTripId = null;
       _tripType = null;
+    }
+    notifyListeners();
+  }
+
+  Future<void> checkActiveStudentTrip(int studentId) async {
+    try {
+      final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/active/$studentId'));
+      if (response.statusCode == 200) {
+        final tripData = json.decode(response.body);
+        _activeTripId = tripData['trip_id'];
+        _tripType = tripData['trip_type'] == 'IDA' ? 1 : 2;
+        _studentTripId = tripData['student_trip_id']; // Armazena o student_trip_id corretamente
+        _hasActiveTrip = true;
+      } else {
+        _hasActiveTrip = false;
+        _activeTripId = null;
+        _tripType = null;
+        _studentTripId = null;
+        print('No active trip found for the student.');
+      }
+    } catch (e) {
+      print('Error fetching active student trip: $e');
+      _hasActiveTrip = false;
+      _activeTripId = null;
+      _tripType = null;
+      _studentTripId = null;
     }
     notifyListeners();
   }
@@ -78,20 +123,4 @@ class TripController extends ChangeNotifier {
       throw Exception('Failed to complete trip');
     }
   }
-
-  Future<void> checkActiveStudentTrip(int studentId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/active/$studentId'));
-    if (response.statusCode == 200) {
-      final tripData = json.decode(response.body);
-      _activeTripId = tripData['trip_id'];
-      _tripType = tripData['trip_type'] == 'IDA' ? 1 : 2; // Supondo que 'IDA' seja 1 e 'VOLTA' seja 2
-      _hasActiveTrip = true;
-    } else {
-      _hasActiveTrip = false;
-      _activeTripId = null;
-      _tripType = null;
-    }
-    notifyListeners();
-  }
 }
-

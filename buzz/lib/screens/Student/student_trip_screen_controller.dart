@@ -5,7 +5,7 @@ import '../../controllers/trip_controller.dart';
 import 'student_trip_inactive_screen.dart';
 
 class StudentTripScreenController extends StatefulWidget {
-  final int studentId; // Adicione o ID do aluno se necessário
+  final int studentId; // ID do aluno
 
   StudentTripScreenController({Key? key, required this.studentId}) : super(key: key);
 
@@ -20,7 +20,7 @@ class _StudentTripScreenControllerState extends State<StudentTripScreenControlle
     // Chama a verificação de viagem ativa para o aluno quando o widget é construído
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final tripController = Provider.of<TripController>(context, listen: false);
-      tripController.checkActiveStudentTrip(widget.studentId);
+      tripController.checkActiveTrip(widget.studentId, isStudent: true); // Usa checkActiveTrip com isStudent definido como true
     });
   }
 
@@ -29,7 +29,7 @@ class _StudentTripScreenControllerState extends State<StudentTripScreenControlle
     return Consumer<TripController>(
       builder: (context, tripController, child) {
         return tripController.hasActiveTrip
-            ? StudentTripActiveScreen()
+            ? StudentTripActiveScreen(tripId: tripController.activeTripId!) // Passa o ID da viagem ativa
             : StudentTripInactiveScreen();
       },
     );
