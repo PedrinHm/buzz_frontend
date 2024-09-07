@@ -13,9 +13,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class StudentHomeTripActiveScreen extends StatefulWidget {
-  final int studentId; // ID do aluno
-  final int tripId; // ID da viagem
-  final int studentTripId; // ID do student trip
+  final int studentId; 
+  final int tripId; 
+  final int studentTripId; 
 
   StudentHomeTripActiveScreen({
     required this.studentId, 
@@ -31,6 +31,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
   bool _showStatusOverlay = false; // Flag para a sobreposição de status
+  List<Map<String, dynamic>> _busList = []; // Lista de ônibus disponíveis
   List<Map<String, String>> busStopList = []; // Lista de pontos de ônibus
   bool isLoading = false; // Flag de carregamento
   late int _studentTripId; // Use late para garantir que será inicializado
@@ -44,6 +45,9 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   void _toggleBusOverlay() {
     setState(() {
       _showBusOverlay = !_showBusOverlay;
+      if (_showBusOverlay) {
+        _fetchActiveBuses(); // Carrega a lista de ônibus ativos
+      }
     });
   }
 
@@ -51,8 +55,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
       if (_showBusStopOverlay) {
-        // Carregar os pontos de ônibus quando a sobreposição for ativada
-        _fetchBusStops();
+        _fetchBusStops(); // Carregar os pontos de ônibus quando a sobreposição for ativada
       }
     });
   }
@@ -61,6 +64,43 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     setState(() {
       _showStatusOverlay = !_showStatusOverlay;
     });
+  }
+
+  Future<void> _fetchActiveBuses() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Realiza a chamada HTTP para buscar ônibus disponíveis para o aluno
+      final response = await http.get(Uri.parse('http://127.0.0.1:8000/buses/available_for_student?student_id=${widget.studentId}'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          _busList = data.map((item) => {
+            'busId': item['bus_id'],
+            'tripId': item['trip_id'],
+            'registrationNumber': item['registration_number'],
+            'name': item['name'],
+            'capacity': item['capacity'],
+            'tripType': item['trip_type'],
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load available buses for student');
+      }
+    } catch (e) {
+      print('Error fetching available buses for student: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao buscar ônibus disponíveis para o aluno')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchBusStops() async {
@@ -91,6 +131,35 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _updateStudentTrip(int newTripId) async {
+    if (_studentTripId == null) {
+      print('Student trip ID is not set');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: Student trip ID não está definido!')),
+      );
+      return;
+    }
+
+    try {
+      // Realiza a chamada HTTP para atualizar a viagem do aluno
+      final response = await http.put(Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
+
+      if (response.statusCode == 200) {
+        print('Viagem do aluno atualizada com sucesso!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Viagem do aluno atualizada com sucesso!')),
+        );
+      } else {
+        throw Exception('Failed to update student trip');
+      }
+    } catch (e) {
+      print('Erro ao atualizar a viagem do aluno: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao atualizar a viagem do aluno')),
+      );
     }
   }
 
@@ -139,8 +208,8 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
                 ),
                 SizedBox(height: 10),
                 CustomStatus(
-                  onPressed: () {},
-                  StatusName: 'Em aula',
+                  onPressed: _toggleStatusOverlay, // Adicione esta linha para definir o callback
+                  StatusName: 'Definir status', // Texto atualizado para indicar o propósito do botão
                   iconData: PhosphorIcons.chalkboardTeacher,
                 ),
                 SizedBox(height: 10),
@@ -213,27 +282,22 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   }
 
   Widget _buildBusList() {
-    final List<Map<String, dynamic>> busList = [
-      {'busNumber': 'XYZ-5678', 'driverName': 'Motorista 1', 'capacity': 56, 'availableSeats': 10, 'available': true},
-      {'busNumber': 'JKL-9101', 'driverName': 'Motorista 2', 'capacity': 56, 'availableSeats': 0, 'available': false},
-    ];
-
     return ListView.builder(
-      itemCount: busList.length,
+      itemCount: _busList.length,
       itemBuilder: (context, index) {
-        final bus = busList[index];
+        final bus = _busList[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
           child: BusDetailsButton(
             onPressed: () {
-              print("Selecionado ônibus: ${bus['busNumber']}");
+              _updateStudentTrip(bus['tripId']); // Chama a função para atualizar a viagem do aluno
               _toggleBusOverlay();
             },
-            busNumber: bus['busNumber'],
-            driverName: bus['driverName'],
+            busNumber: bus['registrationNumber'],
+            driverName: bus['name'],
             capacity: bus['capacity'],
-            availableSeats: bus['availableSeats'],
-            color: bus['available'] ? Color(0xFF395BC7) : Color(0xFFFFBA18),
+            availableSeats: 0, // Defina isso de acordo com os dados recebidos, se necessário
+            color: Color(0xFF395BC7),
           ),
         );
       },
