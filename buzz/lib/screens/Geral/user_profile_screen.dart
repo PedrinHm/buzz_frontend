@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 
-class StudentProfileScreen extends StatelessWidget {
+class UserProfileScreen extends StatelessWidget {
   final String imagePath;
-  final String studentName;
+  final String name;
   final String email;
   final String cpf;
-  final String course;
-  final String university;
+  final String userType; // "admin", "driver", or "student"
+  final String? course;
+  final String? university;
 
-  StudentProfileScreen({
+  UserProfileScreen({
     required this.imagePath,
-    required this.studentName,
+    required this.name,
     required this.email,
     required this.cpf,
-    required this.course,
-    required this.university,
+    required this.userType,
+    this.course,
+    this.university,
   });
 
   @override
@@ -37,7 +39,7 @@ class StudentProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Dados do Aluno',
+                    _getTitle(),
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,
@@ -72,20 +74,48 @@ class StudentProfileScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-              _buildInfoColumn('Aluno', studentName),
+              _buildInfoColumn(_getLabel(), name),
               SizedBox(height: 20),
               _buildInfoColumn('E-mail', email),
               SizedBox(height: 20),
               _buildInfoColumn('CPF', cpf),
-              SizedBox(height: 20),
-              _buildInfoColumn('Curso', course),
-              SizedBox(height: 20),
-              _buildInfoColumn('Faculdade', university),
+              if (userType == 'student') ...[
+                SizedBox(height: 20),
+                _buildInfoColumn('Curso', course ?? ''),
+                SizedBox(height: 20),
+                _buildInfoColumn('Faculdade', university ?? ''),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _getTitle() {
+    switch (userType) {
+      case 'admin':
+        return 'Dados do Administrador';
+      case 'driver':
+        return 'Dados do Motorista';
+      case 'student':
+        return 'Dados do Aluno';
+      default:
+        return 'Perfil';
+    }
+  }
+
+  String _getLabel() {
+    switch (userType) {
+      case 'admin':
+        return 'Admin';
+      case 'driver':
+        return 'Motorista';
+      case 'student':
+        return 'Aluno';
+      default:
+        return 'Usuário';
+    }
   }
 
   Widget _buildInfoColumn(String label, String value) {

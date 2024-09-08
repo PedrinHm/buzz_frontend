@@ -1,13 +1,11 @@
 import 'package:buzz/screens/Driver/bus_stop_screen_controller.dart';
 import 'package:buzz/screens/Driver/student_bus_stop_screen_controller.dart';
+import 'package:buzz/screens/Geral/user_profile_screen.dart';
 import 'package:buzz/screens/Student/student_trip_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/screens/Student/student_home_screen_controller.dart';
 import 'package:buzz/utils/navbar_helper.dart';
-import 'package:buzz/screens/Student/student_profile_screen.dart';
-import 'package:buzz/screens/Driver/profile_driver_screen.dart';
 import 'package:buzz/screens/Admin/home_screen.dart';
-import 'package:buzz/screens/Admin/profile_admin_screen.dart';
 import 'package:buzz/models/usuario.dart';
 import 'package:provider/provider.dart';
 import 'package:buzz/controllers/trip_controller.dart';
@@ -23,7 +21,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 1;
-
   late List<Widget> _screens;
 
   @override
@@ -42,38 +39,41 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> _getScreensForUser(String tipoUsuario) {
     switch (tipoUsuario) {
       case 'student':
-      return [
-        StudentTripScreenController(studentId: widget.usuario.id), // Tela de viagem
-        StudentHomeScreenController(studentId: widget.usuario.id), // Tela principal
-        StudentProfileScreen(
-          imagePath: 'assets/images/profliepic.jpeg',
-          studentName: 'Pedro Henrique Mendes',
-          email: 'pedrohm@hotmail.com',
-          cpf: '11111111111',
-          course: 'Eng. Software',
-          university: 'Universidade de Rio Verde',
-        ),
-      ];
+        return [
+          StudentTripScreenController(studentId: widget.usuario.id),
+          StudentHomeScreenController(studentId: widget.usuario.id),
+          UserProfileScreen(
+            imagePath: 'assets/images/profliepic.jpeg',
+            name: 'Pedro Henrique Mendes',
+            email: 'pedrohm@hotmail.com',
+            cpf: '11111111111',
+            userType: 'student',
+            course: 'Eng. Software',
+            university: 'Universidade de Rio Verde',
+          ),
+        ];
       case 'driver':
         return [
           DriverStudentScreenController(driverId: widget.usuario.id),
           BusStopScreenController(driverId: widget.usuario.id),
-          ProfileDriverScreen(
+          UserProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
-            adminName: 'Admin Name',
+            name: 'Admin Name',
             email: 'admin@email.com',
             cpf: '123.456.789-00',
+            userType: 'driver',
           ),
         ];
       case 'admin':
         _currentIndex = 0;
         return [
-          HomeScreen(), // Home Screen
-          ProfileAdminScreen(
+          HomeScreen(),
+          UserProfileScreen(
             imagePath: 'assets/images/profliepic.jpeg',
-            adminName: 'Admin Name',
+            name: 'Admin Name',
             email: 'admin@email.com',
             cpf: '123.456.789-00',
+            userType: 'admin',
           ),
         ];
       default:
