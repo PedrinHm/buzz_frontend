@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final int userId;
@@ -15,6 +16,7 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<Usuario> _userFuture;
+  String? _base64Image;
 
   @override
   void initState() {
@@ -26,7 +28,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/users/$userId'));
 
     if (response.statusCode == 200) {
-      // Converte o JSON retornado em um objeto Usuario
       return Usuario.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load user');
@@ -34,12 +35,68 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _logout() async {
-    // Limpa qualquer token de autenticação armazenado
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
-
-    // Redireciona para a tela de login
     Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  // Método para selecionar uma imagem e convertê-la para base64
+  Future<void> _pickImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image != null) {
+        print('Imagem selecionada: ${image.path}'); // Log para depuração
+        final bytes = await image.readAsBytes(); // Usa abordagem assíncrona para leitura de bytes
+        setState(() {
+          _base64Image = base64Encode(bytes);
+        });
+        print('Imagem convertida para base64'); // Log para depuração
+        await _uploadProfilePicture(); // Chama o método para enviar a imagem para a API
+      } else {
+        print('Nenhuma imagem selecionada.'); // Log para depuração
+      }
+    } catch (e) {
+      print('Erro ao selecionar imagem: $e'); // Log para depuração de erro
+    }
+  }
+
+  Future<void> _uploadProfilePicture() async {
+    if (_base64Image != null) {
+      try {
+        print('Enviando imagem para API...'); // Log para depuração
+        final response = await http.put(
+          Uri.parse('http://127.0.0.1:8000/users/${widget.userId}/profile-picture'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'picture': _base64Image}),
+        );
+
+        if (response.statusCode == 200) {
+          print('Foto de perfil atualizada com sucesso');
+          setState(() {
+            _userFuture = _fetchUser(widget.userId);
+          });
+        } else {
+          print('Erro ao atualizar foto de perfil: ${response.statusCode}');
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Erro'),
+              content: Text('Não foi possível atualizar a foto de perfil.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } catch (e) {
+        print('Erro ao enviar imagem: $e'); // Log para depuração de erro
+      }
+    }
   }
 
   @override
@@ -90,32 +147,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   IconButton(
                     icon: Icon(Icons.logout, color: Colors.white),
-                    onPressed: _logout, // Chama a função de logout
+                    onPressed: _logout,
                   ),
                 ],
               ),
               SizedBox(height: 20),
               Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: user.profilePicture != null
-                        ? Image.memory(
-                            base64Decode(user.profilePicture!),
-                            width: 175,
-                            height: 175,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/images/default_profile.png',
-                            width: 175,
-                            height: 175,
-                            fit: BoxFit.cover,
-                          ),
+                child: GestureDetector(
+                  onTap: _pickImage, // Seleciona a imagem
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: user.profilePicture != null
+                          ? Image.memory(
+                              base64Decode(user.profilePicture!),
+                              width: 175,
+                              height: 175,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'assets/images/default_profile.png',
+                              width: 175,
+                              height: 175,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
                   ),
                 ),
               ),
