@@ -36,11 +36,11 @@ class Usuario {
   static String _mapUserTypeIdToTipoUsuario(int userTypeId) {
     switch (userTypeId) {
       case 1:
-        return 'admin';
+        return 'student';
       case 2:
         return 'driver';
       case 3:
-        return 'student';
+        return 'admin';
       default:
         return 'unknown';
     }
