@@ -33,7 +33,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   bool _showStatusOverlay = false; 
   List<Map<String, dynamic>> _busList = []; 
   List<Map<String, String>> busStopList = []; 
-  List<Map<int, dynamic>> _statusList = []; // Lista de status disponíveis
+  List<Map<String, dynamic>> _statusList = []; // Lista de status disponíveis
   bool isLoading = false; 
   late int _studentTripId; 
   int? _currentStatus; // Status atual do aluno como int
