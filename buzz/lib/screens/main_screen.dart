@@ -36,50 +36,30 @@ class _MainScreenState extends State<MainScreen> {
     // Adicione mais verificações se necessário
   }
 
-  List<Widget> _getScreensForUser(String tipoUsuario) {
-    switch (tipoUsuario) {
-      case 'student':
-        return [
-          StudentTripScreenController(studentId: widget.usuario.id),
-          StudentHomeScreenController(studentId: widget.usuario.id),
-          UserProfileScreen(
-            imagePath: 'assets/images/profliepic.jpeg',
-            name: 'Pedro Henrique Mendes',
-            email: 'pedrohm@hotmail.com',
-            cpf: '11111111111',
-            userType: 'student',
-            course: 'Eng. Software',
-            university: 'Universidade de Rio Verde',
-          ),
-        ];
-      case 'driver':
-        return [
-          DriverStudentScreenController(driverId: widget.usuario.id),
-          BusStopScreenController(driverId: widget.usuario.id),
-          UserProfileScreen(
-            imagePath: 'assets/images/profliepic.jpeg',
-            name: 'Admin Name',
-            email: 'admin@email.com',
-            cpf: '123.456.789-00',
-            userType: 'driver',
-          ),
-        ];
-      case 'admin':
-        _currentIndex = 0;
-        return [
-          HomeScreen(),
-          UserProfileScreen(
-            imagePath: 'assets/images/profliepic.jpeg',
-            name: 'Admin Name',
-            email: 'admin@email.com',
-            cpf: '123.456.789-00',
-            userType: 'admin',
-          ),
-        ];
-      default:
-        throw Exception('Tipo de usuário desconhecido');
-    }
+List<Widget> _getScreensForUser(String tipoUsuario) {
+  switch (tipoUsuario) {
+    case 'student':
+      return [
+        StudentTripScreenController(studentId: widget.usuario.id),
+        StudentHomeScreenController(studentId: widget.usuario.id),
+        UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+      ];
+    case 'driver':
+      return [
+        DriverStudentScreenController(driverId: widget.usuario.id),
+        BusStopScreenController(driverId: widget.usuario.id),
+        UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+      ];
+    case 'admin':
+      _currentIndex = 0;
+      return [
+        HomeScreen(),
+        UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+      ];
+    default:
+      throw Exception('Tipo de usuário desconhecido');
   }
+}
 
   void _onItemTapped(int index) {
     setState(() {
