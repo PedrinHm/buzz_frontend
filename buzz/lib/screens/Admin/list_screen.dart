@@ -107,7 +107,6 @@ class _ListScreenState extends State<ListScreen> {
           {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController()},
           {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
           {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
-          {'label': 'Curso', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
           {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
         ];
         break;
@@ -161,7 +160,6 @@ class _ListScreenState extends State<ListScreen> {
           {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController(text: item['email'] ?? '')},
           {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['cpf'] ?? ''), 'enabled': false},
           {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController(text: item['phone'] ?? '')},
-          {'label': 'Curso', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['course'] ?? '')},
           {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['faculty_id'] != null ? item['faculty_id'].toString() : '')},
         ];
         break;

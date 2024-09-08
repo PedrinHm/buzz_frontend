@@ -100,8 +100,7 @@ class _FormScreenState extends State<FormScreen> {
           'email': widget.fields[1]['controller'].text,
           'cpf': widget.fields[2]['controller'].text,
           'phone': widget.fields[3]['controller'].text,
-          'course': widget.fields[4]['controller'].text,
-          'faculty_id': selectedFacultyId,
+          'faculty_id': selectedFacultyId,  // Removido o campo 'course'
           'user_type_id': 1,
           'password': widget.fields[2]['controller'].text,
         };
