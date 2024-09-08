@@ -125,43 +125,43 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
     );
   }
 
-  List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
-    List<Widget> sections = [];
-    for (var stop in busStops) {
-      if (stop['name'] == null || stop['status'] == null) continue;
+List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
+  List<Widget> sections = [];
+  for (var stop in busStops) {
+    if (stop['name'] == null || stop['status'] == null) continue;
 
-      sections.add(Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 20),
-          BusStopStatus(
-            busStopName: stop['name'] ?? 'N/A',
-            busStopStatus: stop['status'] ?? 'N/A',
-          ),
-          Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
-          ...students
-              .where((student) => student['busStop'] == stop['name'])
-              .map((student) {
-                if (student['name'] == null || student['status'] == null) return SizedBox.shrink();
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: StudentStatus(
-                    studentName: student['name'] ?? 'N/A',
-                    studentStatus: student['status'] ?? 'N/A',
-                    imagePath: student['imagePath'] ?? '',
-                    busStopName: stop['name']!,
-                  ),
-                );
-              })
-              .toList(),
-        ],
-      ));
-    }
-    return sections;
+    sections.add(Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(height: 20),
+        BusStopStatus(
+          busStopName: stop['name'] ?? 'N/A',
+          busStopStatus: stop['status'] ?? 'N/A',
+        ),
+        Divider(
+          color: Colors.black,
+          thickness: 1,
+        ),
+        ...students
+            .where((student) => student['busStop'] == stop['name'])
+            .map((student) {
+              if (student['name'] == null || student['status'] == null) return SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: StudentStatus(
+                  studentName: student['name'] ?? 'N/A',
+                  studentStatus: student['status'] ?? 'N/A',
+                  profilePictureBase64: student['profilePictureBase64'] ?? '', // Corrigido
+                  busStopName: stop['name']!,
+                ),
+              );
+            })
+            .toList(),
+      ],
+    ));
   }
+  return sections;
+}
 
   // Mapeamento das labels para os valores numéricos usados na ordenação
   final Map<String, int> busStopStatusOrder = {
@@ -219,10 +219,10 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
     print("Dados recebidos: $data");
 
     return data.map((item) => Map<String, String>.from({
-      'name': item['student_name'] as String?,
-      'status': item['student_status'] as String?,
-      'imagePath': 'assets/images/profliepic.jpeg',
-      'busStop': item['bus_stop_name'] as String?,
+      'name': item['student_name'] as String? ?? '',
+      'status': item['student_status'] as String? ?? '',
+      'profilePictureBase64': item['profile_picture'] as String? ?? '', // Use a imagem em base64
+      'busStop': item['bus_stop_name'] as String? ?? '',
     })).toList();
   } else if (response.statusCode == 404) {
     print("Nenhum dado encontrado para o tripId: $tripId");

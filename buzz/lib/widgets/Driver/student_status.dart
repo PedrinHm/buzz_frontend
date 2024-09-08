@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 class StudentStatus extends StatelessWidget {
   final String studentName;
   final String studentStatus;
-  final String imagePath;
+  final String profilePictureBase64;
   final String busStopName;
 
   StudentStatus({
     required this.studentName,
     required this.studentStatus,
-    required this.imagePath,
+    required this.profilePictureBase64,
     required this.busStopName,
   });
 
@@ -30,6 +31,31 @@ class StudentStatus extends StatelessWidget {
     }
   }
 
+  Widget _buildUserProfileImage(String profilePictureBase64) {
+    if (profilePictureBase64.isNotEmpty) {
+      try {
+        // Tenta decodificar a imagem de base64
+        final decodedBytes = base64Decode(profilePictureBase64);
+        return CircleAvatar(
+          radius: 25,
+          backgroundImage: MemoryImage(decodedBytes),
+        );
+      } catch (e) {
+        // Caso haja um erro na decodificação, usa a imagem padrão
+        return CircleAvatar(
+          radius: 25,
+          backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
+        );
+      }
+    } else {
+      // Usa a imagem padrão se o caminho da imagem estiver vazio
+      return CircleAvatar(
+        radius: 25,
+        backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,10 +67,7 @@ class StudentStatus extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundImage: AssetImage(imagePath),
-          ),
+          _buildUserProfileImage(profilePictureBase64),
           SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
