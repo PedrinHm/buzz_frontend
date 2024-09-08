@@ -6,7 +6,7 @@ class Usuario {
   final String? cpf; 
   final String? profilePicture;
   final String? course;
-  final String? university;
+  final String? facultyName; // Novo campo para o nome da faculdade
 
   Usuario({
     required this.tipoUsuario,
@@ -16,7 +16,7 @@ class Usuario {
     this.cpf, 
     this.profilePicture,
     this.course,
-    this.university,
+    this.facultyName, // Adicionado novo campo
   });
 
   // Método para converter um JSON da resposta da API em um objeto Usuario
@@ -29,7 +29,7 @@ class Usuario {
       cpf: json['cpf'],
       profilePicture: json['profile_picture'],
       course: json['course'],
-      university: json['faculty_id'] != null ? 'Faculdade de Id ${json['faculty_id']}' : null,
+      facultyName: json['faculty_name'], // Mapeia o nome da faculdade a partir do JSON
     );
   }
 

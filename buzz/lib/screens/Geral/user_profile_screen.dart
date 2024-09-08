@@ -187,9 +187,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               _buildInfoColumn('CPF', user.cpf ?? 'CPF não disponível'),
               if (user.tipoUsuario == 'student') ...[
                 SizedBox(height: 20),
-                _buildInfoColumn('Curso', user.course ?? 'Curso não disponível'),
-                SizedBox(height: 20),
-                _buildInfoColumn('Faculdade', user.university ?? 'Faculdade não disponível'),
+                _buildInfoColumn('Faculdade', user.facultyName ?? 'Faculdade não disponível'), // Atualizado para usar facultyName
               ],
             ],
           ),
