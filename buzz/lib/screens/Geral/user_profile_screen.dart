@@ -170,7 +170,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               fit: BoxFit.cover,
                             )
                           : Image.asset(
-                              'assets/images/default_profile.png',
+                              'images/default_profile.jpeg',
                               width: 175,
                               height: 175,
                               fit: BoxFit.cover,
