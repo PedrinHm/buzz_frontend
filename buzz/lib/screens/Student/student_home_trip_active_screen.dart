@@ -30,23 +30,35 @@ class StudentHomeTripActiveScreen extends StatefulWidget {
 class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScreen> {
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
-  bool _showStatusOverlay = false; // Flag para a sobreposição de status
-  List<Map<String, dynamic>> _busList = []; // Lista de ônibus disponíveis
-  List<Map<String, String>> busStopList = []; // Lista de pontos de ônibus
-  bool isLoading = false; // Flag de carregamento
-  late int _studentTripId; // Use late para garantir que será inicializado
+  bool _showStatusOverlay = false; 
+  List<Map<String, dynamic>> _busList = []; 
+  List<Map<String, String>> busStopList = []; 
+  List<Map<int, dynamic>> _statusList = []; // Lista de status disponíveis
+  bool isLoading = false; 
+  late int _studentTripId; 
+  int? _currentStatus; // Status atual do aluno como int
+
+  // Mapeamento de status numérico para rótulos e cores
+  final Map<int, Map<String, dynamic>> statusDetails = {
+    1: {'statusText': 'Presente', 'color': Color(0xFF3E9B4F), 'icon': PhosphorIcons.check},
+    2: {'statusText': 'Em aula', 'color': Color(0xFF395BC7), 'icon': PhosphorIcons.chalkboardTeacher},
+    3: {'statusText': 'Aguardando ônibus', 'color': Color(0xFFB0E64C), 'icon': PhosphorIcons.bus},
+    4: {'statusText': 'Não voltará', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
+    5: {'statusText': 'Fila de espera', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
+  };
 
   @override
   void initState() {
     super.initState();
-    _studentTripId = widget.studentTripId; // Inicializa _studentTripId com o valor do widget
+    _studentTripId = widget.studentTripId; 
+    _fetchCurrentStatus(); // Inicializa o status atual
   }
 
   void _toggleBusOverlay() {
     setState(() {
       _showBusOverlay = !_showBusOverlay;
       if (_showBusOverlay) {
-        _fetchActiveBuses(); // Carrega a lista de ônibus ativos
+        _fetchActiveBuses(); 
       }
     });
   }
@@ -55,7 +67,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
       if (_showBusStopOverlay) {
-        _fetchBusStops(); // Carregar os pontos de ônibus quando a sobreposição for ativada
+        _fetchBusStops(); 
       }
     });
   }
@@ -63,7 +75,92 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   void _toggleStatusOverlay() {
     setState(() {
       _showStatusOverlay = !_showStatusOverlay;
+      if (_showStatusOverlay) {
+        _fetchAvailableStatus(); // Carrega a lista de status disponíveis
+      }
     });
+  }
+
+  Future<void> _fetchCurrentStatus() async {
+    try {
+      // Faz uma chamada HTTP para buscar o status atual do aluno
+      final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/${widget.studentTripId}'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _currentStatus = data['status']; // status numérico recebido da API
+        });
+      } else {
+        throw Exception('Failed to fetch current status');
+      }
+    } catch (e) {
+      print('Error fetching current status: $e');
+    }
+  }
+
+  Future<void> _fetchAvailableStatus() async {
+    if (_currentStatus == null) {
+      print('Current status is not set');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: Status atual não está definido!')),
+      );
+      return;
+    }
+
+    // Definindo os status permitidos para cada status atual
+    final Map<int, List<int>> allowedTransitions = {
+      1: [2, 3, 4], // Presente para Em aula, Aguardando ônibus, Não voltará
+      2: [1, 3, 4], // Em aula para Presente, Aguardando ônibus, Não voltará
+      3: [1, 2, 4], // Aguardando ônibus para Presente, Em aula, Não voltará
+      4: [1, 2, 3, 5], // Não voltará para Presente, Em aula, Aguardando ônibus, Fila de espera
+      5: [1, 2, 3, 4] // Fila de espera para Presente, Em aula, Aguardando ônibus, Não voltará
+    };
+
+    final List<int>? possibleStatuses = allowedTransitions[_currentStatus];
+
+    if (possibleStatuses == null) {
+      print('Erro: Transições permitidas não encontradas para o status atual!');
+      return;
+    }
+
+    setState(() {
+      // Cria uma lista de opções de status permitidos com base no status atual
+      _statusList = possibleStatuses.map((status) => {
+        'status': status,
+        ...statusDetails[status]!,
+      }).toList();
+    });
+  }
+
+  Future<void> _updateStudentTripStatus(int newStatus) async {
+    if (_studentTripId == null) {
+      print('Student trip ID is not set');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: Student trip ID não está definido!')),
+      );
+      return;
+    }
+
+    try {
+      final url = Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_status?new_status=$newStatus');
+
+      final response = await http.put(url);
+
+      if (response.statusCode == 200) {
+        print('Status do aluno atualizado com sucesso!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Status do aluno atualizado com sucesso!')),
+        );
+      } else {
+        throw Exception('Failed to update student status');
+      }
+    } catch (e) {
+      print('Erro ao atualizar o status do aluno: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao atualizar o status do aluno')),
+      );
+    }
   }
 
   Future<void> _fetchActiveBuses() async {
@@ -72,7 +169,6 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      // Realiza a chamada HTTP para buscar ônibus disponíveis para o aluno
       final response = await http.get(Uri.parse('http://127.0.0.1:8000/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
@@ -109,7 +205,6 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      // Utilize o ID do aluno e da viagem a partir do widget
       final response = await http.get(Uri.parse('http://127.0.0.1:8000/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
 
       if (response.statusCode == 200) {
@@ -117,7 +212,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
 
         setState(() {
           busStopList = data.map((item) => {
-            'id': item['id'].toString(), // Certifique-se de que 'id' está presente e convertido para String
+            'id': item['id'].toString(),
             'name': item['name'] as String,
             'status': item['status'] as String,
           }).toList();
@@ -144,7 +239,6 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      // Realiza a chamada HTTP para atualizar a viagem do aluno
       final response = await http.put(Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
       if (response.statusCode == 200) {
@@ -173,7 +267,6 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      // Monta a URL com o ID da viagem do aluno e o novo ponto
       final url = Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_point?point_id=$pointId');
 
       final response = await http.put(url);
@@ -208,8 +301,8 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
                 ),
                 SizedBox(height: 10),
                 CustomStatus(
-                  onPressed: _toggleStatusOverlay, // Adicione esta linha para definir o callback
-                  StatusName: 'Definir status', // Texto atualizado para indicar o propósito do botão
+                  onPressed: _toggleStatusOverlay,
+                  StatusName: 'Definir status',
                   iconData: PhosphorIcons.chalkboardTeacher,
                 ),
                 SizedBox(height: 10),
@@ -290,13 +383,13 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
           padding: const EdgeInsets.only(bottom: 20.0),
           child: BusDetailsButton(
             onPressed: () {
-              _updateStudentTrip(bus['tripId']); // Chama a função para atualizar a viagem do aluno
+              _updateStudentTrip(bus['tripId']);
               _toggleBusOverlay();
             },
             busNumber: bus['registrationNumber'],
             driverName: bus['name'],
             capacity: bus['capacity'],
-            availableSeats: 0, // Defina isso de acordo com os dados recebidos, se necessário
+            availableSeats: 0,
             color: Color(0xFF395BC7),
           ),
         );
@@ -317,7 +410,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
             onPressed: () {
               if (busStopId != null) {
                 print("Selecionado ponto de ônibus: ${busStop['name']}");
-                _updateStudentTripPoint(int.parse(busStopId)); // Chama a função para atualizar o ponto
+                _updateStudentTripPoint(int.parse(busStopId));
               } else {
                 print('Erro: ID do ponto de ônibus é nulo');
               }
@@ -332,22 +425,15 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   }
 
   Widget _buildStatusList() {
-    final List<Map<String, dynamic>> statusList = [
-      {'statusText': 'Em aula', 'color': Color(0xFF395BC7), 'icon': PhosphorIcons.chalkboardTeacher},
-      {'statusText': 'Aguardando ônibus', 'color': Color(0xFFB0E64C), 'icon': PhosphorIcons.bus},
-      {'statusText': 'Presente', 'color': Color(0xFF3E9B4F), 'icon': PhosphorIcons.check},
-      {'statusText': 'Não voltará', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
-    ];
-
     return ListView.builder(
-      itemCount: statusList.length,
+      itemCount: _statusList.length,
       itemBuilder: (context, index) {
-        final status = statusList[index];
+        final status = _statusList[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
           child: StatusButton(
             onPressed: () {
-              print("Selecionado status: ${status['statusText']}");
+              _updateStudentTripStatus(status['status']);
               _toggleStatusOverlay();
             },
             statusText: status['statusText'],
