@@ -6,9 +6,9 @@ import 'student_trip_inactive_screen.dart';
 
 class StudentTripScreenController extends StatefulWidget {
   final int studentId; // ID do aluno
-
+  
   StudentTripScreenController({Key? key, required this.studentId}) : super(key: key);
-
+    
   @override
   _StudentTripScreenControllerState createState() => _StudentTripScreenControllerState();
 }

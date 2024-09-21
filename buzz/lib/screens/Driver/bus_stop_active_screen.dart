@@ -32,6 +32,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   late bool _isReturnTrip;
   List<Map<String, String>> tripBusStops = [];
   bool _isProcessing = false;
+  bool _busIssue = false;
 
   @override
   void initState() {
@@ -46,21 +47,64 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
   }
 
-  Future<List<Map<String, String>>> fetchBusStops() async {
-    var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/bus_stops');
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      List<dynamic> data = decodeJsonResponse(response);
-      return data.map((item) => {
-        'name': item['name'] as String,
-        'status': item['status'] as String,
-      }).toList().cast<Map<String, String>>();
-    } else if (response.statusCode == 404) {
-      return [];
-    } else {
-      throw Exception('Failed to load bus stop details');
+    Future<void> toggleBusIssue() async {
+    if (_isProcessing) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/report_bus_issue');
+    try {
+      var response = await http.put(url);
+      if (response.statusCode == 200) {
+        var data = decodeJsonResponse(response);
+        setState(() {
+          _busIssue = data['bus_issue'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Erro ao reportar problema no ônibus: ${response.body}'),
+        ));
+      }
+    } catch (e) {
+      print('Erro ao reportar problema no ônibus: $e');
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
     }
   }
+
+
+Future<List<Map<String, String>>> fetchBusStops() async {
+  var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/bus_stops');
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    var data = decodeJsonResponse(response);
+    setState(() {
+      _busIssue = data['bus_issue'] ?? false;
+    });
+
+    return (data['bus_stops'] as List<dynamic>).map((item) {
+      // Se o status for "Já passou", ele não será alterado para "Ônibus com problema"
+      String status = item['status'] as String;
+      if (_busIssue && status != 'Já passou') {
+        status = 'Ônibus com problema';
+      }
+      return {
+        'name': item['name'] as String,
+        'status': status,
+      };
+    }).toList();
+  } else if (response.statusCode == 404) {
+    return [];
+  } else {
+    throw Exception('Failed to load bus stop details');
+  }
+}
+
+
 
   Future<List<Map<String, String>>> fetchStopsOnTheWay() async {
     var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/pontos_a_caminho/$_tripId');
@@ -312,31 +356,34 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           SizedBox(height: 20),
           Expanded(
             child: tripBusStops.isEmpty
-                ? Center(
-                    child: Text(
-                      'Nenhum ponto de ônibus encontrado.',
-                      style: TextStyle(
-                        color: Color(0xFF000000).withOpacity(0.70),
-                        fontSize: 16,
-                      ),
+              ? Center(
+                  child: Text(
+                    'Nenhum ponto de ônibus encontrado.',
+                    style: TextStyle(
+                      color: Color(0xFF000000).withOpacity(0.70),
+                      fontSize: 16,
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: tripBusStops.length,
-                    itemBuilder: (context, index) {
-                      final stop = tripBusStops[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: TripBusStop(
-                          onPressed: () {
-                            // Add action for each bus stop
-                          },
-                          busStopName: stop['name']!,
-                          busStopStatus: stop['status']!,
-                        ),
-                      );
-                    },
                   ),
+                )
+              : ListView.builder(
+                  itemCount: tripBusStops.length,
+                  itemBuilder: (context, index) {
+                    final stop = tripBusStops[index];
+                    final status = _busIssue && stop['status'] != 'Já passou' 
+                        ? 'Ônibus com problema' 
+                        : stop['status']!;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: TripBusStop(
+                        onPressed: () {
+                          // Ação para cada ponto de ônibus
+                        },
+                        busStopName: stop['name']!,
+                        busStopStatus: status,
+                      ),
+                    );
+                  },
+                ),
           ),
           if (_isReturnTrip)
             _buildReturnTripButtons()
@@ -347,42 +394,48 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-  Widget _buildReturnTripButtons() {
-    String buttonText = 'Selecionar destino';
+Widget _buildReturnTripButtons() {
+  String buttonText = 'Selecionar destino';
 
-    if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
-      buttonText = 'Estou no ponto';
-    } else if (_isFinalStop()) {
-      buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
-    }
+  if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
+    buttonText = 'Estou no ponto';
+  } else if (_isFinalStop()) {
+    buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
+  }
 
-    return Column(
-      children: [
-        if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: ButtonThree(
-                    buttonText: 'Ônibus com problema',
-                    backgroundColor: Color(0xFFCBB427),
-                    onPressed: _isProcessing
-                        ? () {}
-                        : () {
-                            print('Ônibus com problema Pressionado');
-                          },
-                  ),
+  return Column(
+    children: [
+      if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: ButtonThree(
+                  buttonText: _busIssue ? 'Remover Problema' : 'Ônibus com problema',
+                  backgroundColor: Color(0xFFCBB427),
+                  onPressed: _isProcessing
+                      ? () {}
+                      : toggleBusIssue,
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: ButtonThree(
-                    buttonText: buttonText,
-                    backgroundColor: Color(0xFF3E9B4F),
-                    onPressed: _isProcessing
-                        ? () {}
-                        : () {
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: ButtonThree(
+                  buttonText: buttonText,
+                  backgroundColor: _busIssue ? Colors.grey : Color(0xFF3E9B4F), // Define o botão como cinza se houver problema
+                  onPressed: _isProcessing
+                      ? () {}
+                      : () {
+                          if (_busIssue) {
+                            // Mostrar mensagem se houver problema com o ônibus
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Resolva o problema do ônibus para partir.'),
+                              backgroundColor: Colors.redAccent,
+                            ));
+                          } else {
+                            // Ação normal se não houver problema
                             if (buttonText == 'Estou no ponto') {
                               _updateNextToAtStop();
                             } else if (buttonText.contains('Encerrar')) {
@@ -390,26 +443,28 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
                             } else {
                               _showSelectNextStopPopup();
                             }
-                          },
-                  ),
+                          }
+                        },
                 ),
-              ],
-            ),
-          ),
-        if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: ButtonThree(
-                buttonText: 'Finalizar viagem',
-                backgroundColor: Colors.red,
-                onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
               ),
+            ],
+          ),
+        ),
+      if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: ButtonThree(
+              buttonText: 'Finalizar viagem',
+              backgroundColor: Colors.red,
+              onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
             ),
           ),
-      ],
-    );
-  }
+        ),
+    ],
+  );
+}
+
 
   Widget _buildDepartureTripButtons() {
     return Padding(
@@ -437,3 +492,4 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 }
+

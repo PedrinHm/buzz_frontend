@@ -40,90 +40,92 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: _futureData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
-            }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: RefreshIndicator(
+      onRefresh: _refreshData,
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: _futureData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
+          }
 
-            if (!snapshot.hasData || snapshot.data == null) {
-              return Center(child: Text('Nenhum dado encontrado.'));
-            }
+          if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('Nenhum dado encontrado.'));
+          }
 
-            // Convertendo explicitamente para List<Map<String, String>>
-            var students = (snapshot.data!['students'] as List)
-                .map((item) => Map<String, String>.from(item))
-                .toList();
-            var busStops = (snapshot.data!['busStops'] as List)
-                .map((item) => Map<String, String>.from(item))
-                .toList();
+          var students = (snapshot.data!['students'] as List)
+              .map((item) => Map<String, String>.from(item))
+              .toList();
+          var busStops = (snapshot.data!['busStops'] as List)
+              .map((item) => Map<String, String>.from(item))
+              .toList();
 
-            // Ordenando e filtrando os dados antes de exibir
-            busStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
-            students = students
-                .where((student) => student['status'] != 'Fila de espera')
-                .toList();
-            students.sort((a, b) => _compareStudentStatus(a['status']!, b['status']!));
+          bool busIssue = snapshot.data!['bus_issue'] ?? false;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                CustomTitleWidget(title: 'Viagem Atual - Alunos e Pontos de Ônibus'),
-                SizedBox(height: 20),
-                if (busStops.isEmpty && students.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Nenhum ponto de ônibus ou aluno encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: 16,
-                        ),
+          // Ordenando e filtrando os dados antes de exibir
+          busStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
+          students = students
+              .where((student) => student['status'] != 'Fila de espera')
+              .toList();
+          students.sort((a, b) => _compareStudentStatus(a['status']!, b['status']!));
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              CustomTitleWidget(title: 'Viagem Atual - Alunos e Pontos de Ônibus'),
+              SizedBox(height: 20),
+              if (busStops.isEmpty && students.isEmpty)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Nenhum ponto de ônibus ou aluno encontrado.',
+                      style: TextStyle(
+                        color: Color(0xFF000000).withOpacity(0.70),
+                        fontSize: 16,
                       ),
                     ),
-                  )
-                else ...[
-                  if (busStops.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Nenhum ponto de ônibus encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: 16,
-                        ),
+                  ),
+                )
+              else ...[
+                if (busStops.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Nenhum ponto de ônibus encontrado.',
+                      style: TextStyle(
+                        color: Color(0xFF000000).withOpacity(0.70),
+                        fontSize: 16,
                       ),
                     ),
-                  if (students.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Nenhum aluno encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: 16,
-                        ),
+                  ),
+                if (students.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Nenhum aluno encontrado.',
+                      style: TextStyle(
+                        color: Color(0xFF000000).withOpacity(0.70),
+                        fontSize: 16,
                       ),
                     ),
-                  if (busStops.isNotEmpty)
-                    ..._buildBusStopSections(busStops, students),
-                ],
+                  ),
+                if (busStops.isNotEmpty)
+                  ..._buildBusStopSections(busStops, students),
               ],
-            );
-          },
-        ),
+            ],
+          );
+        },
       ),
-    );
-  }
+    ),
+  );
+}
+
 
 List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
   List<Widget> sections = [];
@@ -151,7 +153,7 @@ List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<
                 child: StudentStatus(
                   studentName: student['name'] ?? 'N/A',
                   studentStatus: student['status'] ?? 'N/A',
-                  profilePictureBase64: student['profilePictureBase64'] ?? '', // Corrigido
+                  profilePictureBase64: student['profilePictureBase64'] ?? '',
                   busStopName: stop['name']!,
                 ),
               );
@@ -162,6 +164,7 @@ List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<
   }
   return sections;
 }
+
 
   // Mapeamento das labels para os valores numéricos usados na ordenação
   final Map<String, int> busStopStatusOrder = {
@@ -196,17 +199,25 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
     var studentsFuture = fetchStudents(tripId);
     var busStopsFuture = fetchBusStops(tripId);
     var results = await Future.wait([studentsFuture, busStopsFuture]);
+
+    // Casting explícito para o tipo correto
+    var busStopsResult = results[1] as Map<String, dynamic>;
+
     return {
-      'students': results[0],
-      'busStops': results[1],
+      'students': results[0],  // Retorna os dados dos estudantes
+      'busStops': busStopsResult['busStops'],  // Retorna os pontos de ônibus
+      'bus_issue': busStopsResult['bus_issue'],  // Retorna o estado do problema do ônibus
     };
   } catch (e) {
     return {
       'students': [],
       'busStops': [],
+      'bus_issue': false,
     };
   }
 }
+
+
 
 Future<List<Map<String, String>>> fetchStudents(int tripId) async {
   var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/details');
@@ -233,18 +244,40 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
   }
 }
 
-Future<List<Map<String, String>>> fetchBusStops(int tripId) async {
+Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
   var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/bus_stops');
   var response = await http.get(url);
+  
   if (response.statusCode == 200) {
-    List<dynamic> data = decodeJsonResponse(response);
-    return data.map((item) => Map<String, String>.from({
-      'name': item['name'] as String?,
-      'status': item['status'] as String?,
-    })).toList();
+    var data = decodeJsonResponse(response);
+
+    // Verificando o valor de bus_issue
+    bool busIssue = data['bus_issue'] ?? false;
+
+    List<Map<String, String>> busStops = (data['bus_stops'] as List).map((item) {
+      // Se o status for "Já passou", mantemos o status original
+      String status = item['status'] as String? ?? 'N/A';
+      if (busIssue && status != 'Já passou') {
+        status = 'Ônibus com problema';
+      }
+      return {
+        'name': item['name'] as String? ?? 'N/A',
+        'status': status,
+      };
+    }).toList();
+
+    return {
+      'bus_issue': busIssue,
+      'busStops': busStops,
+    };
   } else if (response.statusCode == 404) {
-    return [];
+    return {
+      'bus_issue': false,
+      'busStops': [],
+    };
   } else {
     throw Exception('Failed to load bus stop details');
   }
 }
+
+
