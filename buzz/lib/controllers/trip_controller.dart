@@ -45,7 +45,7 @@ class TripController extends ChangeNotifier {
   }
 
   Future<void> checkActiveDriverTrip(int driverId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/trips/active/$driverId'));
+    final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/trips/active/$driverId'));
     if (response.statusCode == 200) {
       final tripData = json.decode(response.body);
       _activeTripId = tripData['id'];
@@ -61,7 +61,7 @@ class TripController extends ChangeNotifier {
 
   Future<void> checkActiveStudentTrip(int studentId) async {
     try {
-      final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/active/$studentId'));
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
       if (response.statusCode == 200) {
         final tripData = json.decode(response.body);
         _activeTripId = tripData['trip_id'];
@@ -87,7 +87,7 @@ class TripController extends ChangeNotifier {
 
   Future<void> initiateTrip(int driverId, int busId, int tripType) async {
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/trips/'),
+      Uri.parse('https://buzzbackend-production.up.railway.app/trips/'),
       headers: {"Content-Type": "application/json"},
       body: json.encode({
         'trip_type': tripType,
@@ -110,7 +110,7 @@ class TripController extends ChangeNotifier {
 
   Future<void> completeTrip(int tripId) async {
     String endpoint = _tripType == 1 ? 'finalizar_ida' : 'finalizar_volta';
-    final response = await http.put(Uri.parse('http://127.0.0.1:8000/trips/$tripId/$endpoint'));
+    final response = await http.put(Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/$endpoint'));
     
     if (response.statusCode == 200) {
       if (_tripType == 1) {

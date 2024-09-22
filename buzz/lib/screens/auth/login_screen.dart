@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print('Sending login request with email: $email and password: $password');
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/auth/'),  // Verifique se a URL está correta
+        Uri.parse('https://buzzbackend-production.up.railway.app/auth/'),  // Verifique se a URL está correta
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

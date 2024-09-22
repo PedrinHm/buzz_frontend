@@ -25,7 +25,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<Usuario> _fetchUser(int userId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/users/$userId'));
+    final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/users/$userId'));
 
     if (response.statusCode == 200) {
       return Usuario.fromJson(jsonDecode(response.body));
@@ -67,7 +67,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       try {
         print('Enviando imagem para API...'); // Log para depuração
         final response = await http.put(
-          Uri.parse('http://127.0.0.1:8000/users/${widget.userId}/profile-picture'),
+          Uri.parse('https://buzzbackend-production.up.railway.app/users/${widget.userId}/profile-picture'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'picture': _base64Image}),
         );

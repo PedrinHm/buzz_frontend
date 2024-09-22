@@ -33,7 +33,7 @@ void _handleBusSelection(BuildContext context) {
           _selectedTripId = selectedTripId; // Armazena o tripId selecionado
           _fetchBusStops(widget.studentId); // Passa o ID do estudante para buscar os pontos de ônibus
         },
-        url: 'http://127.0.0.1:8000/buses/trips/active_trips',
+        url: 'https://buzzbackend-production.up.railway.app/buses/trips/active_trips',
       );
     },
   );
@@ -41,7 +41,7 @@ void _handleBusSelection(BuildContext context) {
 
 void _fetchBusStops(int studentId) async {
   // Utiliza o novo endpoint com o ID do estudante e da viagem
-  String url = 'http://127.0.0.1:8000/bus_stops/action/trip?student_id=$studentId&trip_id=$_selectedTripId';
+  String url = 'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=$studentId&trip_id=$_selectedTripId';
 
   print('Fetching bus stops from URL: $url'); // Debug print
 
@@ -83,7 +83,7 @@ void _fetchBusStops(int studentId) async {
   }
 
   Future<void> _createStudentTrip() async {
-    final url = 'http://127.0.0.1:8000/student_trips';
+    final url = 'https://buzzbackend-production.up.railway.app/student_trips';
     final body = json.encode({
       'trip_id': _selectedTripId,
       'student_id': widget.studentId,  // Usa o 'studentId' passado para o widget

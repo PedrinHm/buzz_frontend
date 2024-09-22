@@ -55,7 +55,7 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _fetchFaculties() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/faculties/'));
+    final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/faculties/'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -77,7 +77,7 @@ class _FormScreenState extends State<FormScreen> {
 
     switch (widget.title) {
       case 'Cadastro de Motorista':
-        apiUrl = 'http://127.0.0.1:8000/users/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -91,7 +91,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Aluno':
-        apiUrl = 'http://127.0.0.1:8000/users/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -106,7 +106,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Pontos de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/bus_stops/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -116,7 +116,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/buses/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/buses/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -127,7 +127,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Faculdades':
-        apiUrl = 'http://127.0.0.1:8000/faculties/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }

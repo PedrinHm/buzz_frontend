@@ -41,19 +41,19 @@ class _ListScreenState extends State<ListScreen> {
     String apiUrl;
     switch (widget.title) {
       case 'Cadastro de Motorista':
-        apiUrl = 'http://127.0.0.1:8000/users/?user_type_id=2';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/users/?user_type_id=2';
         break;
       case 'Cadastro de Aluno':
-        apiUrl = 'http://127.0.0.1:8000/users/?user_type_id=1';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/users/?user_type_id=1';
         break;
       case 'Cadastro de Pontos de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/bus_stops/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/';
         break;
       case 'Cadastro de Ônibus':
-        apiUrl = 'http://127.0.0.1:8000/buses/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/buses/';
         break;
       case 'Cadastro de Faculdades':
-        apiUrl = 'http://127.0.0.1:8000/faculties/';
+        apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/';
         break;
       default:
         setState(() {
@@ -207,19 +207,19 @@ class _ListScreenState extends State<ListScreen> {
             String apiUrl;
             switch (widget.title) {
               case 'Cadastro de Motorista':
-                apiUrl = 'http://127.0.0.1:8000/users/$id/';
+                apiUrl = 'https://buzzbackend-production.up.railway.app/users/$id/';
                 break;
               case 'Cadastro de Aluno':
-                apiUrl = 'http://127.0.0.1:8000/users/$id/';
+                apiUrl = 'https://buzzbackend-production.up.railway.app/users/$id/';
                 break;
               case 'Cadastro de Pontos de Ônibus':
-                apiUrl = 'http://127.0.0.1:8000/bus_stops/$id/';
+                apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/$id/';
                 break;
               case 'Cadastro de Ônibus':
-                apiUrl = 'http://127.0.0.1:8000/buses/$id/';
+                apiUrl = 'https://buzzbackend-production.up.railway.app/buses/$id/';
                 break;
               case 'Cadastro de Faculdades':
-                apiUrl = 'http://127.0.0.1:8000/faculties/$id/';
+                apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/$id/';
                 break;
               default:
                 return;

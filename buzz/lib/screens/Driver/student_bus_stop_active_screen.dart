@@ -220,7 +220,7 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
 
 
 Future<List<Map<String, String>>> fetchStudents(int tripId) async {
-  var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/details');
+  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/details');
   var response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -245,7 +245,7 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
 }
 
 Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
-  var url = Uri.parse('http://127.0.0.1:8000/trips/$tripId/bus_stops');
+  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/bus_stops');
   var response = await http.get(url);
   
   if (response.statusCode == 200) {

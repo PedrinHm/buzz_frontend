@@ -54,7 +54,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       _isProcessing = true;
     });
 
-    var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/report_bus_issue');
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$_tripId/report_bus_issue');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {
@@ -78,7 +78,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
 
 
 Future<List<Map<String, String>>> fetchBusStops() async {
-  var url = Uri.parse('http://127.0.0.1:8000/trips/$_tripId/bus_stops');
+  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$_tripId/bus_stops');
   var response = await http.get(url);
   if (response.statusCode == 200) {
     var data = decodeJsonResponse(response);
@@ -107,7 +107,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
 
 
   Future<List<Map<String, String>>> fetchStopsOnTheWay() async {
-    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/pontos_a_caminho/$_tripId');
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/trip_bus_stops/pontos_a_caminho/$_tripId');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       List<dynamic> data = decodeJsonResponse(response);
@@ -164,7 +164,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
       return;
     }
 
-    var url = Uri.parse('http://127.0.0.1:8000/$endpoint');
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/$endpoint');
 
     try {
       var response = await http.put(url);
@@ -214,7 +214,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
       _isProcessing = true;
     });
 
-    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/selecionar_proximo_ponto/$_tripId?new_stop_id=$stopId');
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/trip_bus_stops/selecionar_proximo_ponto/$_tripId?new_stop_id=$stopId');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {
@@ -245,7 +245,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
       _isProcessing = true;
     });
 
-    var url = Uri.parse('http://127.0.0.1:8000/trip_bus_stops/atualizar_proximo_para_no_ponto/$_tripId');
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/trip_bus_stops/atualizar_proximo_para_no_ponto/$_tripId');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {

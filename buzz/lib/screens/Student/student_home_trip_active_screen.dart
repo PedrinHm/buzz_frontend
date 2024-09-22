@@ -84,7 +84,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   Future<void> _fetchCurrentStatus() async {
     try {
       // Faz uma chamada HTTP para buscar o status atual do aluno
-      final response = await http.get(Uri.parse('http://127.0.0.1:8000/student_trips/${widget.studentTripId}'));
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -143,7 +143,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      final url = Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_status?new_status=$newStatus');
+      final url = Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
 
       final response = await http.put(url);
 
@@ -169,7 +169,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      final response = await http.get(Uri.parse('http://127.0.0.1:8000/buses/available_for_student?student_id=${widget.studentId}'));
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -205,7 +205,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      final response = await http.get(Uri.parse('http://127.0.0.1:8000/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -239,7 +239,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      final response = await http.put(Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
+      final response = await http.put(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
       if (response.statusCode == 200) {
         print('Viagem do aluno atualizada com sucesso!');
@@ -267,7 +267,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      final url = Uri.parse('http://127.0.0.1:8000/student_trips/$_studentTripId/update_point?point_id=$pointId');
+      final url = Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_point?point_id=$pointId');
 
       final response = await http.put(url);
 

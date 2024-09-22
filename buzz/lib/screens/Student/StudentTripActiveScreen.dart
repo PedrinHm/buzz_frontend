@@ -37,7 +37,7 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
   }
 
 Future<void> fetchBusStops() async {
-  final String url = 'http://127.0.0.1:8000/trips/${widget.tripId}/bus_stops';
+  final String url = 'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}/bus_stops';
 
   try {
     final response = await http.get(Uri.parse(url));
