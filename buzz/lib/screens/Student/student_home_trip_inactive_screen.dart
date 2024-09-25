@@ -84,10 +84,10 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
   }
 
   Future<void> _createStudentTrip() async {
-    final url = 'https://buzzbackend-production.up.railway.app/student_trips';
+    final url = 'https://buzzbackend-production.up.railway.app/student_trips/';
     final body = json.encode({
       'trip_id': _selectedTripId,
-      'student_id': widget.studentId,  // Usa o 'studentId' passado para o widget
+      'student_id': widget.studentId,  
       'point_id': _selectedBusStopId,  
     });
 

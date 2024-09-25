@@ -1,7 +1,7 @@
 import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
-import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
+import 'package:buzz/utils/size_config.dart';
 
 class StudentBusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
