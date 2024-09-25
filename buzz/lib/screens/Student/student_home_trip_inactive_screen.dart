@@ -1,3 +1,4 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Selection_Overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/widgets/Geral/Bus_Selection_Dialog.dart';
@@ -22,46 +23,46 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
   int _selectedTripId = 0;  // Armazena o ID da viagem selecionada
   int _selectedBusStopId = 0;  // Armazena o ID do ponto de ônibus selecionado
 
-void _handleBusSelection(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return BusSelectionDialog(
-        onBusSelected: (int selectedBusId, int selectedTripId, int selectedTripType) {
-          Navigator.pop(context); // Fechar o diálogo após a seleção
-          print('Ônibus selecionado: $selectedBusId, Viagem: $selectedTripId, Tipo de viagem: $selectedTripType'); // Debug print
-          _selectedTripId = selectedTripId; // Armazena o tripId selecionado
-          _fetchBusStops(widget.studentId); // Passa o ID do estudante para buscar os pontos de ônibus
-        },
-        url: 'https://buzzbackend-production.up.railway.app/buses/trips/active_trips',
-      );
-    },
-  );
-}
-
-void _fetchBusStops(int studentId) async {
-  // Utiliza o novo endpoint com o ID do estudante e da viagem
-  String url = 'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=$studentId&trip_id=$_selectedTripId';
-
-  print('Fetching bus stops from URL: $url'); // Debug print
-
-  final response = await http.get(Uri.parse(url));
-
-  if (response.statusCode == 200) {
-    final responseData = json.decode(response.body);
-    print('Dados recebidos dos pontos de ônibus: $responseData'); // Debug print
-
-    setState(() {
-      _busStops = List<Map<String, dynamic>>.from(responseData);
-      _showBusStopSelectionOverlay();
-    });
-  } else {
-    print('Erro ao buscar pontos de ônibus: ${response.reasonPhrase}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao buscar pontos de ônibus')),
+  void _handleBusSelection(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BusSelectionDialog(
+          onBusSelected: (int selectedBusId, int selectedTripId, int selectedTripType) {
+            Navigator.pop(context); // Fechar o diálogo após a seleção
+            print('Ônibus selecionado: $selectedBusId, Viagem: $selectedTripId, Tipo de viagem: $selectedTripType'); // Debug print
+            _selectedTripId = selectedTripId; // Armazena o tripId selecionado
+            _fetchBusStops(widget.studentId); // Passa o ID do estudante para buscar os pontos de ônibus
+          },
+          url: 'https://buzzbackend-production.up.railway.app/buses/trips/active_trips',
+        );
+      },
     );
   }
-}
+
+  void _fetchBusStops(int studentId) async {
+    // Utiliza o novo endpoint com o ID do estudante e da viagem
+    String url = 'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=$studentId&trip_id=$_selectedTripId';
+
+    print('Fetching bus stops from URL: $url'); // Debug print
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      print('Dados recebidos dos pontos de ônibus: $responseData'); // Debug print
+
+      setState(() {
+        _busStops = List<Map<String, dynamic>>.from(responseData);
+        _showBusStopSelectionOverlay();
+      });
+    } else {
+      print('Erro ao buscar pontos de ônibus: ${response.reasonPhrase}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao buscar pontos de ônibus')),
+      );
+    }
+  }
 
   void _showBusStopSelectionOverlay() {
     setState(() {
@@ -129,7 +130,7 @@ void _fetchBusStops(int studentId) async {
                   'Você não está em nenhuma viagem atualmente.',
                   style: TextStyle(
                     color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
+                    fontSize: getHeightProportion(context, 16), // Proporção para altura
                   ),
                 ),
               ],
@@ -138,7 +139,7 @@ void _fetchBusStops(int studentId) async {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(getHeightProportion(context, 16.0)), // Proporção para altura
               child: ButtonThree(
                 buttonText: 'Selecionar viagem',
                 backgroundColor: Color(0xFF395BC7),

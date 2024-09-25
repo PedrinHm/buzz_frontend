@@ -8,6 +8,7 @@ import 'package:buzz/models/usuario.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async'; 
+import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(16.0),  // Adiciona padding para melhor visualização
+          padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Proporção em altura
           child: _isLoading 
             ? CircularProgressIndicator()
             : Column(
@@ -147,16 +148,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   controller: emailController,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
                 CustomInputField(
                   labelText: 'Senha',
                   obscureText: true,
                   controller: passwordController,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
                 if (_errorMessage.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.only(bottom: getHeightProportion(context, 10)),  // Proporção em altura
                     child: Text(
                       _errorMessage,
                       style: TextStyle(color: Colors.red),
@@ -164,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 if (_lockoutEndTime != null)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.only(bottom: getHeightProportion(context, 10)),  // Proporção em altura
                     child: Text(
                       'Você poderá tentar novamente em ${_formatTimeRemaining()}',
                       style: TextStyle(color: Colors.red),

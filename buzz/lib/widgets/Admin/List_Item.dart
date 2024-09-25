@@ -1,4 +1,4 @@
-
+import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -23,10 +23,13 @@ class ListItem extends StatelessWidget {
     final Color backgroundColor = index % 2 == 0 ? Colors.grey[300]! : Colors.grey[400]!;
 
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.90,
+      width: MediaQuery.of(context).size.width * 0.90, // Proporção para a largura
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8.0),
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        margin: EdgeInsets.symmetric(vertical: getHeightProportion(context, 8.0)), // Proporção para espaçamento vertical
+        padding: EdgeInsets.symmetric(
+          horizontal: getWidthProportion(context, 16.0), // Proporção para espaçamento horizontal
+          vertical: getHeightProportion(context, 12.0),  // Proporção para espaçamento vertical
+        ),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10.0),
@@ -40,17 +43,17 @@ class ListItem extends StatelessWidget {
                 Text(
                   primaryText,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: getHeightProportion(context, 16), // Proporção para tamanho da fonte
                     color: Colors.black,
                     fontWeight: FontWeight.w600, // SemiBold
                     fontFamily: 'Inter',
                   ),
                 ),
-                SizedBox(height: 4.0),
+                SizedBox(height: getHeightProportion(context, 4.0)), // Proporção para espaçamento vertical
                 Text(
                   secondaryText,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: getHeightProportion(context, 14), // Proporção para tamanho da fonte
                     color: Colors.black,
                     fontFamily: 'Inter',
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class BusDetailsButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -25,20 +26,23 @@ class BusDetailsButton extends StatelessWidget {
         onTap: onPressed,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: 130,
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+          height: getHeightProportion(context, 130),  // Proporção de altura
+          padding: EdgeInsets.symmetric(
+            vertical: getHeightProportion(context, 15.0), 
+            horizontal: getWidthProportion(context, 20.0), // Proporção de padding
+          ),
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(15),
+                padding: EdgeInsets.all(getHeightProportion(context, 15)),  // Proporção de padding
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
                   border: Border.all(
                     color: Colors.white,
                     width: 1,
@@ -47,10 +51,10 @@ class BusDetailsButton extends StatelessWidget {
                 child: Icon(
                   PhosphorIcons.bus,
                   color: Colors.white,
-                  size: 35,
+                  size: getHeightProportion(context, 35),  // Tamanho do ícone proporcional
                 ),
               ),
-              SizedBox(width: 20),
+              SizedBox(width: getWidthProportion(context, 20)), // Proporção de espaçamento
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -58,7 +62,7 @@ class BusDetailsButton extends StatelessWidget {
                   Text(
                     'Ônibus',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -66,21 +70,21 @@ class BusDetailsButton extends StatelessWidget {
                   Text(
                     busNumber,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     driverName,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     'Capacidade: $capacity',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                       color: Colors.white,
                     ),
                   ),
@@ -88,7 +92,7 @@ class BusDetailsButton extends StatelessWidget {
                     Text(
                       'Vagas disponíveis: $availableSeats',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                         color: Colors.white,
                       ),
                     ),

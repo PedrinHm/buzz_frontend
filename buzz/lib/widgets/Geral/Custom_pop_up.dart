@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class CustomPopup extends StatelessWidget {
   final String message;
@@ -19,22 +20,22 @@ class CustomPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(getHeightProportion(context, 16)),  // Proporção de borda
       ),
       elevation: 0,
       backgroundColor: Colors.white,
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(getHeightProportion(context, 16)),  // Proporção de padding
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 16),
+            SizedBox(height: getHeightProportion(context, 16)),  // Proporção de espaço
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontFamily: 'Inter', fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: getHeightProportion(context, 18), fontFamily: 'Inter', fontWeight: FontWeight.w400),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: getHeightProportion(context, 24)),  // Proporção de espaço
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -43,14 +44,22 @@ class CustomPopup extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFDD4425), // Cor do botão "Cancelar"
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(getHeightProportion(context, 12)),  // Proporção de borda
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidthProportion(context, 24), 
+                      vertical: getHeightProportion(context, 12),
+                    ),  // Proporção de padding
                     child: Text(
                       cancelText,
-                      style: TextStyle(fontSize: 16, fontFamily: 'Inter', fontWeight: FontWeight.w400, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -59,14 +68,22 @@ class CustomPopup extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF3E9B4F), // Cor do botão "Confirmar"
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(getHeightProportion(context, 12)),  // Proporção de borda
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getWidthProportion(context, 24), 
+                      vertical: getHeightProportion(context, 12),
+                    ),  // Proporção de padding
                     child: Text(
                       confirmText,
-                      style: TextStyle(fontSize: 16, fontFamily: 'Inter', fontWeight: FontWeight.w400, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
 
 class BusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
@@ -38,14 +39,14 @@ class BusStopInactiveScreen extends StatelessWidget {
                   'Nenhuma viagem em andamento.',
                   style: TextStyle(
                     color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: 16,
+                    fontSize: getHeightProportion(context, 16),  // Proporção ajustada
                   ),
                 ),
               ],
             ),
           ),
           Positioned(
-            bottom: 20.0,
+            bottom: getHeightProportion(context, 20.0),  // Proporção ajustada
             left: 0,
             right: 0,
             child: Center(

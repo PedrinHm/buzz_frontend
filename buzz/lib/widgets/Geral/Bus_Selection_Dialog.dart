@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Student/bus_details_button.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class BusSelectionDialog extends StatelessWidget {
   final Function(int, int, int) onBusSelected;  // Modificado para aceitar 3 parâmetros: busId, tripId, tripType
@@ -25,11 +26,11 @@ class BusSelectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(getWidthProportion(context, 16))), // Proporção aplicada
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(getHeightProportion(context, 16.0)), // Proporção aplicada
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _fetchAvailableBuses(),
           builder: (context, snapshot) {
@@ -47,9 +48,13 @@ class BusSelectionDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Defina seu ônibus atual',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: getHeightProportion(context, 18), // Proporção aplicada
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: getHeightProportion(context, 20)), // Proporção aplicada
                   Expanded(
                     child: ListView.builder(
                       itemCount: buses.length,
@@ -57,7 +62,7 @@ class BusSelectionDialog extends StatelessWidget {
                         final bus = buses[index];
                         print('Dados do ônibus: $bus'); // Debug print dos dados de cada ônibus
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
+                          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)), // Proporção aplicada
                           child: BusDetailsButton(
                             onPressed: () {
                               // Use as chaves corretas 'bus_id', 'trip_id', e 'trip_type'

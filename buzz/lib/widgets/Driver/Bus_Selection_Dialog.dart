@@ -1,3 +1,4 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,11 +23,11 @@ class BusSelectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(getWidthProportion(context, 16))),  // Aplicando proporção
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Aplicando proporção
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _fetchAvailableBuses(),
           builder: (context, snapshot) {
@@ -43,16 +44,20 @@ class BusSelectionDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Defina seu ônibus atual',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: getHeightProportion(context, 18),  // Aplicando proporção
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: getHeightProportion(context, 20)),  // Aplicando proporção
                   Expanded(
                     child: ListView.builder(
                       itemCount: buses.length,
                       itemBuilder: (context, index) {
                         final bus = buses[index];
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
+                          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)),  // Aplicando proporção
                           child: BusDetailsButton(
                             onPressed: () {
                               if (bus['id'] != null) {

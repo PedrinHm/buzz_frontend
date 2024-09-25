@@ -1,3 +1,4 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 
 class ButtonTwo extends StatelessWidget {
@@ -19,12 +20,15 @@ class ButtonTwo extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),  // Arredondamento das bordas
         ),
-        fixedSize: Size(320, 70),  // Tamanho fixo do botão (largura x altura)
+        fixedSize: Size(
+          getWidthProportion(context, 320),  // Largura proporcional
+          getHeightProportion(context, 70),   // Altura proporcional
+        ),
       ),
       child: Text(
         buttonText,  // Texto do botão passado como parâmetro
         style: TextStyle(
-          fontSize: 16,  // Tamanho do texto
+          fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
           fontWeight: FontWeight.normal,  // Peso da fonte
         ),
       ),

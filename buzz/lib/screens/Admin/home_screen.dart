@@ -1,5 +1,6 @@
 import 'package:buzz/screens/Admin/list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -22,7 +23,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
             AdminButtonTwo(
               buttonText: 'Cadastro de Aluno',
               onPressed: () {
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
             AdminButtonTwo(
               buttonText: 'Cadastro de Pontos de Ônibus',
               onPressed: () {
@@ -50,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
             AdminButtonTwo(
               buttonText: 'Cadastro de Ônibus',
               onPressed: () {
@@ -64,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 20),
+            SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
             AdminButtonTwo(
               buttonText: 'Cadastro de Faculdades',
               onPressed: () {
@@ -103,14 +104,17 @@ class AdminButtonTwo extends StatelessWidget {
         backgroundColor: Color(0xFF395BC7),  // Cor de fundo do botão
         foregroundColor: Colors.white,       // Cor do texto e ícones
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),  // Arredondamento das bordas
+          borderRadius: BorderRadius.circular(getWidthProportion(context, 10)),  // Proporção em largura para borda
         ),
-        fixedSize: Size(320, 70),  // Tamanho fixo do botão (largura x altura)
+        fixedSize: Size(
+          getWidthProportion(context, 320),  // Proporção em largura
+          getHeightProportion(context, 70),  // Proporção em altura
+        ),
       ),
       child: Text(
         buttonText,  // Texto do botão passado como parâmetro
         style: TextStyle(
-          fontSize: 16,  // Tamanho do texto
+          fontSize: getHeightProportion(context, 16),  // Proporção em altura para o tamanho da fonte
           fontWeight: FontWeight.normal,  // Peso da fonte
           fontFamily: 'Inter',
         ),

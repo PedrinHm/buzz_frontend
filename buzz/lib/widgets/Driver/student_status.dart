@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class StudentStatus extends StatelessWidget {
   final String studentName;
@@ -31,26 +32,26 @@ class StudentStatus extends StatelessWidget {
     }
   }
 
-  Widget _buildUserProfileImage(String profilePictureBase64) {
+  Widget _buildUserProfileImage(String profilePictureBase64, BuildContext context) {
     if (profilePictureBase64.isNotEmpty) {
       try {
         // Tenta decodificar a imagem de base64
         final decodedBytes = base64Decode(profilePictureBase64);
         return CircleAvatar(
-          radius: 25,
+          radius: getWidthProportion(context, 25), // Aplicando proporção
           backgroundImage: MemoryImage(decodedBytes),
         );
       } catch (e) {
         // Caso haja um erro na decodificação, usa a imagem padrão
         return CircleAvatar(
-          radius: 25,
+          radius: getWidthProportion(context, 25), // Aplicando proporção
           backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
         );
       }
     } else {
       // Usa a imagem padrão se o caminho da imagem estiver vazio
       return CircleAvatar(
-        radius: 25,
+        radius: getWidthProportion(context, 25), // Aplicando proporção
         backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
       );
     }
@@ -59,16 +60,19 @@ class StudentStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.90, // Ocupa 90% da largura da tela
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      width: MediaQuery.of(context).size.width * 0.90,// Proporção da largura
+      padding: EdgeInsets.symmetric(
+        vertical: getHeightProportion(context, 10), // Proporção em altura
+        horizontal: getWidthProportion(context, 20), // Proporção em largura
+      ),
       decoration: BoxDecoration(
         color: _getColorFromStatus(studentStatus),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção do raio
       ),
       child: Row(
         children: [
-          _buildUserProfileImage(profilePictureBase64),
-          SizedBox(width: 10),
+          _buildUserProfileImage(profilePictureBase64, context), // Passando o context para a função
+          SizedBox(width: getWidthProportion(context, 10)), // Proporção em largura
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -76,14 +80,14 @@ class StudentStatus extends StatelessWidget {
                 studentName,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: getHeightProportion(context, 14), // Proporção em altura
                 ),
               ),
               Text(
                 studentStatus,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: getHeightProportion(context, 14), // Proporção em altura
                 ),
               ),
             ],

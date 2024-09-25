@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/trip_controller.dart';
 import 'student_trip_inactive_screen.dart';
-
 class StudentTripScreenController extends StatefulWidget {
   final int studentId; // ID do aluno
   
@@ -30,7 +29,7 @@ class _StudentTripScreenControllerState extends State<StudentTripScreenControlle
       builder: (context, tripController, child) {
         return tripController.hasActiveTrip
             ? StudentTripActiveScreen(tripId: tripController.activeTripId!) // Passa o ID da viagem ativa
-            : StudentTripInactiveScreen();
+            : StudentTripInactiveScreen(); // Aqui já foi adaptado com as proporções no arquivo inativo
       },
     );
   }

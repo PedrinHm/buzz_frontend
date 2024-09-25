@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class BusStopSelectionOverlay extends StatelessWidget {
   final VoidCallback onCancel;
@@ -19,21 +20,21 @@ class BusStopSelectionOverlay extends StatelessWidget {
       color: Colors.black.withOpacity(0.9),
       child: Column(
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: getHeightProportion(context, 40)), // Proporção aplicada
           Text(
             'Defina seu ponto de ônibus atual',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: getHeightProportion(context, 24), // Proporção aplicada
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: getHeightProportion(context, 20)), // Proporção aplicada
           Expanded(
-            child: _buildBusStopList(),
+            child: _buildBusStopList(context),
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(getHeightProportion(context, 20.0)), // Proporção aplicada
             child: ButtonThree(
               buttonText: 'Cancelar',
               backgroundColor: Colors.red,
@@ -45,13 +46,13 @@ class BusStopSelectionOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildBusStopList() {
+  Widget _buildBusStopList(BuildContext context) {
     return ListView.builder(
       itemCount: busStops.length,
       itemBuilder: (context, index) {
         final busStop = busStops[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)), // Proporção aplicada
           child: TripBusStop(
             onPressed: () {
               print("Selecionado ponto de ônibus: ${busStop['name']}");

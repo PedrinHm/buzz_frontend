@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class BusStopStatus extends StatelessWidget {
   final String busStopName;
@@ -30,12 +31,15 @@ class BusStopStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.90, // Máximo de 90% da largura da tela
+        maxWidth: MediaQuery.of(context).size.width * 0.90,  // Máximo de 90% da largura da tela proporcional
       ),
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: EdgeInsets.symmetric(
+        vertical: getHeightProportion(context, 5), // Proporção em altura
+        horizontal: getWidthProportion(context, 10), // Proporção em largura
+      ),
       decoration: BoxDecoration(
         color: _getColorFromStatus(busStopStatus),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção em largura
       ),
       child: Row(
         children: [
@@ -44,17 +48,17 @@ class BusStopStatus extends StatelessWidget {
               busStopName,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: getHeightProportion(context, 14), // Proporção em altura
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          SizedBox(width: 5),
+          SizedBox(width: getWidthProportion(context, 5)), // Proporção em largura
           Text(
             '$busStopStatus',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: getHeightProportion(context, 14), // Proporção em altura
             ),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class CustomInputField extends StatefulWidget {
   final String labelText;
@@ -38,7 +39,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
-            fontSize: 16.0,
+            fontSize: getHeightProportion(context, 16.0),  // Tamanho do texto proporcional
           ),
         ),
         FractionallySizedBox(
@@ -53,11 +54,11 @@ class _CustomInputFieldState extends State<CustomInputField> {
               fillColor: Color(0xFFD9D9D9),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFD9D9D9), width: 2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),  // Proporção de borda
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFD9D9D9), width: 2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),  // Proporção de borda
               ),
               suffixIcon: widget.obscureText
                   ? IconButton(

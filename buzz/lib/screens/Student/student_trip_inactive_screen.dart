@@ -1,3 +1,4 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 
 class StudentTripInactiveScreen extends StatelessWidget {
@@ -12,7 +13,7 @@ class StudentTripInactiveScreen extends StatelessWidget {
               'Você não está em nenhuma viagem atualmente.',
               style: TextStyle(
                 color: Color(0xFF000000).withOpacity(0.70),
-                fontSize: 16,
+                fontSize: getHeightProportion(context, 16), // Proporção para altura
               ),
             ),
           ],

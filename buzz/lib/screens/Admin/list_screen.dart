@@ -7,6 +7,7 @@ import 'package:buzz/widgets/Admin/list_item.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -257,13 +258,13 @@ class _ListScreenState extends State<ListScreen> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: getHeightProportion(context, 40)),  // Proporção em altura
           CustomTitleWidget(title: widget.title),
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Proporção em altura
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final item = items[index];

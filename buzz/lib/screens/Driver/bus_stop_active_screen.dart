@@ -6,6 +6,7 @@ import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
+import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
 
 dynamic decodeJsonResponse(http.Response response) {
   if (response.statusCode == 200) {
@@ -47,7 +48,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
   }
 
-    Future<void> toggleBusIssue() async {
+  Future<void> toggleBusIssue() async {
     if (_isProcessing) return;
 
     setState(() {
@@ -76,35 +77,31 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     }
   }
 
+  Future<List<Map<String, String>>> fetchBusStops() async {
+    var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$_tripId/bus_stops');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var data = decodeJsonResponse(response);
+      setState(() {
+        _busIssue = data['bus_issue'] ?? false;
+      });
 
-Future<List<Map<String, String>>> fetchBusStops() async {
-  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$_tripId/bus_stops');
-  var response = await http.get(url);
-  if (response.statusCode == 200) {
-    var data = decodeJsonResponse(response);
-    setState(() {
-      _busIssue = data['bus_issue'] ?? false;
-    });
-
-    return (data['bus_stops'] as List<dynamic>).map((item) {
-      // Se o status for "Já passou", ele não será alterado para "Ônibus com problema"
-      String status = item['status'] as String;
-      if (_busIssue && status != 'Já passou') {
-        status = 'Ônibus com problema';
-      }
-      return {
-        'name': item['name'] as String,
-        'status': status,
-      };
-    }).toList();
-  } else if (response.statusCode == 404) {
-    return [];
-  } else {
-    throw Exception('Failed to load bus stop details');
+      return (data['bus_stops'] as List<dynamic>).map((item) {
+        String status = item['status'] as String;
+        if (_busIssue && status != 'Já passou') {
+          status = 'Ônibus com problema';
+        }
+        return {
+          'name': item['name'] as String,
+          'status': status,
+        };
+      }).toList();
+    } else if (response.statusCode == 404) {
+      return [];
+    } else {
+      throw Exception('Failed to load bus stop details');
+    }
   }
-}
-
-
 
   Future<List<Map<String, String>>> fetchStopsOnTheWay() async {
     var url = Uri.parse('https://buzzbackend-production.up.railway.app/trip_bus_stops/pontos_a_caminho/$_tripId');
@@ -317,7 +314,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
           return Dialog(
             backgroundColor: Colors.black.withOpacity(0.7),
             child: Container(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(getHeightProportion(context, 16.0)), // Proporção ajustada
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -329,7 +326,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
                       Navigator.of(context).pop();
                     },
                   )).toList(),
-                  SizedBox(height: 20),
+                  SizedBox(height: getHeightProportion(context, 20)), // Proporção ajustada
                   ButtonThree(
                     buttonText: 'Cancelar',
                     backgroundColor: Colors.red,
@@ -351,9 +348,9 @@ Future<List<Map<String, String>>> fetchBusStops() async {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 20),
+          SizedBox(height: getHeightProportion(context, 40)),  // Proporção ajustada
           CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
-          SizedBox(height: 20),
+          SizedBox(height: getHeightProportion(context, 20)),  // Proporção ajustada
           Expanded(
             child: tripBusStops.isEmpty
               ? Center(
@@ -361,7 +358,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
                     'Nenhum ponto de ônibus encontrado.',
                     style: TextStyle(
                       color: Color(0xFF000000).withOpacity(0.70),
-                      fontSize: 16,
+                      fontSize: getHeightProportion(context, 16),  // Proporção ajustada
                     ),
                   ),
                 )
@@ -373,7 +370,7 @@ Future<List<Map<String, String>>> fetchBusStops() async {
                         ? 'Ônibus com problema' 
                         : stop['status']!;
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      padding: EdgeInsets.symmetric(vertical: getHeightProportion(context, 10.0)),  // Proporção ajustada
                       child: TripBusStop(
                         onPressed: () {
                           // Ação para cada ponto de ônibus
@@ -394,81 +391,79 @@ Future<List<Map<String, String>>> fetchBusStops() async {
     );
   }
 
-Widget _buildReturnTripButtons() {
-  String buttonText = 'Selecionar destino';
+  Widget _buildReturnTripButtons() {
+    String buttonText = 'Selecionar destino';
 
-  if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
-    buttonText = 'Estou no ponto';
-  } else if (_isFinalStop()) {
-    buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
-  }
+    if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
+      buttonText = 'Estou no ponto';
+    } else if (_isFinalStop()) {
+      buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
+    }
 
-  return Column(
-    children: [
-      if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                child: ButtonThree(
-                  buttonText: _busIssue ? 'Remover Problema' : 'Ônibus com problema',
-                  backgroundColor: Color(0xFFCBB427),
-                  onPressed: _isProcessing
-                      ? () {}
-                      : toggleBusIssue,
+    return Column(
+      children: [
+        if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
+          Padding(
+            padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: ButtonThree(
+                    buttonText: _busIssue ? 'Remover Problema' : 'Ônibus com problema',
+                    backgroundColor: Color(0xFFCBB427),
+                    onPressed: _isProcessing
+                        ? () {}
+                        : toggleBusIssue,
+                  ),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: ButtonThree(
-                  buttonText: buttonText,
-                  backgroundColor: _busIssue ? Colors.grey : Color(0xFF3E9B4F), // Define o botão como cinza se houver problema
-                  onPressed: _isProcessing
-                      ? () {}
-                      : () {
-                          if (_busIssue) {
-                            // Mostrar mensagem se houver problema com o ônibus
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Resolva o problema do ônibus para partir.'),
-                              backgroundColor: Colors.redAccent,
-                            ));
-                          } else {
-                            // Ação normal se não houver problema
-                            if (buttonText == 'Estou no ponto') {
-                              _updateNextToAtStop();
-                            } else if (buttonText.contains('Encerrar')) {
-                              _finalizeTrip(buttonText);
+                SizedBox(width: getWidthProportion(context, 10)),  // Proporção ajustada
+                Expanded(
+                  child: ButtonThree(
+                    buttonText: buttonText,
+                    backgroundColor: _busIssue ? Colors.grey : Color(0xFF3E9B4F), // Define o botão como cinza se houver problema
+                    onPressed: _isProcessing
+                        ? () {}
+                        : () {
+                            if (_busIssue) {
+                              // Mostrar mensagem se houver problema com o ônibus
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('Resolva o problema do ônibus para partir.'),
+                                backgroundColor: Colors.redAccent,
+                              ));
                             } else {
-                              _showSelectNextStopPopup();
+                              if (buttonText == 'Estou no ponto') {
+                                _updateNextToAtStop();
+                              } else if (buttonText.contains('Encerrar')) {
+                                _finalizeTrip(buttonText);
+                              } else {
+                                _showSelectNextStopPopup();
+                              }
                             }
-                          }
-                        },
+                          },
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: ButtonThree(
-              buttonText: 'Finalizar viagem',
-              backgroundColor: Colors.red,
-              onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
+              ],
             ),
           ),
-        ),
-    ],
-  );
-}
-
+        if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
+          Padding(
+            padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+            child: Center(
+              child: ButtonThree(
+                buttonText: 'Finalizar viagem',
+                backgroundColor: Colors.red,
+                onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 
   Widget _buildDepartureTripButtons() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -479,7 +474,7 @@ Widget _buildReturnTripButtons() {
               onPressed: _isProcessing ? () {} : _showCancelTripPopup,
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: getWidthProportion(context, 10)),  // Proporção ajustada
           Expanded(
             child: ButtonThree(
               buttonText: 'Finalizar Viagem',
@@ -492,4 +487,3 @@ Widget _buildReturnTripButtons() {
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class CustomBusInfoButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -18,20 +19,23 @@ class CustomBusInfoButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        height: 100, // Ajustar a altura para evitar estouro de pixels
-        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        height: getHeightProportion(context, 100),  // Proporção de altura
+        padding: EdgeInsets.symmetric(
+          vertical: getHeightProportion(context, 10.0), 
+          horizontal: getWidthProportion(context, 20.0), // Proporção de padding
+        ),
         decoration: BoxDecoration(
           color: Color(0xFF395BC7),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(10), // Ajustar padding interno
+              padding: EdgeInsets.all(getHeightProportion(context, 10)),  // Proporção de padding
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
                 border: Border.all(
                   color: Colors.white,
                   width: 1,
@@ -40,10 +44,10 @@ class CustomBusInfoButton extends StatelessWidget {
               child: Icon(
                 PhosphorIcons.bus,
                 color: Colors.white,
-                size: 35,
+                size: getHeightProportion(context, 35),  // Tamanho do ícone proporcional
               ),
             ),
-            SizedBox(width: 20),
+            SizedBox(width: getWidthProportion(context, 20)),  // Proporção de espaçamento
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -51,7 +55,7 @@ class CustomBusInfoButton extends StatelessWidget {
                 Text(
                   'Definir ônibus',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
@@ -59,14 +63,14 @@ class CustomBusInfoButton extends StatelessWidget {
                 Text(
                   'Ônibus atual: $busNumber',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                     color: Colors.white,
                   ),
                 ),
                 Text(
                   driverName,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                     color: Colors.white,
                   ),
                 ),

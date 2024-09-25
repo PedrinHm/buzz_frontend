@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
+import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
 
 class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController cpfController = TextEditingController();
@@ -83,7 +84,7 @@ class ForgotPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Proporção em altura
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -99,7 +100,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
             Button_One(
               buttonText: 'Enviar para meu e-mail',
               onPressed: () {

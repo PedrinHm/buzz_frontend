@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class TripBusStop extends StatelessWidget {
   final VoidCallback onPressed;
@@ -51,36 +52,41 @@ class TripBusStop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+      padding: EdgeInsets.symmetric(
+        horizontal: getWidthProportion(context, MediaQuery.of(context).size.width * 0.05),
+      ),
       child: InkWell(
         onTap: onPressed,
         child: Container(
-          height: MediaQuery.of(context).size.height * (100 / 938),
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+          height: getHeightProportion(context, 100), // Proporção aplicada
+          padding: EdgeInsets.symmetric(
+            vertical: getHeightProportion(context, 15.0), // Proporção aplicada
+            horizontal: getWidthProportion(context, 20.0), // Proporção aplicada
+          ),
           decoration: BoxDecoration(
             color: _getColorFromStatus(busStopStatus), // Obtém a cor com base no status
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção aplicada
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(15),
+                padding: EdgeInsets.all(getWidthProportion(context, 15)), // Proporção aplicada
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção aplicada
                   border: Border.all(
                     color: Colors.white,
-                    width: 1,
+                    width: getWidthProportion(context, 1), // Proporção aplicada
                   ),
                 ),
                 child: Icon(
                   _getIconFromStatus(busStopStatus), // Usa o ícone baseado no status
                   color: Colors.white,
-                  size: 35,
+                  size: getHeightProportion(context, 35), // Proporção aplicada
                 ),
               ),
-              SizedBox(width: 20),
+              SizedBox(width: getWidthProportion(context, 20)), // Proporção aplicada
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +95,7 @@ class TripBusStop extends StatelessWidget {
                     Text(
                       busStopName,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: getHeightProportion(context, 16), // Proporção aplicada
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
@@ -98,7 +104,7 @@ class TripBusStop extends StatelessWidget {
                     Text(
                       busStopStatus,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: getHeightProportion(context, 12), // Proporção aplicada
                         color: Colors.white,
                       ),
                     ),

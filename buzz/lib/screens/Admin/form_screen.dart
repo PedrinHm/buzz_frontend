@@ -6,6 +6,7 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/CustomDropdownField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -178,18 +179,18 @@ class _FormScreenState extends State<FormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(getHeightProportion(context, 16.0)),
         child: _isFacultyLoading || _isLoading
             ? Center(child: CircularProgressIndicator())
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: getHeightProportion(context, 40)),  // Proporção em altura
                   CustomTitleWidget(title: widget.title),
-                  SizedBox(height: 20),
+                  SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
                   ...widget.fields.where((field) => field['label'] != 'Faculdade').map((field) {
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
+                      padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)),  // Proporção em altura
                       child: CustomInputField(
                         labelText: field['label'],
                         keyboardType: field['keyboardType'],
@@ -200,7 +201,7 @@ class _FormScreenState extends State<FormScreen> {
                   }).toList(),
                   if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno')
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
+                      padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)),  // Proporção em altura
                       child: CustomDropdownField(
                         labelText: 'Faculdade',
                         value: selectedFacultyId,
@@ -235,7 +236,7 @@ class _FormScreenState extends State<FormScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
                 ],
               ),
       ),

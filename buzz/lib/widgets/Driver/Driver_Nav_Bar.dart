@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class DriverNavBar extends StatelessWidget {
   final int currentIndex;
@@ -10,17 +11,26 @@ class DriverNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.mapPin),
+          icon: Icon(
+            PhosphorIcons.mapPin,
+            size: getHeightProportion(context, 24), // Aplicando proporção no tamanho do ícone
+          ),
           label: 'Trip',
         ),
         BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.houseSimple),
+          icon: Icon(
+            PhosphorIcons.houseSimple,
+            size: getHeightProportion(context, 24), // Aplicando proporção no tamanho do ícone
+          ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.user),
+          icon: Icon(
+            PhosphorIcons.user,
+            size: getHeightProportion(context, 24), // Aplicando proporção no tamanho do ícone
+          ),
           label: 'Profile',
         ),
       ],

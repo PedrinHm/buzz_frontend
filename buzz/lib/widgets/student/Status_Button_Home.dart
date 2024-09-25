@@ -1,5 +1,5 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
-
 
 class CustomStatus extends StatelessWidget {
   final VoidCallback onPressed;
@@ -18,8 +18,8 @@ class CustomStatus extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9, 
-        height: MediaQuery.of(context).size.height * (100 / 938), 
-        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+        height: getHeightProportion(context, 100), // Altura proporcional
+        padding: EdgeInsets.symmetric(vertical: getHeightProportion(context, 15.0), horizontal: getWidthProportion(context, 20.0)), // Padding proporcional
         decoration: BoxDecoration(
           color: Color(0xFF395BC7), 
           borderRadius: BorderRadius.circular(10), 
@@ -28,7 +28,7 @@ class CustomStatus extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(15), 
+              padding: EdgeInsets.all(getHeightProportion(context, 15)), // Padding proporcional
               decoration: BoxDecoration( 
                 shape: BoxShape.rectangle, 
                 borderRadius: BorderRadius.circular(10),
@@ -40,10 +40,10 @@ class CustomStatus extends StatelessWidget {
               child: Icon(
                 iconData, // Usa o ícone passado como parâmetro
                 color: Colors.white,
-                size: 35, 
+                size: getWidthProportion(context, 35), // Tamanho proporcional
               ),
             ),
-            SizedBox(width: 20),
+            SizedBox(width: getWidthProportion(context, 20)), // Espaço proporcional
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -51,7 +51,7 @@ class CustomStatus extends StatelessWidget {
                 Text(
                   'Definir Status',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: getWidthProportion(context, 16), // Tamanho de fonte proporcional
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
@@ -59,7 +59,7 @@ class CustomStatus extends StatelessWidget {
                 Text(
                   'Status atual: $StatusName', 
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: getWidthProportion(context, 12), // Tamanho de fonte proporcional
                     color: Colors.white,
                   ),
                 ),

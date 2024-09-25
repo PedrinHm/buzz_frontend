@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class CustomDropdownField extends StatelessWidget {
   final String labelText;
@@ -24,7 +24,7 @@ class CustomDropdownField extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
-            fontSize: 16.0,
+            fontSize: getHeightProportion(context, 16.0),  // Tamanho do texto proporcional
           ),
         ),
         FractionallySizedBox(
@@ -34,23 +34,26 @@ class CustomDropdownField extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Color(0xFFD9D9D9),
                 border: Border.all(color: Color(0xFFD9D9D9), width: 2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),  // Proporção de borda
               ),
               child: DropdownButtonFormField<int>(
                 value: value,
                 items: items,
                 onChanged: onChanged,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: getWidthProportion(context, 10), 
+                    vertical: getHeightProportion(context, 15),
+                  ),  // Proporção de padding
                   filled: true,
                   fillColor: Color(0xFFD9D9D9),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xFFD9D9D9), width: 2),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),  // Proporção de borda
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xFFD9D9D9), width: 2),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),  // Proporção de borda
                   ),
                 ),
                 dropdownColor: Color(0xFFD9D9D9),
@@ -59,7 +62,7 @@ class CustomDropdownField extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
-                  fontSize: 16.0,
+                  fontSize: getHeightProportion(context, 16.0),  // Tamanho do texto proporcional
                   color: Colors.black,
                 ),
               ),

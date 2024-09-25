@@ -1,3 +1,4 @@
+import 'package:buzz/utils/size_config.dart';
 import 'package:provider/provider.dart'; // Certifique-se de que o Provider esteja importado
 import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
 import 'package:buzz/widgets/Student/Bus_Stop_Button_Home.dart';
@@ -295,28 +296,28 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
           Center(
             child: Column(
               children: [
-                SizedBox(height: 40),
+                SizedBox(height: getHeightProportion(context, 40)), // Proporção para altura
                 FullScreenMessage(
                   message: 'Existem ônibus em viagem de ida, está participando?',
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
                 CustomStatus(
                   onPressed: _toggleStatusOverlay,
                   StatusName: 'Definir status',
                   iconData: PhosphorIcons.chalkboardTeacher,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
                 CustomBusStopButton(
                   onPressed: _toggleBusStopOverlay,
                   busStopName: "Definir ponto de ônibus",
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
                 CustomBusButton(
                   onPressed: _toggleBusOverlay,
                   busNumber: "ABC-1234",
                   driverName: "Nome Do Motorista",
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
               ],
             ),
           ),
@@ -343,26 +344,30 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     );
   }
 
-  Widget _buildOverlay(String title, Widget content, VoidCallback onCancel) {
-    return Container(
-      color: Colors.black.withOpacity(0.9),
-      child: Column(
+Widget _buildOverlay(String title, Widget content, VoidCallback onCancel) {
+  return Stack(
+    children: [
+      Container(
+        color: Colors.black.withOpacity(0.9), // Fundo semi-transparente
+      ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: getHeightProportion(context, 40)), // Proporção para altura
           Text(
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: getHeightProportion(context, 24), // Proporção para altura
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: getHeightProportion(context, 20)), // Proporção para altura
           Expanded(
             child: content,
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(getHeightProportion(context, 20)), // Proporção para altura
             child: ButtonThree(
               buttonText: 'Cancelar',
               backgroundColor: Colors.red,
@@ -371,8 +376,10 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
           ),
         ],
       ),
-    );
-  }
+    ],
+  );
+}
+
 
   Widget _buildBusList() {
     return ListView.builder(
@@ -380,7 +387,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       itemBuilder: (context, index) {
         final bus = _busList[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
           child: BusDetailsButton(
             onPressed: () {
               _updateStudentTrip(bus['tripId']);
@@ -405,7 +412,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
         final busStopId = busStop['id'];
 
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
           child: TripBusStop(
             onPressed: () {
               if (busStopId != null) {
@@ -430,7 +437,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       itemBuilder: (context, index) {
         final status = _statusList[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
+          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
           child: StatusButton(
             onPressed: () {
               _updateStudentTripStatus(status['status']);

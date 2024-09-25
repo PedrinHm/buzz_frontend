@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:buzz/utils/size_config.dart'; // Import das funções de proporção
 
 class ButtonThree extends StatelessWidget {
   final String buttonText;
@@ -14,20 +15,20 @@ class ButtonThree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 189, // Largura fixa do botão
-      height: 50, // Altura fixa do botão
+      width: getWidthProportion(context, 189), // Proporção aplicada na largura
+      height: getHeightProportion(context, 50), // Proporção aplicada na altura
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white, // Cor do texto do botão
           backgroundColor: backgroundColor, // Usa a cor de fundo passada como parâmetro
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção aplicada
           ),
         ),
         child: Text(
           buttonText,
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: getHeightProportion(context, 16)), // Proporção aplicada no tamanho do texto
         ),
       ),
     );
