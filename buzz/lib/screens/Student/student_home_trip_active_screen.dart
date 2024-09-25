@@ -1,4 +1,5 @@
 import 'package:buzz/utils/size_config.dart';
+import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:provider/provider.dart'; // Certifique-se de que o Provider esteja importado
 import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
 import 'package:buzz/widgets/Student/Bus_Stop_Button_Home.dart';
@@ -322,63 +323,37 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
             ),
           ),
           if (_showBusOverlay)
-            _buildOverlay(
-              'Defina seu ônibus atual',
-              _buildBusList(),
-              _toggleBusOverlay,
+            BuildOverlay(
+              title: 'Defina seu ônibus atual',
+              content: isLoading 
+                  ? Center(child: CircularProgressIndicator()) 
+                  : _buildBusList(),
+              onCancel: _toggleBusOverlay,
             ),
+
           if (_showBusStopOverlay)
-            _buildOverlay(
-              'Defina seu ponto de ônibus atual',
-              isLoading ? CircularProgressIndicator() : _buildBusStopList(),
-              _toggleBusStopOverlay,
+            BuildOverlay(
+              title: 'Defina seu ponto de ônibus atual',
+              content: isLoading 
+                  ? Center(child: CircularProgressIndicator()) 
+                  : _buildBusStopList(),
+              onCancel: _toggleBusStopOverlay,
             ),
+
           if (_showStatusOverlay)
-            _buildOverlay(
-              'Defina seu status atual',
-              _buildStatusList(),
-              _toggleStatusOverlay,
+            BuildOverlay(
+              title: 'Defina seu status atual',
+              content: isLoading 
+                  ? Center(child: CircularProgressIndicator()) 
+                  : _buildStatusList(),
+              onCancel: _toggleStatusOverlay,
             ),
         ],
       ),
     );
   }
 
-Widget _buildOverlay(String title, Widget content, VoidCallback onCancel) {
-  return Stack(
-    children: [
-      Container(
-        color: Colors.black.withOpacity(0.9), // Fundo semi-transparente
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: getHeightProportion(context, 40)), // Proporção para altura
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: getHeightProportion(context, 24), // Proporção para altura
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: getHeightProportion(context, 20)), // Proporção para altura
-          Expanded(
-            child: content,
-          ),
-          Padding(
-            padding: EdgeInsets.all(getHeightProportion(context, 20)), // Proporção para altura
-            child: ButtonThree(
-              buttonText: 'Cancelar',
-              backgroundColor: Colors.red,
-              onPressed: onCancel,
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
-}
+
 
 
   Widget _buildBusList() {
