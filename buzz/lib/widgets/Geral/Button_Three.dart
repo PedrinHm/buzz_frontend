@@ -26,9 +26,11 @@ class ButtonThree extends StatelessWidget {
             borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção aplicada
           ),
         ),
-        child: Text(
-          buttonText,
-          style: TextStyle(fontSize: getHeightProportion(context, 16)), // Proporção aplicada no tamanho do texto
+        child: Center( // Garante que o texto fique centralizado
+          child: Text(
+            buttonText,
+            style: TextStyle(fontSize: getHeightProportion(context, 16)), // Proporção aplicada no tamanho do texto
+          ),
         ),
       ),
     );
