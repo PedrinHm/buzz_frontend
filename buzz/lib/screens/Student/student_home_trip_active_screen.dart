@@ -1,6 +1,6 @@
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
-import 'package:provider/provider.dart'; // Certifique-se de que o Provider esteja importado
+import 'package:provider/provider.dart';
 import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
 import 'package:buzz/widgets/Student/Bus_Stop_Button_Home.dart';
 import 'package:buzz/widgets/Student/Message_Home.dart';

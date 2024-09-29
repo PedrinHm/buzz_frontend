@@ -27,23 +27,25 @@ class _StudentHomeScreenControllerState extends State<StudentHomeScreenControlle
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
-        if (tripController == null) {
+        if (tripController == null || tripController.isLoading) {
+          // Exibe um indicador de carregamento enquanto o tripController está carregando
           return Center(child: CircularProgressIndicator());
         }
 
         if (!tripController.hasActiveTrip) {
           return StudentHomeTripInactiveScreen(studentId: widget.studentId);
         } else {
-          // Verifica se o studentTripId foi definido
+          // Verifica se o studentTripId está sendo carregado
           if (tripController.studentTripId == null) {
-            print("Erro: Student Trip ID não encontrado.");
-            return Center(child: Text("Erro: Student Trip ID não encontrado."));
+            // Ainda carregando os detalhes da viagem
+            return Center(child: CircularProgressIndicator());
           }
 
+          // Exibe a tela ativa com os dados carregados
           return StudentHomeTripActiveScreen(
             studentId: widget.studentId,
-            tripId: tripController.activeTripId ?? 0, 
-            studentTripId: tripController.studentTripId!, 
+            tripId: tripController.activeTripId ?? 0,
+            studentTripId: tripController.studentTripId!,
           );
         }
       },

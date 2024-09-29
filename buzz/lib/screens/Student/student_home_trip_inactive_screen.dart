@@ -1,3 +1,4 @@
+import 'package:buzz/controllers/trip_controller.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'dart:convert';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Student/bus_details_button.dart';
+import 'package:provider/provider.dart';
 
 class StudentHomeTripInactiveScreen extends StatefulWidget {
   final int studentId;
@@ -20,6 +22,7 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
   bool isLoading = false;
+  bool isCreatingTrip = false; 
   List<Map<String, dynamic>> _busList = [];
   List<Map<String, dynamic>> _busStopList = [];
   int _selectedTripId = 0; // Armazena o tripId selecionado
@@ -96,40 +99,85 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
     }
   }
 
-  // Função para criar a viagem do estudante
-  Future<void> _createStudentTrip() async {
-    final url = 'https://buzzbackend-production.up.railway.app/student_trips/';
-    final body = json.encode({
-      'trip_id': _selectedTripId,
-      'student_id': widget.studentId,
-      'point_id': _selectedBusStopId,
-    });
+Future<void> _createStudentTrip(int tripId, int pointId) async {
+  setState(() {
+    isCreatingTrip = true;  
+  });
 
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      );
+  final url = 'https://buzzbackend-production.up.railway.app/student_trips/';
+  final body = json.encode({
+    'trip_id': tripId,
+    'student_id': widget.studentId,
+    'point_id': pointId,
+  });
 
-      if (response.statusCode == 200) {
-        print('Viagem do estudante criada com sucesso!');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Viagem criada com sucesso!')),
-        );
-      } else {
-        print('Erro ao criar viagem: ${response.reasonPhrase}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar viagem do estudante')),
-        );
-      }
-    } catch (e) {
-      print('Erro ao criar viagem: $e');
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      // Após a criação da viagem, tenta buscar o student_trip_id
+      await _waitForStudentTripId(widget.studentId, tripId);
+    } else {
+      print('Erro ao criar viagem: ${response.reasonPhrase}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao criar viagem do estudante')),
       );
     }
+  } catch (e) {
+    print('Erro ao criar viagem: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao criar viagem do estudante')),
+    );
+  } finally {
+    setState(() {
+      isCreatingTrip = false;  // Esconde o indicador de carregamento após a criação da viagem
+    });
   }
+}
+
+
+Future<void> _waitForStudentTripId(int studentId, int tripId) async {
+  int retryCount = 0;
+  const int maxRetries = 10;  // Número máximo de tentativas
+  const Duration retryDelay = Duration(seconds: 2);  // Tempo entre tentativas
+
+  while (retryCount < maxRetries) {
+    try {
+      // Faz a requisição para verificar se o student_trip_id foi gerado
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
+
+      if (response.statusCode == 200) {
+        final tripData = json.decode(response.body);
+        final studentTripId = tripData['student_trip_id'];
+
+        if (studentTripId != null) {
+          // Atualiza o TripController com a nova viagem
+          final tripController = Provider.of<TripController>(context, listen: false);
+          tripController.startStudentTrip(studentTripId, tripId);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Viagem do estudante criada com sucesso!')),
+          );
+          return;  // Sai da função quando o ID é encontrado
+        }
+      }
+    } catch (e) {
+      print('Erro ao buscar o student_trip_id: $e');
+    }
+
+    // Espera antes de tentar novamente
+    await Future.delayed(retryDelay);
+    retryCount++;
+  }
+
+  // Se não conseguir o student_trip_id após todas as tentativas, lança erro
+  throw Exception('Erro: student_trip_id não foi gerado pela API após várias tentativas.');
+}
+
+
 
   // Função para abrir o overlay de seleção de viagem
   void _toggleBusOverlay() {
@@ -228,32 +276,36 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
     );
   }
 
-  // Função para construir a lista de pontos de ônibus
-  Widget _buildBusStopList() {
-    return ListView.builder(
-      itemCount: _busStopList.length,
-      itemBuilder: (context, index) {
-        final busStop = _busStopList[index];
-        final busStopId = busStop['id'];
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
-          child: TripBusStop(
-            onPressed: () {
-              if (busStopId != null) {
-                print("Selecionado ponto de ônibus: ${busStop['name']}");
-                _selectedBusStopId = int.parse(busStopId); // Armazena o ponto de ônibus selecionado
-                _createStudentTrip(); // Cria a viagem do estudante
-              } else {
-                print('Erro: ID do ponto de ônibus é nulo');
-              }
-              _toggleBusStopOverlay(0); // Fecha o overlay após a seleção
-            },
-            busStopName: busStop['name']!,
-            busStopStatus: busStop['status']!,
-          ),
-        );
-      },
-    );
+Widget _buildBusStopList() {
+  if (isCreatingTrip) {
+    // Mostra o indicador de carregamento enquanto a viagem está sendo criada
+    return Center(child: CircularProgressIndicator());
   }
+
+  return ListView.builder(
+    itemCount: _busStopList.length,
+    itemBuilder: (context, index) {
+      final busStop = _busStopList[index];
+      final busStopId = busStop['id'];
+
+      return Padding(
+        padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
+        child: TripBusStop(
+          onPressed: () {
+            if (busStopId != null) {
+              print("Selecionado ponto de ônibus: ${busStop['name']}");
+              _createStudentTrip(_selectedTripId, int.parse(busStopId)); // Cria a viagem
+            } else {
+              print('Erro: ID do ponto de ônibus é nulo');
+            }
+          },
+          busStopName: busStop['name']!,
+          busStopStatus: busStop['status']!,
+        ),
+      );
+    },
+  );
+}
+
+
 }

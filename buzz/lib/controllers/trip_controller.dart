@@ -8,12 +8,21 @@ class TripController extends ChangeNotifier {
   int? _tripType;
   bool _isStudent = false;
   int? _studentTripId;
+  bool _isLoading = false; // Nova variável para controlar o estado de carregamento
 
   bool get hasActiveTrip => _hasActiveTrip;
   int? get activeTripId => _activeTripId;
   int? get tripType => _tripType;
   bool get isStudent => _isStudent;
   int? get studentTripId => _studentTripId;
+  bool get isLoading => _isLoading; 
+
+  void startStudentTrip(int studentTripId, int tripId) {
+    _hasActiveTrip = true;
+    _studentTripId = studentTripId;
+    _activeTripId = tripId;
+    notifyListeners(); 
+  }
 
   void startTrip(int tripId, int tripType) {
     _hasActiveTrip = true;
@@ -32,16 +41,21 @@ class TripController extends ChangeNotifier {
   }
 
   Future<void> checkActiveTrip(int userId, {bool isStudent = false}) async {
+    _isLoading = true; // Começa o carregamento
+    notifyListeners();
+
     _isStudent = isStudent;
 
     if (isStudent) {
       // Se for aluno, verifica a viagem ativa associada ao student_trip
       await checkActiveStudentTrip(userId);
-      print('Student Trip ID obtido: $_studentTripId');
     } else {
       // Se for motorista, verifica a viagem ativa associada ao motorista
       await checkActiveDriverTrip(userId);
     }
+
+    _isLoading = false; // Finaliza o carregamento
+    notifyListeners();
   }
 
   Future<void> checkActiveDriverTrip(int driverId) async {
@@ -73,7 +87,6 @@ class TripController extends ChangeNotifier {
         _activeTripId = null;
         _tripType = null;
         _studentTripId = null;
-        print('No active trip found for the student.');
       }
     } catch (e) {
       print('Error fetching active student trip: $e');
