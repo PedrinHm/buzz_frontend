@@ -4,11 +4,16 @@ import 'package:provider/provider.dart';
 import '../../controllers/trip_controller.dart';
 import 'bus_stop_active_screen.dart';
 
-class BusStopScreenController extends StatelessWidget {
+class BusStopScreenController extends StatefulWidget {
   final int driverId;
 
   BusStopScreenController({required this.driverId});
 
+  @override
+  _BusStopScreenControllerState createState() => _BusStopScreenControllerState();
+}
+
+class _BusStopScreenControllerState extends State<BusStopScreenController> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TripController>(
@@ -19,6 +24,7 @@ class BusStopScreenController extends StatelessWidget {
               try {
                 if (tripController.activeTripId != null) {
                   await tripController.completeTrip(tripController.activeTripId!);
+                  
                   if (tripController.tripType == 2) { // Se for VOLTA
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text("Viagem concluída com sucesso"),
@@ -37,6 +43,17 @@ class BusStopScreenController extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text("Falha ao concluir a viagem: $e"),
                 ));
+              } finally {
+                // Garantir que o refresh da tela seja feito, independente do resultado
+                setState(() {
+                  // Ação que causa o refresh da tela
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => BusStopScreenController(driverId: widget.driverId),
+                    ),
+                  );
+                });
               }
             },
             tripId: tripController.activeTripId!,
@@ -47,7 +64,7 @@ class BusStopScreenController extends StatelessWidget {
             startTrip: (int driverId, int busId) {
               return tripController.initiateTrip(driverId, busId, 1); // Aqui, estou assumindo que o tipo de viagem padrão é '1' (IDA)
             },
-            driverId: driverId,
+            driverId: widget.driverId,
           );
         }
       },

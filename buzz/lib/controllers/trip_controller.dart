@@ -5,17 +5,17 @@ import 'dart:convert';
 class TripController extends ChangeNotifier {
   bool _hasActiveTrip = false;
   int? _activeTripId;
-  int? _tripType;
+  int? _tripType; // 1 para ida, 2 para volta
   bool _isStudent = false;
   int? _studentTripId;
-  bool _isLoading = false; // Nova variável para controlar o estado de carregamento
+  bool _isLoading = false;
 
   bool get hasActiveTrip => _hasActiveTrip;
   int? get activeTripId => _activeTripId;
   int? get tripType => _tripType;
   bool get isStudent => _isStudent;
   int? get studentTripId => _studentTripId;
-  bool get isLoading => _isLoading; 
+  bool get isLoading => _isLoading;
 
   void startStudentTrip(int studentTripId, int tripId) {
     _hasActiveTrip = true;
@@ -127,10 +127,13 @@ class TripController extends ChangeNotifier {
     
     if (response.statusCode == 200) {
       if (_tripType == 1) {
+        // Se a viagem de ida foi concluída, iniciar a viagem de volta
         final returnTripData = json.decode(response.body);
-        startTrip(returnTripData['id'], 2); // Iniciar viagem de volta
+        startTrip(returnTripData['id'], 2); // 2 significa viagem de volta
+        notifyListeners(); // Garante que os listeners sejam notificados
       } else {
         endTrip(); // Encerrar completamente a viagem
+        notifyListeners(); // Garante que os listeners sejam notificados
       }
     } else {
       throw Exception('Failed to complete trip');

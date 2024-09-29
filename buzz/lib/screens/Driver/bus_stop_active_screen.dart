@@ -8,15 +8,6 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
 import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
 
-dynamic decodeJsonResponse(http.Response response) {
-  if (response.statusCode == 200) {
-    String responseBody = utf8.decode(response.bodyBytes);
-    return json.decode(responseBody);
-  } else {
-    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
-  }
-}
-
 class BusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
@@ -142,67 +133,59 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
            tripBusStops.where((stop) => stop['status'] == 'Já passou').length == tripBusStops.length - 1;
   }
 
-  Future<void> _finalizeTrip(String action) async {
-    if (_isProcessing) return;
+Future<void> _finalizeTrip(String action) async {
+  if (_isProcessing) return;
 
-    setState(() {
-      _isProcessing = true;
-    });
+  setState(() {
+    _isProcessing = true;
+  });
 
-    String endpoint;
+  String endpoint;
 
-    if (action == 'Encerrar viagem de ida') {
-      endpoint = 'trip_bus_stops/finalizar_ponto_atual/$_tripId';
-    } else if (action == 'Encerrar viagem de volta') {
-      endpoint = 'trips/$_tripId/finalizar_volta';
-    } else if (action == 'Finalizar viagem') {
-       endpoint = 'trips/$_tripId/finalizar_ida';
-    } else {
-      return;
-    }
-
-    var url = Uri.parse('https://buzzbackend-production.up.railway.app/$endpoint');
-
-    try {
-      var response = await http.put(url);
-      if (response.statusCode == 200) {
-        if (action == 'Encerrar viagem de ida') {
-          final returnTripData = decodeJsonResponse(response);
-          setState(() {
-            tripBusStops = [];
-            _tripId = returnTripData['id'];
-            _isReturnTrip = true;
-          });
-          fetchBusStops().then((data) {
-            setState(() {
-              tripBusStops = data;
-              tripBusStops.sort(_compareBusStopStatus);
-            });
-          });
-        } else {
-          fetchBusStops().then((data) {
-            setState(() {
-              tripBusStops = data;
-              tripBusStops.sort(_compareBusStopStatus);
-            });
-          });
-          if (_allStopsPassed()) {
-            widget.endTrip();
-          }
-        }
-      } else {
-        throw Exception('Failed to finalize the trip');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Erro ao finalizar a viagem: $e"),
-      ));
-    } finally {
-      setState(() {
-        _isProcessing = false;
-      });
-    }
+  if (action == 'Encerrar viagem de ida') {
+    endpoint = 'trip_bus_stops/finalizar_ponto_atual/$_tripId';
+  } else if (action == 'Encerrar viagem de volta') {
+    endpoint = 'trips/$_tripId/finalizar_volta';
+  } else if (action == 'Finalizar viagem') {
+    endpoint = 'trips/$_tripId/finalizar_ida';  // Endpoint que finaliza a viagem de ida
+  } else {
+    return;
   }
+
+  var url = Uri.parse('https://buzzbackend-production.up.railway.app/$endpoint');
+
+  try {
+    var response = await http.put(url);
+
+    if (response.statusCode == 200) {
+      final returnTripData = json.decode(response.body);
+
+      // Atualiza o tripId para o da viagem de volta
+      Future.microtask(() {
+        setState(() {
+          _tripId = returnTripData['id'];
+          _isReturnTrip = true;
+        });
+
+        // Exibir no console a atualização do tripId
+        print("Novo tripId para viagem de volta: $_tripId");
+
+        // Força a atualização contínua até o tripId ser atualizado
+        _forceRefreshUntilUpdated();
+      });
+    } else {
+      throw Exception('Erro ao finalizar a viagem de ida');
+    }
+  } catch (e) {
+    print("Erro durante a finalização da viagem: $e");
+  } finally {
+    setState(() {
+      _isProcessing = false;
+    });
+  }
+}
+
+
 
   Future<void> _selectNextStop(int stopId) async {
     if (_isProcessing) return;
@@ -266,6 +249,30 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     }
   }
 
+void _forceRefreshUntilUpdated() async {
+  int retries = 0;  // Adiciona contador de tentativas
+  while (retries < 10) {  // Limita o número de tentativas para evitar loop infinito
+    await Future.delayed(Duration(seconds: 1));  // Aguardar 1 segundo entre as verificações
+
+    // Verificar se o tripId foi atualizado
+    if (_tripId != widget.tripId) {
+      setState(() {
+        print("Tela atualizada com o novo tripId: $_tripId");
+      });
+      break;  // Sai do loop quando o tripId for diferente do inicial
+    }
+
+    // Exibir mensagem no console enquanto espera pela atualização
+    print("Aguardando atualização do tripId...");
+    retries++;
+  }
+
+  if (retries >= 1) {
+    print("Tentativas de atualização do tripId excedidas.");
+  }
+}
+
+
   void _showCancelTripPopup() {
     showDialog(
       context: context,
@@ -286,25 +293,25 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-  void _showFinalizeTripPopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomPopup(
-          message: "Tem certeza de que deseja finalizar o ponto atual?",
-          confirmText: "Sim",
-          cancelText: "Não",
-          onConfirm: () {
-            Navigator.of(context).pop();
-            _finalizeTrip('Finalizar viagem');
-          },
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
-  }
+void _showConfirmFinalizeTripPopup() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return CustomPopup(
+        message: "Tem certeza de que deseja finalizar a viagem de ida?",
+        confirmText: "Sim",
+        cancelText: "Não",
+        onConfirm: () {
+          Navigator.of(context).pop();
+          _finalizeTrip('Finalizar viagem');
+        },
+        onCancel: () {
+          Navigator.of(context).pop();
+        },
+      );
+    },
+  );
+}
 
   void _showSelectNextStopPopup() {
     fetchStopsOnTheWay().then((stops) {
@@ -475,13 +482,14 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             ),
           ),
           SizedBox(width: getWidthProportion(context, 10)),  // Proporção ajustada
-          Expanded(
-            child: ButtonThree(
-              buttonText: 'Finalizar Viagem',
-              backgroundColor: Colors.red,
-              onPressed: _isProcessing ? () {} : _showFinalizeTripPopup,
-            ),
-          ),
+        Expanded(
+  child: ButtonThree(
+    buttonText: 'Finalizar Viagem',
+    backgroundColor: Colors.red,
+    onPressed: _isProcessing ? () {} : _showConfirmFinalizeTripPopup, // Chama o popup em vez de chamar a requisição direta
+  ),
+),
+
         ],
       ),
     );
