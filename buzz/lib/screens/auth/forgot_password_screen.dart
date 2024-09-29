@@ -15,7 +15,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   Future<void> _sendResetPasswordRequest(BuildContext context) async {
     final cpf = cpfController.text;
-    final url = 'https://buzzbackend-production.up.railway.app/auth/forgot-password/'; // URL da API
+    final url = 'https://buzzbackend-production.up.railway.app/auth/forgot-password'; // URL da API
 
     try {
       final response = await http.post(
