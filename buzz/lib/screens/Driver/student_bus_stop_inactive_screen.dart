@@ -2,6 +2,7 @@ import 'package:buzz/widgets/Driver/Bus_Selection_Dialog.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/utils/size_config.dart';
+import 'package:buzz/widgets/Geral/buildOverlay.dart';
 
 class StudentBusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
@@ -9,31 +10,39 @@ class StudentBusStopInactiveScreen extends StatelessWidget {
 
   StudentBusStopInactiveScreen({required this.startTrip, required this.driverId});
 
-Future<void> _showBusSelectionDialog(BuildContext context) async {
-  final busId = await showDialog<int>(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.transparent, // Para mostrar o overlay
-        child: _buildOverlay(
-          'Selecione um Ônibus',
-          BusSelectionDialog(
-            onBusSelected: (selectedBusId) {
-              Navigator.of(context).pop(selectedBusId);
-            },
-            url: 'https://buzzbackend-production.up.railway.app/buses/available',
+  Future<void> _showBusSelectionDialog(BuildContext context) async {
+    final busId = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // Para mostrar o overlay
+          child: _buildOverlay(
+            'Selecione um Ônibus',
+            BusSelectionDialog(
+              onBusSelected: (selectedBusId) {
+                Navigator.of(context).pop(selectedBusId);
+              },
+              url: 'https://buzzbackend-production.up.railway.app/buses/available',
+            ),
+            () => Navigator.of(context).pop(), // Função para cancelar
           ),
-          () => Navigator.of(context).pop(), // Função para cancelar
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  if (busId != null) {
-    await startTrip(driverId, busId);
+    if (busId != null) {
+      await startTrip(driverId, busId);
+    }
   }
-}
 
+  // Definindo o método _buildOverlay
+  Widget _buildOverlay(String title, Widget content, VoidCallback onCancel) {
+    return BuildOverlay(
+      title: title,
+      content: content,
+      onCancel: onCancel,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

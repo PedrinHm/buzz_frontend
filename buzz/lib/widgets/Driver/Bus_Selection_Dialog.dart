@@ -1,3 +1,4 @@
+import 'package:buzz/screens/Admin/form_screen.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,10 +12,11 @@ class BusSelectionDialog extends StatelessWidget {
 
   BusSelectionDialog({required this.onBusSelected, required this.url});
 
+  // Atualizando para usar a função decodeJsonResponse
   Future<List<Map<String, dynamic>>> _fetchAvailableBuses() async {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(json.decode(response.body));
+      return List<Map<String, dynamic>>.from(decodeJsonResponse(response));
     } else {
       throw Exception('Failed to load buses');
     }
