@@ -35,7 +35,7 @@ class _StudentHomeTripInactiveScreenState extends State<StudentHomeTripInactiveS
     });
 
     try {
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/buses/available'));
+      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/buses/trips/active_trips'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
