@@ -18,51 +18,30 @@ class _BusStopScreenControllerState extends State<BusStopScreenController> {
   Widget build(BuildContext context) {
     return Consumer<TripController>(
       builder: (context, tripController, child) {
-        if (tripController.hasActiveTrip && tripController.activeTripId != null) {
+        if (tripController.activeTripId != null) {
           return BusStopActiveScreen(
             endTrip: () async {
               try {
-                if (tripController.activeTripId != null) {
-                  await tripController.completeTrip(tripController.activeTripId!);
-                  
-                  if (tripController.tripType == 2) { // Se for VOLTA
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("Viagem concluída com sucesso"),
-                    ));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("Viagem de ida concluída. Iniciando viagem de volta..."),
-                    ));
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Nenhum ID de viagem ativa encontrado"),
-                  ));
+                await tripController.completeTrip(tripController.activeTripId!);
+
+                if (tripController.activeTripId == null) {
+                  // A viagem foi finalizada completamente, então atualizamos a interface
+                  setState(() {});
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Falha ao concluir a viagem: $e"),
+                  content: Text("Erro ao finalizar a viagem: $e"),
                 ));
-              } finally {
-                // Garantir que o refresh da tela seja feito, independente do resultado
-                setState(() {
-                  // Ação que causa o refresh da tela
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => BusStopScreenController(driverId: widget.driverId),
-                    ),
-                  );
-                });
               }
             },
             tripId: tripController.activeTripId!,
-            isReturnTrip: tripController.tripType == 2, // Passando o tripType
+            isReturnTrip: tripController.tripType == 2,  // Passando o tripType
           );
         } else {
+          // Quando não há mais viagem ativa, exibe a tela inativa
           return BusStopInactiveScreen(
             startTrip: (int driverId, int busId) {
-              return tripController.initiateTrip(driverId, busId, 1); // Aqui, estou assumindo que o tipo de viagem padrão é '1' (IDA)
+              return tripController.initiateTrip(driverId, busId, 1);  // Inicia uma nova viagem
             },
             driverId: widget.driverId,
           );

@@ -222,10 +222,7 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
 
   if (response.statusCode == 200) {
     List<dynamic> data = decodeJsonResponse(response);
-
-    // Printando os dados recebidos
-    print("Dados recebidos: $data");
-
+ 
     return data.map((item) => Map<String, String>.from({
       'name': item['student_name'] as String? ?? '',
       'status': item['student_status'] as String? ?? '',

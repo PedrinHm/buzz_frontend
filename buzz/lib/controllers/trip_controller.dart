@@ -32,11 +32,13 @@ class TripController extends ChangeNotifier {
   }
 
   void endTrip() {
+     print("Finalizando a viagem, tripId atual: $_activeTripId");
     _hasActiveTrip = false;
     _activeTripId = null;
     _tripType = null;
     _isStudent = false;
     _studentTripId = null; // Reseta o studentTripId ao finalizar a viagem
+    print("Viagem finalizada. tripId é null agora.");
     notifyListeners();
   }
 
@@ -121,22 +123,22 @@ class TripController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> completeTrip(int tripId) async {
+   Future<void> completeTrip(int tripId) async {
     String endpoint = _tripType == 1 ? 'finalizar_ida' : 'finalizar_volta';
     final response = await http.put(Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/$endpoint'));
     
     if (response.statusCode == 200) {
       if (_tripType == 1) {
-        // Se a viagem de ida foi concluída, iniciar a viagem de volta
+        // Inicia a viagem de volta
         final returnTripData = json.decode(response.body);
-        startTrip(returnTripData['id'], 2); // 2 significa viagem de volta
-        notifyListeners(); // Garante que os listeners sejam notificados
+        startTrip(returnTripData['id'], 2);  // Viagem de volta
       } else {
-        endTrip(); // Encerrar completamente a viagem
-        notifyListeners(); // Garante que os listeners sejam notificados
+        // Finaliza completamente a viagem de volta e define tripId como null
+        endTrip();  // Define que não há mais viagem ativa
       }
     } else {
-      throw Exception('Failed to complete trip');
+      throw Exception('Erro ao concluir a viagem');
     }
   }
+
 }
