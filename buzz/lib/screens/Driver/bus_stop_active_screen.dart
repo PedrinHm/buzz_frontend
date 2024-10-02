@@ -399,74 +399,85 @@ void _showConfirmFinalizeTripPopup() {
   }
 
   Widget _buildReturnTripButtons() {
-    String buttonText = 'Selecionar destino';
+  String buttonText = 'Selecionar destino';
 
-    if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
-      buttonText = 'Estou no ponto';
-    } else if (_isFinalStop()) {
-      buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
-    }
-
-    return Column(
-      children: [
-        if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
-          Padding(
-            padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: ButtonThree(
-                    buttonText: _busIssue ? 'Remover Problema' : 'Ônibus com problema',
-                    backgroundColor: Color(0xFFCBB427),
-                    onPressed: _isProcessing
-                        ? () {}
-                        : toggleBusIssue,
-                  ),
-                ),
-                SizedBox(width: getWidthProportion(context, 10)),  // Proporção ajustada
-                Expanded(
-                  child: ButtonThree(
-                    buttonText: buttonText,
-                    backgroundColor: _busIssue ? Colors.grey : Color(0xFF3E9B4F), // Define o botão como cinza se houver problema
-                    onPressed: _isProcessing
-                        ? () {}
-                        : () {
-                            if (_busIssue) {
-                              // Mostrar mensagem se houver problema com o ônibus
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Resolva o problema do ônibus para partir.'),
-                                backgroundColor: Colors.redAccent,
-                              ));
-                            } else {
-                              if (buttonText == 'Estou no ponto') {
-                                _updateNextToAtStop();
-                              } else if (buttonText.contains('Encerrar')) {
-                                _finalizeTrip(buttonText);
-                              } else {
-                                _showSelectNextStopPopup();
-                              }
-                            }
-                          },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
-          Padding(
-            padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
-            child: Center(
-              child: ButtonThree(
-                buttonText: 'Finalizar viagem',
-                backgroundColor: Colors.red,
-                onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
-              ),
-            ),
-          ),
-      ],
-    );
+  if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
+    buttonText = 'Estou no ponto';
+  } else if (_isFinalStop()) {
+    buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
   }
+
+  return Column(
+    children: [
+      if (!_allStopsPassed()) // Exibir os botões apenas se não for o último ponto
+        Padding(
+          padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: ButtonThree(
+                  buttonText: _busIssue ? 'Remover Problema' : 'Ônibus com problema',
+                  backgroundColor: Color(0xFFCBB427),
+                  onPressed: _isProcessing
+                      ? () {}
+                      : toggleBusIssue,
+                ),
+              ),
+              SizedBox(width: getWidthProportion(context, 10)),  // Proporção ajustada
+              Expanded(
+                child: ButtonThree(
+                  buttonText: buttonText,
+                  backgroundColor: _busIssue ? Colors.grey : Color(0xFF3E9B4F), // Define o botão como cinza se houver problema
+                  onPressed: _isProcessing
+                      ? () {}
+                      : () {
+                          if (_busIssue) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Resolva o problema do ônibus para partir.'),
+                              backgroundColor: Colors.redAccent,
+                            ));
+                          } else {
+                            if (buttonText == 'Estou no ponto') {
+                              _updateNextToAtStop();
+                            } else if (buttonText.contains('Encerrar')) {
+                              _finalizeTrip(buttonText);
+                            } else {
+                              _showSelectNextStopPopup();
+                            }
+                          }
+                        },
+                ),
+              ),
+            ],
+          ),
+        ),
+      if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
+        Padding(
+          padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+          child: Center(
+            child: ButtonThree(
+              buttonText: 'Finalizar viagem',
+              backgroundColor: Colors.red,
+              onPressed: _isProcessing ? () {} : () => _finalizeTrip('Finalizar viagem'),
+            ),
+          ),
+        ),
+      if (_isReturnTrip && tripBusStops.isEmpty) // Exibir o botão "Finalizar viagem" se não houver pontos de ônibus na lista
+        Padding(
+          padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+          child: Center(
+            child: ButtonThree(
+              buttonText: 'Finalizar viagem',
+              backgroundColor: Colors.red,
+              onPressed: _isProcessing ? () {} : () => _finalizeTrip('Encerrar viagem de volta'),
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
 
   Widget _buildDepartureTripButtons() {
     return Padding(
