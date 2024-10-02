@@ -11,17 +11,13 @@ class CustomTitleWidget extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width * 0.90,
       height: getHeightProportion(context, 50),  // Proporção de altura
-      decoration: BoxDecoration(
-        color: Color(0xFF395BC7),
-        borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
-      ),
       alignment: Alignment.center,
       child: Text(
         title,
         style: TextStyle(
-          color: Colors.white,
-          fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
-          fontWeight: FontWeight.w600,
+          color: Color(0xFF395BC7),
+          fontSize: getHeightProportion(context, 24),  // Tamanho do texto proporcional
+          fontWeight: FontWeight.bold,
           fontFamily: 'Inter', // Certifique-se de ter a fonte 'Inter' incluída no seu projeto
         ),
         textAlign: TextAlign.center,
