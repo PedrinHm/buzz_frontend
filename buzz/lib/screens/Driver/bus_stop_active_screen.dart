@@ -310,6 +310,27 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
+  void _showConfirmFinalizeReturnTripPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomPopup(
+          message: "Tem certeza de que deseja finalizar a viagem de volta?",
+          confirmText: "Sim",
+          cancelText: "Não",
+          onConfirm: () {
+            Navigator.of(context).pop();
+            _finalizeTrip('Encerrar viagem de volta');
+          },
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
+
   void _showConfirmFinalizeTripPopup() {
     showDialog(
       context: context,
@@ -443,7 +464,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-  Widget _buildReturnTripButtons() {
+Widget _buildReturnTripButtons() {
     String buttonText = 'Selecionar destino';
 
     if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
@@ -476,10 +497,8 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
                 Expanded(
                   child: ButtonThree(
                     buttonText: buttonText,
-                    backgroundColor: _busIssue
-                        ? Colors.grey
-                        : Color(
-                            0xFF3E9B4F), // Define o botão como cinza se houver problema
+                    backgroundColor:
+                        _busIssue ? Colors.grey : Color(0xFF3E9B4F),
                     onPressed: _isProcessing
                         ? () {}
                         : () {
@@ -493,8 +512,12 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
                             } else {
                               if (buttonText == 'Estou no ponto') {
                                 _updateNextToAtStop();
-                              } else if (buttonText.contains('Encerrar')) {
-                                _finalizeTrip(buttonText);
+                              } else if (buttonText ==
+                                  'Encerrar viagem de volta') {
+                                _showConfirmFinalizeReturnTripPopup();
+                              } else if (buttonText ==
+                                  'Encerrar viagem de ida') {
+                                _showConfirmFinalizeTripPopup();
                               } else {
                                 _showSelectNextStopPopup();
                               }
@@ -532,7 +555,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
                 backgroundColor: Colors.red,
                 onPressed: _isProcessing
                     ? () {}
-                    : () => _finalizeTrip('Encerrar viagem de volta'),
+                    : () => _showConfirmFinalizeReturnTripPopup(),
               ),
             ),
           ),
