@@ -148,7 +148,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             tripBusStops.length - 1;
   }
 
-Future<void> _finalizeTrip(String action) async {
+  Future<void> _finalizeTrip(String action) async {
     if (_isProcessing) return;
 
     setState(() {
@@ -224,7 +224,6 @@ Future<void> _finalizeTrip(String action) async {
       });
     }
   }
-
 
   Future<void> _selectNextStop(int stopId) async {
     if (_isProcessing) return;
@@ -376,51 +375,69 @@ Future<void> _finalizeTrip(String action) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(
-              height: getHeightProportion(context, 40)), // Proporção ajustada
-          CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
-          SizedBox(
-              height: getHeightProportion(context, 20)), // Proporção ajustada
-          Expanded(
-            child: tripBusStops.isEmpty
-                ? Center(
-                    child: Text(
-                      'Nenhum ponto de ônibus encontrado.',
-                      style: TextStyle(
-                        color: Color(0xFF000000).withOpacity(0.70),
-                        fontSize: getHeightProportion(
-                            context, 16), // Proporção ajustada
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: tripBusStops.length,
-                    itemBuilder: (context, index) {
-                      final stop = tripBusStops[index];
-                      final status = _busIssue && stop['status'] != 'Já passou'
-                          ? 'Ônibus com problema'
-                          : stop['status']!;
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: getHeightProportion(
-                                context, 10.0)), // Proporção ajustada
-                        child: TripBusStop(
-                          onPressed: () {
-                            // Ação para cada ponto de ônibus
-                          },
-                          busStopName: stop['name']!,
-                          busStopStatus: status,
+          Column(
+            children: [
+              SizedBox(
+                  height:
+                      getHeightProportion(context, 40)), // Proporção ajustada
+              CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
+              SizedBox(
+                  height:
+                      getHeightProportion(context, 20)), // Proporção ajustada
+              Expanded(
+                child: tripBusStops.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Nenhum ponto de ônibus encontrado.',
+                          style: TextStyle(
+                            color: Color(0xFF000000).withOpacity(0.70),
+                            fontSize: getHeightProportion(
+                                context, 16), // Proporção ajustada
+                          ),
                         ),
-                      );
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        itemCount: tripBusStops.length,
+                        itemBuilder: (context, index) {
+                          final stop = tripBusStops[index];
+                          final status =
+                              _busIssue && stop['status'] != 'Já passou'
+                                  ? 'Ônibus com problema'
+                                  : stop['status']!;
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: getHeightProportion(
+                                    context, 10.0)), // Proporção ajustada
+                            child: TripBusStop(
+                              onPressed: () {
+                                // Ação para cada ponto de ônibus
+                              },
+                              busStopName: stop['name']!,
+                              busStopStatus: status,
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              if (_isReturnTrip)
+                _buildReturnTripButtons()
+              else
+                _buildDepartureTripButtons(),
+            ],
           ),
-          if (_isReturnTrip)
-            _buildReturnTripButtons()
-          else
-            _buildDepartureTripButtons(),
+          // Exibir o fundo com a cor do tema e o indicador de carregamento quando uma requisição estiver em andamento
+          if (_isProcessing)
+            Positioned.fill(
+              child: Container(
+                color: Theme.of(context)
+                    .scaffoldBackgroundColor, // Cor do fundo do tema
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
         ],
       ),
     );
