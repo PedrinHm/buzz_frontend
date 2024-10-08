@@ -1,6 +1,7 @@
 import 'package:buzz/controllers/trip_controller.dart';
 import 'package:buzz/screens/Driver/bus_stop_inactive_screen.dart';
 import 'package:buzz/screens/Driver/student_bus_stop_active_screen.dart';
+import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -351,40 +352,42 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-  void _showSelectNextStopPopup() {
+void _showSelectNextStopPopup() {
     fetchStopsOnTheWay().then((stops) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return Dialog(
-            backgroundColor: Colors.black.withOpacity(0.7),
-            child: Container(
-              padding: EdgeInsets.all(
-                  getHeightProportion(context, 16.0)), // Proporção ajustada
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...stops
-                      .map((stop) => TripBusStop(
-                            busStopName: stop['name']!,
-                            busStopStatus: 'A caminho',
-                            onPressed: () {
-                              _selectNextStop(int.parse(stop['id']!));
-                              Navigator.of(context).pop();
-                            },
-                          ))
-                      .toList(),
-                  SizedBox(
-                      height: getHeightProportion(
-                          context, 20)), // Proporção ajustada
-                  ButtonThree(
-                    buttonText: 'Cancelar',
-                    backgroundColor: Colors.red,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+          return SafeArea(
+            // Garante que o overlay respeite as áreas seguras, como a barra de navegação
+            top:
+                false, // Permite que o overlay cubra a parte superior se necessário
+            bottom: true, // Protege a barra de navegação
+            child: Align(
+              alignment: Alignment
+                  .bottomCenter, // Alinha o overlay na parte inferior da tela
+              child: BuildOverlay(
+                title: 'Selecione o Próximo Ponto',
+                content: ListView.builder(
+                  itemCount: stops.length,
+                  itemBuilder: (context, index) {
+                    final stop = stops[index];
+                    return Material(
+                      color: Colors
+                          .transparent, // Mantém o fundo transparente para combinar com o design
+                      child: TripBusStop(
+                        busStopName: stop['name']!,
+                        busStopStatus: 'A caminho',
+                        onPressed: () {
+                          _selectNextStop(int.parse(stop['id']!));
+                          Navigator.of(context)
+                              .pop(); // Fecha o overlay após seleção
+                        },
+                      ),
+                    );
+                  },
+                ),
+                onCancel: () =>
+                    Navigator.of(context).pop(), // Fecha o overlay ao cancelar
               ),
             ),
           );
