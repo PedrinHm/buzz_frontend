@@ -21,47 +21,59 @@ class TripController extends ChangeNotifier {
     _hasActiveTrip = true;
     _studentTripId = studentTripId;
     _activeTripId = tripId;
-    notifyListeners(); 
+
+    // Usando addPostFrameCallback para chamar notifyListeners após o build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void startTrip(int tripId, int tripType) {
     _hasActiveTrip = true;
     _activeTripId = tripId;
     _tripType = tripType;
-    notifyListeners();
-  }
 
-  void endTrip() {
-     print("Finalizando a viagem, tripId atual: $_activeTripId");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
+  }
+void endTrip() {
+    print("Finalizando a viagem, tripId atual: $_activeTripId");
     _hasActiveTrip = false;
-    _activeTripId = null;
+    _activeTripId = null; // Certifica-se de que activeTripId seja null
     _tripType = null;
     _isStudent = false;
-    _studentTripId = null; // Reseta o studentTripId ao finalizar a viagem
-    print("Viagem finalizada. tripId é null agora.");
-    notifyListeners();
+    _studentTripId = null;
+    print("Viagem finalizada. activeTripId é null agora.");
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   Future<void> checkActiveTrip(int userId, {bool isStudent = false}) async {
-    _isLoading = true; // Começa o carregamento
-    notifyListeners();
+    _isLoading = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
 
     _isStudent = isStudent;
 
     if (isStudent) {
-      // Se for aluno, verifica a viagem ativa associada ao student_trip
       await checkActiveStudentTrip(userId);
     } else {
-      // Se for motorista, verifica a viagem ativa associada ao motorista
       await checkActiveDriverTrip(userId);
     }
 
-    _isLoading = false; // Finaliza o carregamento
-    notifyListeners();
+    _isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   Future<void> checkActiveDriverTrip(int driverId) async {
-    final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/trips/active/$driverId'));
+    final response = await http.get(Uri.parse(
+        'https://buzzbackend-production.up.railway.app/trips/active/$driverId'));
     if (response.statusCode == 200) {
       final tripData = json.decode(response.body);
       _activeTripId = tripData['id'];
@@ -72,17 +84,20 @@ class TripController extends ChangeNotifier {
       _activeTripId = null;
       _tripType = null;
     }
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   Future<void> checkActiveStudentTrip(int studentId) async {
     try {
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
+      final response = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
       if (response.statusCode == 200) {
         final tripData = json.decode(response.body);
         _activeTripId = tripData['trip_id'];
         _tripType = tripData['trip_type'] == 'IDA' ? 1 : 2;
-        _studentTripId = tripData['student_trip_id']; // Armazena o student_trip_id corretamente
+        _studentTripId = tripData['student_trip_id'];
         _hasActiveTrip = true;
       } else {
         _hasActiveTrip = false;
@@ -97,7 +112,9 @@ class TripController extends ChangeNotifier {
       _tripType = null;
       _studentTripId = null;
     }
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   Future<void> initiateTrip(int driverId, int busId, int tripType) async {
@@ -120,25 +137,33 @@ class TripController extends ChangeNotifier {
     } else {
       throw Exception('Failed to start trip');
     }
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
-   Future<void> completeTrip(int tripId) async {
+Future<void> completeTrip(int tripId) async {
     String endpoint = _tripType == 1 ? 'finalizar_ida' : 'finalizar_volta';
-    final response = await http.put(Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/$endpoint'));
-    
+    final response = await http.put(Uri.parse(
+        'https://buzzbackend-production.up.railway.app/trips/$tripId/$endpoint'));
+
     if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+
       if (_tripType == 1) {
-        // Inicia a viagem de volta
-        final returnTripData = json.decode(response.body);
-        startTrip(returnTripData['id'], 2);  // Viagem de volta
+        // Inicia a viagem de volta usando o new_trip_id retornado na resposta
+        int? returnTripId = responseData['new_trip_id'];
+        if (returnTripId != null) {
+          startTrip(returnTripId, 2); // Viagem de volta
+        }
       } else {
-        // Finaliza completamente a viagem de volta e define tripId como null
-        endTrip();  // Define que não há mais viagem ativa
+        // Finaliza completamente a viagem de volta e redefine o estado para null
+        endTrip(); // Define que não há mais viagem ativa
       }
     } else {
       throw Exception('Erro ao concluir a viagem');
     }
   }
+
 
 }

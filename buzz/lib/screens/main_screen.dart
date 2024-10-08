@@ -27,11 +27,17 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = _getScreensForUser(widget.usuario.tipoUsuario);
+
+    // Usar addPostFrameCallback para chamar _verifyControllers após a construção do widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _verifyControllers();
+    });
   }
 
   Future<void> _verifyControllers() async {
     if (widget.usuario.tipoUsuario == 'driver') {
-      await Provider.of<TripController>(context, listen: false).checkActiveTrip(widget.usuario.id);
+      await Provider.of<TripController>(context, listen: false)
+          .checkActiveTrip(widget.usuario.id);
     }
     // Adicione mais verificações se necessário
   }
@@ -42,19 +48,22 @@ class _MainScreenState extends State<MainScreen> {
         return [
           StudentTripScreenController(studentId: widget.usuario.id),
           StudentHomeScreenController(studentId: widget.usuario.id),
-          UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+          UserProfileScreen(
+              userId: widget.usuario.id), // Passando apenas o userId
         ];
       case 'driver':
         return [
           DriverStudentScreenController(driverId: widget.usuario.id),
           BusStopScreenController(driverId: widget.usuario.id),
-          UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+          UserProfileScreen(
+              userId: widget.usuario.id), // Passando apenas o userId
         ];
       case 'admin':
         _currentIndex = 0;
         return [
           HomeScreen(),
-          UserProfileScreen(userId: widget.usuario.id), // Passando apenas o userId
+          UserProfileScreen(
+              userId: widget.usuario.id), // Passando apenas o userId
         ];
       default:
         throw Exception('Tipo de usuário desconhecido');
@@ -82,7 +91,8 @@ class _MainScreenState extends State<MainScreen> {
               index: _currentIndex,
               children: _screens,
             ),
-            bottomNavigationBar: getNavBar(widget.usuario.tipoUsuario, _currentIndex, _onItemTapped),
+            bottomNavigationBar: getNavBar(
+                widget.usuario.tipoUsuario, _currentIndex, _onItemTapped),
           );
         }
       },

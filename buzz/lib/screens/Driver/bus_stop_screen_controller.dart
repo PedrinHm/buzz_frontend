@@ -10,7 +10,8 @@ class BusStopScreenController extends StatefulWidget {
   BusStopScreenController({required this.driverId});
 
   @override
-  _BusStopScreenControllerState createState() => _BusStopScreenControllerState();
+  _BusStopScreenControllerState createState() =>
+      _BusStopScreenControllerState();
 }
 
 class _BusStopScreenControllerState extends State<BusStopScreenController> {
@@ -24,9 +25,15 @@ class _BusStopScreenControllerState extends State<BusStopScreenController> {
               try {
                 await tripController.completeTrip(tripController.activeTripId!);
 
-                if (tripController.activeTripId == null) {
-                  // A viagem foi finalizada completamente, então atualizamos a interface
-                  setState(() {});
+                // Verifica se o tripId é null após finalizar a viagem de volta
+                if (tripController.tripType == 2 &&
+                    tripController.activeTripId == null) {
+                  // A viagem de volta foi finalizada completamente, atualize para a tela inativa
+                  setState(() {
+                    // Força um refresh da tela para exibir a tela inativa
+                    print(
+                        "Viagem de volta finalizada. Mudando para a tela inativa.");
+                  });
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -34,14 +41,14 @@ class _BusStopScreenControllerState extends State<BusStopScreenController> {
                 ));
               }
             },
-            tripId: tripController.activeTripId!,
-            isReturnTrip: tripController.tripType == 2,  // Passando o tripType
+            tripId: tripController.activeTripId ?? 0,
+            isReturnTrip: tripController.tripType == 2,
           );
         } else {
           // Quando não há mais viagem ativa, exibe a tela inativa
           return BusStopInactiveScreen(
             startTrip: (int driverId, int busId) {
-              return tripController.initiateTrip(driverId, busId, 1);  // Inicia uma nova viagem
+              return tripController.initiateTrip(driverId, busId, 1);
             },
             driverId: widget.driverId,
           );
