@@ -12,7 +12,8 @@ dynamic decodeJsonResponse(http.Response response) {
     String responseBody = utf8.decode(response.bodyBytes);
     return json.decode(responseBody);
   } else {
-    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+    throw Exception(
+        'Failed to parse JSON, status code: ${response.statusCode}');
   }
 }
 
@@ -23,10 +24,12 @@ class StudentBusStopActiveScreen extends StatefulWidget {
   StudentBusStopActiveScreen({required this.endTrip, required this.tripId});
 
   @override
-  _StudentBusStopActiveScreenState createState() => _StudentBusStopActiveScreenState();
+  _StudentBusStopActiveScreenState createState() =>
+      _StudentBusStopActiveScreenState();
 }
 
-class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen> {
+class _StudentBusStopActiveScreenState
+    extends State<StudentBusStopActiveScreen> {
   Future<Map<String, dynamic>>? _futureData;
 
   @override
@@ -52,7 +55,8 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
+              return Center(
+                  child: Text('Erro ao carregar dados: ${snapshot.error}'));
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
@@ -69,18 +73,24 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
             bool busIssue = snapshot.data!['bus_issue'] ?? false;
 
             // Ordenando e filtrando os dados antes de exibir
-            busStops.sort((a, b) => _compareBusStopStatus(a['status']!, b['status']!));
+            busStops.sort(
+                (a, b) => _compareBusStopStatus(a['status']!, b['status']!));
             students = students
                 .where((student) => student['status'] != 'Fila de espera')
                 .toList();
-            students.sort((a, b) => _compareStudentStatus(a['status']!, b['status']!));
+            students.sort(
+                (a, b) => _compareStudentStatus(a['status']!, b['status']!));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: getHeightProportion(context, 40)),  // Proporção ajustada
-                CustomTitleWidget(title: 'Viagem Atual - Alunos e Pontos de Ônibus'),
-                SizedBox(height: getHeightProportion(context, 20)),  // Proporção ajustada
+                SizedBox(
+                    height:
+                        getHeightProportion(context, 40)), // Proporção ajustada
+                CustomTitleWidget(title: 'Alunos e Pontos de Ônibus'),
+                SizedBox(
+                    height:
+                        getHeightProportion(context, 20)), // Proporção ajustada
                 if (busStops.isEmpty && students.isEmpty)
                   Expanded(
                     child: Center(
@@ -88,7 +98,8 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
                         'Nenhum ponto de ônibus ou aluno encontrado.',
                         style: TextStyle(
                           color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(context, 16),  // Proporção ajustada
+                          fontSize: getHeightProportion(
+                              context, 16), // Proporção ajustada
                         ),
                       ),
                     ),
@@ -96,23 +107,27 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
                 else ...[
                   if (busStops.isEmpty)
                     Padding(
-                      padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+                      padding: EdgeInsets.all(getHeightProportion(
+                          context, 8.0)), // Proporção ajustada
                       child: Text(
                         'Nenhum ponto de ônibus encontrado.',
                         style: TextStyle(
                           color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(context, 16),  // Proporção ajustada
+                          fontSize: getHeightProportion(
+                              context, 16), // Proporção ajustada
                         ),
                       ),
                     ),
                   if (students.isEmpty)
                     Padding(
-                      padding: EdgeInsets.all(getHeightProportion(context, 8.0)),  // Proporção ajustada
+                      padding: EdgeInsets.all(getHeightProportion(
+                          context, 8.0)), // Proporção ajustada
                       child: Text(
                         'Nenhum aluno encontrado.',
                         style: TextStyle(
                           color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(context, 16),  // Proporção ajustada
+                          fontSize: getHeightProportion(
+                              context, 16), // Proporção ajustada
                         ),
                       ),
                     ),
@@ -127,7 +142,8 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
     );
   }
 
-  List<Widget> _buildBusStopSections(List<Map<String, String>> busStops, List<Map<String, String>> students) {
+  List<Widget> _buildBusStopSections(
+      List<Map<String, String>> busStops, List<Map<String, String>> students) {
     List<Widget> sections = [];
     for (var stop in busStops) {
       if (stop['name'] == null || stop['status'] == null) continue;
@@ -135,7 +151,8 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
       sections.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: getHeightProportion(context, 20)),  // Proporção ajustada
+          SizedBox(
+              height: getHeightProportion(context, 20)), // Proporção ajustada
           BusStopStatus(
             busStopName: stop['name'] ?? 'N/A',
             busStopStatus: stop['status'] ?? 'N/A',
@@ -147,18 +164,20 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
           ...students
               .where((student) => student['busStop'] == stop['name'])
               .map((student) {
-                if (student['name'] == null || student['status'] == null) return SizedBox.shrink();
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: getHeightProportion(context, 5)),  // Proporção ajustada
-                  child: StudentStatus(
-                    studentName: student['name'] ?? 'N/A',
-                    studentStatus: student['status'] ?? 'N/A',
-                    profilePictureBase64: student['profilePictureBase64'] ?? '',
-                    busStopName: stop['name']!,
-                  ),
-                );
-              })
-              .toList(),
+            if (student['name'] == null || student['status'] == null)
+              return SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical:
+                      getHeightProportion(context, 5)), // Proporção ajustada
+              child: StudentStatus(
+                studentName: student['name'] ?? 'N/A',
+                studentStatus: student['status'] ?? 'N/A',
+                profilePictureBase64: student['profilePictureBase64'] ?? '',
+                busStopName: stop['name']!,
+              ),
+            );
+          }).toList(),
         ],
       ));
     }
@@ -184,12 +203,14 @@ class _StudentBusStopActiveScreenState extends State<StudentBusStopActiveScreen>
 
   // Função de comparação para ordenar os pontos de ônibus
   int _compareBusStopStatus(String statusA, String statusB) {
-    return (busStopStatusOrder[statusA] ?? 0).compareTo(busStopStatusOrder[statusB] ?? 0);
+    return (busStopStatusOrder[statusA] ?? 0)
+        .compareTo(busStopStatusOrder[statusB] ?? 0);
   }
 
   // Função de comparação para ordenar os alunos
   int _compareStudentStatus(String statusA, String statusB) {
-    return (studentStatusOrder[statusA] ?? 0).compareTo(studentStatusOrder[statusB] ?? 0);
+    return (studentStatusOrder[statusA] ?? 0)
+        .compareTo(studentStatusOrder[statusB] ?? 0);
   }
 }
 
@@ -203,9 +224,10 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
     var busStopsResult = results[1] as Map<String, dynamic>;
 
     return {
-      'students': results[0],  // Retorna os dados dos estudantes
-      'busStops': busStopsResult['busStops'],  // Retorna os pontos de ônibus
-      'bus_issue': busStopsResult['bus_issue'],  // Retorna o estado do problema do ônibus
+      'students': results[0], // Retorna os dados dos estudantes
+      'busStops': busStopsResult['busStops'], // Retorna os pontos de ônibus
+      'bus_issue':
+          busStopsResult['bus_issue'], // Retorna o estado do problema do ônibus
     };
   } catch (e) {
     return {
@@ -217,29 +239,35 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
 }
 
 Future<List<Map<String, String>>> fetchStudents(int tripId) async {
-  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/details');
+  var url = Uri.parse(
+      'https://buzzbackend-production.up.railway.app/trips/$tripId/details');
   var response = await http.get(url);
 
   if (response.statusCode == 200) {
     List<dynamic> data = decodeJsonResponse(response);
- 
-    return data.map((item) => Map<String, String>.from({
-      'name': item['student_name'] as String? ?? '',
-      'status': item['student_status'] as String? ?? '',
-      'profilePictureBase64': item['profile_picture'] as String? ?? '', // Use a imagem em base64
-      'busStop': item['bus_stop_name'] as String? ?? '',
-    })).toList();
+
+    return data
+        .map((item) => Map<String, String>.from({
+              'name': item['student_name'] as String? ?? '',
+              'status': item['student_status'] as String? ?? '',
+              'profilePictureBase64': item['profile_picture'] as String? ??
+                  '', // Use a imagem em base64
+              'busStop': item['bus_stop_name'] as String? ?? '',
+            }))
+        .toList();
   } else if (response.statusCode == 404) {
     print("Nenhum dado encontrado para o tripId: $tripId");
     return [];
   } else {
-    print("Erro ao carregar os detalhes da viagem dos estudantes, status code: ${response.statusCode}");
+    print(
+        "Erro ao carregar os detalhes da viagem dos estudantes, status code: ${response.statusCode}");
     throw Exception('Failed to load student trip details');
   }
 }
 
 Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
-  var url = Uri.parse('https://buzzbackend-production.up.railway.app/trips/$tripId/bus_stops');
+  var url = Uri.parse(
+      'https://buzzbackend-production.up.railway.app/trips/$tripId/bus_stops');
   var response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -248,7 +276,8 @@ Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
     // Verificando o valor de bus_issue
     bool busIssue = data['bus_issue'] ?? false;
 
-    List<Map<String, String>> busStops = (data['bus_stops'] as List).map((item) {
+    List<Map<String, String>> busStops =
+        (data['bus_stops'] as List).map((item) {
       String status = item['status'] as String? ?? 'N/A';
       if (busIssue && status != 'Já passou') {
         status = 'Ônibus com problema';

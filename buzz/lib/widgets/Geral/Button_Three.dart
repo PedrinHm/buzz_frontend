@@ -21,15 +21,21 @@ class ButtonThree extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white, // Cor do texto do botão
-          backgroundColor: backgroundColor, // Usa a cor de fundo passada como parâmetro
+          backgroundColor:
+              backgroundColor, // Usa a cor de fundo passada como parâmetro
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção aplicada
+            borderRadius: BorderRadius.circular(
+                getWidthProportion(context, 10)), // Proporção aplicada
           ),
         ),
-        child: Center( // Garante que o texto fique centralizado
+        child: Center(
+          // Garante que o texto fique centralizado
           child: Text(
             buttonText,
-            style: TextStyle(fontSize: getHeightProportion(context, 16)), // Proporção aplicada no tamanho do texto
+            textAlign: TextAlign.center, // Centraliza o texto
+            style: TextStyle(
+                fontSize: getHeightProportion(
+                    context, 16)), // Proporção aplicada no tamanho do texto
           ),
         ),
       ),

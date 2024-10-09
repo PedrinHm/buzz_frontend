@@ -331,7 +331,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-
+  
   void _showConfirmFinalizeTripPopup() {
     showDialog(
       context: context,
@@ -352,7 +352,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     );
   }
 
-void _showSelectNextStopPopup() {
+  void _showSelectNextStopPopup() {
     fetchStopsOnTheWay().then((stops) {
       showDialog(
         context: context,
@@ -406,7 +406,7 @@ void _showSelectNextStopPopup() {
               SizedBox(
                   height:
                       getHeightProportion(context, 40)), // Proporção ajustada
-              CustomTitleWidget(title: 'Viagem Atual - Pontos de Ônibus'),
+              CustomTitleWidget(title: 'Pontos de Ônibus'),
               SizedBox(
                   height:
                       getHeightProportion(context, 20)), // Proporção ajustada
@@ -467,7 +467,7 @@ void _showSelectNextStopPopup() {
     );
   }
 
-Widget _buildReturnTripButtons() {
+  Widget _buildReturnTripButtons() {
     String buttonText = 'Selecionar destino';
 
     if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {

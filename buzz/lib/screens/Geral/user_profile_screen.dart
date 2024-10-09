@@ -170,7 +170,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               fit: BoxFit.cover,
                             )
                           : Image.asset(
-                              'images/default_profile.jpeg',
+                              'assets/images/default_profile.jpeg',
                               width: getHeightProportion(context, 175), // Proporção ajustada
                               height: getHeightProportion(context, 175), // Proporção ajustada
                               fit: BoxFit.cover,
