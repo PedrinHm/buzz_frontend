@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.example.buzz"
+    namespace = "com.example.myapplication"
     compileSdk = 34  // Defina explicitamente o compileSdkVersion
 
     compileOptions {
@@ -33,7 +33,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.buzz"
+        applicationId = "com.example.myapplication"
         minSdkVersion = 21  // Defina explicitamente o minSdkVersion
         targetSdkVersion = 33  // Defina explicitamente o targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
@@ -50,3 +50,5 @@ android {
 flutter {
     source = "../.."
 }
+
+apply plugin: 'com.google.gms.google-services'

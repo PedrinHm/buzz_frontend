@@ -16,7 +16,7 @@ class CustomTitleWidget extends StatelessWidget {
         title,
         style: TextStyle(
           color: Color(0xFF395BC7),
-          fontSize: getHeightProportion(context, 24),  // Tamanho do texto proporcional
+          fontSize: getHeightProportion(context, 20),  // Tamanho do texto proporcional
           fontWeight: FontWeight.bold,
           fontFamily: 'Inter', // Certifique-se de ter a fonte 'Inter' incluída no seu projeto
         ),

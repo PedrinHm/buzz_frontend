@@ -7,8 +7,9 @@ import 'package:buzz/widgets/Geral/Text_Button.dart';
 import 'package:buzz/models/usuario.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async'; 
-import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
+import 'dart:async';
+import 'package:buzz/utils/size_config.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -42,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print('Sending login request with email: $email and password: $password');
       final response = await http.post(
-        Uri.parse('https://buzzbackend-production.up.railway.app/auth/'),  // Verifique se a URL está correta
+        Uri.parse(
+            'https://buzzbackend-production.up.railway.app/auth/'), // Verifique se a URL está correta
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -58,7 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         final String status = responseBody['status'];
         final int userTypeId = responseBody['user_type_id'];
-        final int userId = responseBody['id'];  // Extraindo o ID do usuário da resposta
+        final int userId =
+            responseBody['id']; // Extraindo o ID do usuário da resposta
 
         print('Login successful. User type ID: $userTypeId');
         if (status == 'success') {
@@ -78,15 +81,23 @@ class _LoginScreenState extends State<LoginScreen> {
               usuario = Usuario(tipoUsuario: 'unknown', id: userId);
           }
 
+          // Obter o token do dispositivo e atualizar no banco de dados
+          String? deviceToken = await _getDeviceToken();
+          if (deviceToken != null) {
+            await _atualizarDeviceToken(userId, deviceToken);
+          }
+
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MainScreen(usuario: usuario)),
+            MaterialPageRoute(
+                builder: (context) => MainScreen(usuario: usuario)),
           );
         }
       } else if (response.statusCode == 403) {
         setState(() {
           _lockoutEndTime = DateTime.now().add(Duration(minutes: 10));
-          _errorMessage = 'Você excedeu o limite de tentativas, tente novamente mais tarde';
+          _errorMessage =
+              'Você excedeu o limite de tentativas, tente novamente mais tarde';
 
           _startTimer(); // Inicia o cronômetro para atualizar a interface
         });
@@ -114,7 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {});
 
       if (_lockoutEndTime != null && DateTime.now().isAfter(_lockoutEndTime!)) {
-        _timer?.cancel(); // Cancela o cronômetro quando o tempo de bloqueio terminar
+        _timer
+            ?.cancel(); // Cancela o cronômetro quando o tempo de bloqueio terminar
       }
     });
   }
@@ -137,59 +149,97 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Proporção em altura
-          child: _isLoading 
-            ? CircularProgressIndicator()
-            : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomInputField(
-                  labelText: 'Login',
-                  keyboardType: TextInputType.emailAddress,
-                  controller: emailController,
-                ),
-                SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
-                CustomInputField(
-                  labelText: 'Senha',
-                  obscureText: true,
-                  controller: passwordController,
-                ),
-                SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
-                if (_errorMessage.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: getHeightProportion(context, 10)),  // Proporção em altura
-                    child: Text(
-                      _errorMessage,
-                      style: TextStyle(color: Colors.red),
+          padding: EdgeInsets.all(
+              getHeightProportion(context, 16.0)), // Proporção em altura
+          child: _isLoading
+              ? CircularProgressIndicator()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomInputField(
+                      labelText: 'Login',
+                      keyboardType: TextInputType.emailAddress,
+                      controller: emailController,
                     ),
-                  ),
-                if (_lockoutEndTime != null)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: getHeightProportion(context, 10)),  // Proporção em altura
-                    child: Text(
-                      'Você poderá tentar novamente em ${_formatTimeRemaining()}',
-                      style: TextStyle(color: Colors.red),
+                    SizedBox(
+                        height: getHeightProportion(
+                            context, 20)), // Proporção em altura
+                    CustomInputField(
+                      labelText: 'Senha',
+                      obscureText: true,
+                      controller: passwordController,
                     ),
-                  ),
-                Button_One(
-                  buttonText: 'Realizar Login',
-                  onPressed: _isLoading || (_lockoutEndTime != null && DateTime.now().isBefore(_lockoutEndTime!))
-                    ? () {}  // função vazia quando desabilitado
-                    : _login,
+                    SizedBox(
+                        height: getHeightProportion(
+                            context, 20)), // Proporção em altura
+                    if (_errorMessage.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: getHeightProportion(
+                                context, 10)), // Proporção em altura
+                        child: Text(
+                          _errorMessage,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    if (_lockoutEndTime != null)
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: getHeightProportion(
+                                context, 10)), // Proporção em altura
+                        child: Text(
+                          'Você poderá tentar novamente em ${_formatTimeRemaining()}',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    Button_One(
+                      buttonText: 'Realizar Login',
+                      onPressed: _isLoading ||
+                              (_lockoutEndTime != null &&
+                                  DateTime.now().isBefore(_lockoutEndTime!))
+                          ? () {} // função vazia quando desabilitado
+                          : _login,
+                    ),
+                    TextLinkButton(
+                      text: 'Esqueceu a senha?',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ForgotPasswordScreen()),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                TextLinkButton(
-                  text: 'Esqueceu a senha?',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-                    );    
-                  },
-                ),
-              ],
-            ),
         ),
       ),
     );
+  }
+
+  Future<void> _atualizarDeviceToken(int userId, String deviceToken) async {
+    const url =
+        'https://buzzbackend-production.up.railway.app/auth/update-device-token';
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'user_id': userId,
+        'device_token': deviceToken,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Token do dispositivo atualizado com sucesso no backend.');
+    } else {
+      print('Erro ao atualizar o token do dispositivo: ${response.body}');
+    }
+  }
+
+  Future<String?> _getDeviceToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String? deviceToken = await messaging.getToken();
+    print("Token do dispositivo: $deviceToken");
+    return deviceToken;
   }
 }

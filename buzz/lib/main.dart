@@ -5,8 +5,26 @@ import 'package:buzz/screens/Auth/login_screen.dart';
 import 'package:buzz/screens/main_screen.dart';
 import 'package:buzz/controllers/trip_controller.dart';
 import 'package:buzz/models/usuario.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
+// Função para lidar com notificações em segundo plano
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Inicialize o Firebase para garantir que esteja pronto para processar as mensagens
+  await Firebase.initializeApp();
+  print('Mensagem recebida em segundo plano: ${message.messageId}');
+}
+
+void main() async {
+  // Garantir que a inicialização dos widgets Flutter e do Firebase seja feita corretamente
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicialize o Firebase antes de qualquer outra operação que dependa dele
+  await Firebase.initializeApp();
+
+  // Configurar o Firebase Messaging para lidar com mensagens em segundo plano
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(MyApp());
 }
 
