@@ -59,7 +59,7 @@ class CustomBusStopButton extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Ponto de ônibus atual: $busStopName', 
+                  '$busStopName', 
                   style: TextStyle(
                     fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
                     color: Colors.white,

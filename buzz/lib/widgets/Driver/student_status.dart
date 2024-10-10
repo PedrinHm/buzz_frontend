@@ -25,14 +25,15 @@ class StudentStatus extends StatelessWidget {
         return Color(0xFF93C03F);
       case 'Em aula':
         return Color(0xFF395BC7);
-      case 'Na fila de espera':
+      case 'Fila de espera':
         return Color(0xFFA5921E);
       default:
         return Color(0xFF395BC7); // Cor padrão
     }
   }
 
-  Widget _buildUserProfileImage(String profilePictureBase64, BuildContext context) {
+  Widget _buildUserProfileImage(
+      String profilePictureBase64, BuildContext context) {
     if (profilePictureBase64.isNotEmpty) {
       try {
         // Tenta decodificar a imagem de base64
@@ -60,19 +61,22 @@ class StudentStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.90,// Proporção da largura
+      width: MediaQuery.of(context).size.width * 0.90, // Proporção da largura
       padding: EdgeInsets.symmetric(
         vertical: getHeightProportion(context, 10), // Proporção em altura
         horizontal: getWidthProportion(context, 20), // Proporção em largura
       ),
       decoration: BoxDecoration(
         color: _getColorFromStatus(studentStatus),
-        borderRadius: BorderRadius.circular(getWidthProportion(context, 10)), // Proporção do raio
+        borderRadius: BorderRadius.circular(
+            getWidthProportion(context, 10)), // Proporção do raio
       ),
       child: Row(
         children: [
-          _buildUserProfileImage(profilePictureBase64, context), // Passando o context para a função
-          SizedBox(width: getWidthProportion(context, 10)), // Proporção em largura
+          _buildUserProfileImage(profilePictureBase64,
+              context), // Passando o context para a função
+          SizedBox(
+              width: getWidthProportion(context, 10)), // Proporção em largura
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -80,14 +84,16 @@ class StudentStatus extends StatelessWidget {
                 studentName,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: getHeightProportion(context, 14), // Proporção em altura
+                  fontSize:
+                      getHeightProportion(context, 14), // Proporção em altura
                 ),
               ),
               Text(
                 studentStatus,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: getHeightProportion(context, 14), // Proporção em altura
+                  fontSize:
+                      getHeightProportion(context, 14), // Proporção em altura
                 ),
               ),
             ],

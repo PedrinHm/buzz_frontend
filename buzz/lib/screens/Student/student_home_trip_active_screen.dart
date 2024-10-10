@@ -1,4 +1,5 @@
 import 'package:buzz/utils/size_config.dart';
+import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:provider/provider.dart';
 import 'package:buzz/widgets/Student/Bus_Button_Home.dart';
@@ -231,7 +232,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
   }
 
-  Future<void> _updateStudentTrip(int newTripId) async {
+Future<void> _updateStudentTrip(int newTripId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,12 +242,33 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      final response = await http.put(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
+      final response = await http.put(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
       if (response.statusCode == 200) {
         print('Viagem do aluno atualizada com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Viagem do aluno atualizada com sucesso!')),
+        );
+      } else if (response.statusCode == 400 &&
+          response.body.contains("New trip is full")) {
+        // Exibe popup se a viagem estiver cheia
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomPopup(
+              message: 'A viagem está cheia. Deseja entrar na fila de espera?',
+              confirmText: 'Sim',
+              cancelText: 'Não',
+              onConfirm: () {
+                Navigator.of(context).pop();
+                _enterWaitlist(newTripId);
+              },
+              onCancel: () {
+                Navigator.of(context).pop();
+              },
+            );
+          },
         );
       } else {
         throw Exception('Failed to update student trip');
@@ -258,6 +280,29 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       );
     }
   }
+
+// Nova função para entrar na fila de espera
+  Future<void> _enterWaitlist(int newTripId) async {
+    try {
+      final response = await http.put(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId&waitlist=true'));
+
+      if (response.statusCode == 200) {
+        print('Aluno entrou na fila de espera com sucesso!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Você entrou na fila de espera com sucesso!')),
+        );
+      } else {
+        throw Exception('Failed to join waitlist');
+      }
+    } catch (e) {
+      print('Erro ao entrar na fila de espera: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao entrar na fila de espera')),
+      );
+    }
+  }
+
 
   Future<void> _updateStudentTripPoint(int pointId) async {
     if (_studentTripId == null) {
@@ -299,26 +344,26 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
               children: [
                 SizedBox(height: getHeightProportion(context, 40)), // Proporção para altura
                 FullScreenMessage(
-                  message: 'Existem ônibus em viagem de ida, está participando?',
+                  message: 'Seja bem vindo ao Buzz!',
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
+                SizedBox(height: getHeightProportion(context, 10)), 
                 CustomStatus(
                   onPressed: _toggleStatusOverlay,
-                  StatusName: 'Definir status',
+                  StatusName: 'Definir status', //Aqui o status atual do aluno
                   iconData: PhosphorIcons.chalkboardTeacher,
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
+                SizedBox(height: getHeightProportion(context, 10)), 
                 CustomBusStopButton(
                   onPressed: _toggleBusStopOverlay,
-                  busStopName: "Definir ponto de ônibus",
+                  busStopName: "Definir ponto de ônibus", //Aqui devemos puxar o nome do ponto de onibus atual do aluno pego em student_trip
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
+                SizedBox(height: getHeightProportion(context, 10)), 
                 CustomBusButton(
                   onPressed: _toggleBusOverlay,
-                  busNumber: "ABC-1234",
-                  driverName: "Nome Do Motorista",
+                  busNumber: "ABC-1234", //Aqui a placa do onibus da viagem atual
+                  driverName: "Nome Do Motorista", //Aqui o nome do motorista da viagem atual
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), // Proporção para altura
+                SizedBox(height: getHeightProportion(context, 10)), 
               ],
             ),
           ),

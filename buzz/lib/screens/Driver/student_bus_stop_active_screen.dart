@@ -72,12 +72,8 @@ class _StudentBusStopActiveScreenState
 
             bool busIssue = snapshot.data!['bus_issue'] ?? false;
 
-            // Ordenando e filtrando os dados antes de exibir
             busStops.sort(
                 (a, b) => _compareBusStopStatus(a['status']!, b['status']!));
-            students = students
-                .where((student) => student['status'] != 'Fila de espera')
-                .toList();
             students.sort(
                 (a, b) => _compareStudentStatus(a['status']!, b['status']!));
 
@@ -184,7 +180,6 @@ class _StudentBusStopActiveScreenState
     return sections;
   }
 
-  // Mapeamento das labels para os valores numéricos usados na ordenação
   final Map<String, int> busStopStatusOrder = {
     'No ponto': 2,
     'Próximo ponto': 3,
@@ -199,6 +194,7 @@ class _StudentBusStopActiveScreenState
     'Aguardando no ponto': 3,
     'Em aula': 2,
     'Não voltará': 4,
+    'Fila de espera': 5
   };
 
   // Função de comparação para ordenar os pontos de ônibus
@@ -220,14 +216,12 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
     var busStopsFuture = fetchBusStops(tripId);
     var results = await Future.wait([studentsFuture, busStopsFuture]);
 
-    // Casting explícito para o tipo correto
     var busStopsResult = results[1] as Map<String, dynamic>;
 
     return {
-      'students': results[0], // Retorna os dados dos estudantes
-      'busStops': busStopsResult['busStops'], // Retorna os pontos de ônibus
-      'bus_issue':
-          busStopsResult['bus_issue'], // Retorna o estado do problema do ônibus
+      'students': results[0],
+      'busStops': busStopsResult['busStops'],
+      'bus_issue': busStopsResult['bus_issue'],
     };
   } catch (e) {
     return {
@@ -250,8 +244,7 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
         .map((item) => Map<String, String>.from({
               'name': item['student_name'] as String? ?? '',
               'status': item['student_status'] as String? ?? '',
-              'profilePictureBase64': item['profile_picture'] as String? ??
-                  '', // Use a imagem em base64
+              'profilePictureBase64': item['profile_picture'] as String? ?? '',
               'busStop': item['bus_stop_name'] as String? ?? '',
             }))
         .toList();
@@ -273,7 +266,6 @@ Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
   if (response.statusCode == 200) {
     var data = decodeJsonResponse(response);
 
-    // Verificando o valor de bus_issue
     bool busIssue = data['bus_issue'] ?? false;
 
     List<Map<String, String>> busStops =
