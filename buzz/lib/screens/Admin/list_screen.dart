@@ -7,7 +7,7 @@ import 'package:buzz/widgets/Admin/list_item.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
+import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -15,7 +15,8 @@ dynamic decodeJsonResponse(http.Response response) {
     String responseBody = utf8.decode(response.bodyBytes);
     return json.decode(responseBody);
   } else {
-    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+    throw Exception(
+        'Failed to parse JSON, status code: ${response.statusCode}');
   }
 }
 
@@ -30,22 +31,33 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   List<Map<String, dynamic>> items = [];
+  List<Map<String, dynamic>> filteredItems = [];
   bool _isLoading = true;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchItems();
+    _searchController.addListener(_filterItems);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchItems() async {
     String apiUrl;
     switch (widget.title) {
       case 'Cadastro de Motorista':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/users/?user_type_id=2';
+        apiUrl =
+            'https://buzzbackend-production.up.railway.app/users/?user_type_id=2';
         break;
       case 'Cadastro de Aluno':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/users/?user_type_id=1';
+        apiUrl =
+            'https://buzzbackend-production.up.railway.app/users/?user_type_id=1';
         break;
       case 'Cadastro de Pontos de Ônibus':
         apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/';
@@ -74,20 +86,31 @@ class _ListScreenState extends State<ListScreen> {
           } else if (widget.title == 'Cadastro de Aluno') {
             return item['user_type_id'] == 1;
           } else {
-            return item['system_deleted'] == 0; // Filtra itens com system_deleted == 0
+            return item['system_deleted'] == 0;
           }
         }).map<Map<String, dynamic>>((item) {
           return item as Map<String, dynamic>;
         }).toList();
+        filteredItems = items;
         _isLoading = false;
       });
     } else {
-      // Handle error
       print('Erro ao buscar itens: ${response.body}');
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void _filterItems() {
+    setState(() {
+      filteredItems = items.where((item) {
+        final query = _searchController.text.toLowerCase();
+        return item['name'].toLowerCase().contains(query) ||
+            (item['email'] != null &&
+                item['email'].toLowerCase().contains(query));
+      }).toList();
+    });
   }
 
   void _navigateToAddForm(BuildContext context) async {
@@ -96,37 +119,103 @@ class _ListScreenState extends State<ListScreen> {
     switch (widget.title) {
       case 'Cadastro de Motorista':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
-          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController()},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
-          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
+          {
+            'label': 'Nome',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
+          {
+            'label': 'Email',
+            'keyboardType': TextInputType.emailAddress,
+            'controller': TextEditingController()
+          },
+          {
+            'label': 'CPF',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
+          {
+            'label': 'Telefone',
+            'keyboardType': TextInputType.phone,
+            'controller': TextEditingController()
+          },
         ];
         break;
       case 'Cadastro de Aluno':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
-          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController()},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
-          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController()},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
+          {
+            'label': 'Nome',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
+          {
+            'label': 'Email',
+            'keyboardType': TextInputType.emailAddress,
+            'controller': TextEditingController()
+          },
+          {
+            'label': 'CPF',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
+          {
+            'label': 'Telefone',
+            'keyboardType': TextInputType.phone,
+            'controller': TextEditingController()
+          },
+          {
+            'label': 'Faculdade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController()
+          },
         ];
         break;
       case 'Cadastro de Pontos de Ônibus':
         fields = [
-          {'label': 'Nome do Ponto', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController()},
+          {
+            'label': 'Nome do Ponto',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController()
+          },
+          {
+            'label': 'Faculdade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController()
+          },
         ];
         break;
       case 'Cadastro de Ônibus':
         fields = [
-          {'label': 'Modelo', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
-          {'label': 'Placa', 'keyboardType': TextInputType.text, 'controller': TextEditingController(), 'enabled': true},
-          {'label': 'Capacidade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(), 'enabled': true},
+          {
+            'label': 'Modelo',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController()
+          },
+          {
+            'label': 'Placa',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
+          {
+            'label': 'Capacidade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(),
+            'enabled': true
+          },
         ];
         break;
       case 'Cadastro de Faculdades':
         fields = [
-          {'label': 'Nome da Faculdade', 'keyboardType': TextInputType.text, 'controller': TextEditingController()},
+          {
+            'label': 'Nome da Faculdade',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController()
+          },
         ];
         break;
       default:
@@ -135,7 +224,9 @@ class _ListScreenState extends State<ListScreen> {
 
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FormScreen(title: widget.title, fields: fields)),
+      MaterialPageRoute(
+          builder: (context) =>
+              FormScreen(title: widget.title, fields: fields)),
     );
 
     if (result == true) {
@@ -143,43 +234,120 @@ class _ListScreenState extends State<ListScreen> {
     }
   }
 
-  void _navigateToEditForm(BuildContext context, Map<String, dynamic> item) async {
+  void _navigateToEditForm(
+      BuildContext context, Map<String, dynamic> item) async {
     List<Map<String, dynamic>> fields;
 
     switch (widget.title) {
       case 'Cadastro de Motorista':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? ''), 'enabled': false},
-          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController(text: item['email'] ?? '')},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['cpf'] ?? ''), 'enabled': false},
-          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController(text: item['phone'] ?? '')},
+          {
+            'label': 'Nome',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(text: item['name'] ?? ''),
+            'enabled': false
+          },
+          {
+            'label': 'Email',
+            'keyboardType': TextInputType.emailAddress,
+            'controller': TextEditingController(text: item['email'] ?? '')
+          },
+          {
+            'label': 'CPF',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(text: item['cpf'] ?? ''),
+            'enabled': false
+          },
+          {
+            'label': 'Telefone',
+            'keyboardType': TextInputType.phone,
+            'controller': TextEditingController(text: item['phone'] ?? '')
+          },
         ];
         break;
       case 'Cadastro de Aluno':
         fields = [
-          {'label': 'Nome', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? ''), 'enabled': false},
-          {'label': 'Email', 'keyboardType': TextInputType.emailAddress, 'controller': TextEditingController(text: item['email'] ?? '')},
-          {'label': 'CPF', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['cpf'] ?? ''), 'enabled': false},
-          {'label': 'Telefone', 'keyboardType': TextInputType.phone, 'controller': TextEditingController(text: item['phone'] ?? '')},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['faculty_id'] != null ? item['faculty_id'].toString() : '')},
+          {
+            'label': 'Nome',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(text: item['name'] ?? ''),
+            'enabled': false
+          },
+          {
+            'label': 'Email',
+            'keyboardType': TextInputType.emailAddress,
+            'controller': TextEditingController(text: item['email'] ?? '')
+          },
+          {
+            'label': 'CPF',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(text: item['cpf'] ?? ''),
+            'enabled': false
+          },
+          {
+            'label': 'Telefone',
+            'keyboardType': TextInputType.phone,
+            'controller': TextEditingController(text: item['phone'] ?? '')
+          },
+          {
+            'label': 'Faculdade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(
+                text: item['faculty_id'] != null
+                    ? item['faculty_id'].toString()
+                    : '')
+          },
         ];
         break;
       case 'Cadastro de Pontos de Ônibus':
         fields = [
-          {'label': 'Nome do Ponto', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
-          {'label': 'Faculdade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['faculty_id'] != null ? item['faculty_id'].toString() : '')},
+          {
+            'label': 'Nome do Ponto',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(text: item['name'] ?? '')
+          },
+          {
+            'label': 'Faculdade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(
+                text: item['faculty_id'] != null
+                    ? item['faculty_id'].toString()
+                    : '')
+          },
         ];
         break;
       case 'Cadastro de Ônibus':
         fields = [
-          {'label': 'Modelo', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
-          {'label': 'Placa', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['registration_number'] ?? ''), 'enabled': false},
-          {'label': 'Capacidade', 'keyboardType': TextInputType.number, 'controller': TextEditingController(text: item['capacity'] != null ? item['capacity'].toString() : ''), 'enabled': false},
+          {
+            'label': 'Modelo',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(text: item['name'] ?? '')
+          },
+          {
+            'label': 'Placa',
+            'keyboardType': TextInputType.text,
+            'controller':
+                TextEditingController(text: item['registration_number'] ?? ''),
+            'enabled': false
+          },
+          {
+            'label': 'Capacidade',
+            'keyboardType': TextInputType.number,
+            'controller': TextEditingController(
+                text: item['capacity'] != null
+                    ? item['capacity'].toString()
+                    : ''),
+            'enabled': false
+          },
         ];
         break;
       case 'Cadastro de Faculdades':
         fields = [
-          {'label': 'Nome da Faculdade', 'keyboardType': TextInputType.text, 'controller': TextEditingController(text: item['name'] ?? '')},
+          {
+            'label': 'Nome da Faculdade',
+            'keyboardType': TextInputType.text,
+            'controller': TextEditingController(text: item['name'] ?? '')
+          },
         ];
         break;
       default:
@@ -188,7 +356,12 @@ class _ListScreenState extends State<ListScreen> {
 
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FormScreen(title: widget.title, fields: fields, isEdit: true, id: item['id'])),
+      MaterialPageRoute(
+          builder: (context) => FormScreen(
+              title: widget.title,
+              fields: fields,
+              isEdit: true,
+              id: item['id'])),
     );
 
     if (result == true) {
@@ -208,19 +381,24 @@ class _ListScreenState extends State<ListScreen> {
             String apiUrl;
             switch (widget.title) {
               case 'Cadastro de Motorista':
-                apiUrl = 'https://buzzbackend-production.up.railway.app/users/$id/';
+                apiUrl =
+                    'https://buzzbackend-production.up.railway.app/users/$id/';
                 break;
               case 'Cadastro de Aluno':
-                apiUrl = 'https://buzzbackend-production.up.railway.app/users/$id/';
+                apiUrl =
+                    'https://buzzbackend-production.up.railway.app/users/$id/';
                 break;
               case 'Cadastro de Pontos de Ônibus':
-                apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/$id/';
+                apiUrl =
+                    'https://buzzbackend-production.up.railway.app/bus_stops/$id/';
                 break;
               case 'Cadastro de Ônibus':
-                apiUrl = 'https://buzzbackend-production.up.railway.app/buses/$id/';
+                apiUrl =
+                    'https://buzzbackend-production.up.railway.app/buses/$id/';
                 break;
               case 'Cadastro de Faculdades':
-                apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/$id/';
+                apiUrl =
+                    'https://buzzbackend-production.up.railway.app/faculties/$id/';
                 break;
               default:
                 return;
@@ -232,7 +410,8 @@ class _ListScreenState extends State<ListScreen> {
               _showSnackbar('Registro excluído com sucesso!', Colors.green);
               _fetchItems();
             } else {
-              _showSnackbar('Erro ao excluir registro: ${response.body}', Colors.red);
+              _showSnackbar(
+                  'Erro ao excluir registro: ${response.body}', Colors.red);
             }
 
             Navigator.of(context).pop(); // Fecha o diálogo após a exclusão
@@ -258,21 +437,34 @@ class _ListScreenState extends State<ListScreen> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: getHeightProportion(context, 40)),  // Proporção em altura
+          SizedBox(height: getHeightProportion(context, 40)),
           CustomTitleWidget(title: widget.title),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    padding: EdgeInsets.all(getHeightProportion(context, 16.0)),  // Proporção em altura
-                    itemCount: items.length,
+                    padding: EdgeInsets.all(getHeightProportion(context, 16.0)),
+                    itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
-                      final item = items[index];
+                      final item = filteredItems[index];
                       String secondaryText;
                       if (widget.title == 'Cadastro de Pontos de Ônibus') {
-                        secondaryText = item['faculty_name'] ?? 'Faculdade não encontrada';
+                        secondaryText =
+                            item['faculty_name'] ?? 'Faculdade não encontrada';
                       } else if (widget.title == 'Cadastro de Ônibus') {
-                        secondaryText = item['registration_number'] ?? 'Placa não encontrada';
+                        secondaryText = item['registration_number'] ??
+                            'Placa não encontrada';
                       } else {
                         secondaryText = item['email'] ?? '';
                       }
