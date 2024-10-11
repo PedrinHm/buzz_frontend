@@ -95,7 +95,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Motorista':
         apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
@@ -109,7 +109,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Aluno':
         apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
