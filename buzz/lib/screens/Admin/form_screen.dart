@@ -6,7 +6,7 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/CustomDropdownField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:buzz/utils/size_config.dart';  // Importa o arquivo de utilitários de tamanho
+import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -14,7 +14,8 @@ dynamic decodeJsonResponse(http.Response response) {
     String responseBody = utf8.decode(response.bodyBytes);
     return json.decode(responseBody);
   } else {
-    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+    throw Exception(
+        'Failed to parse JSON, status code: ${response.statusCode}');
   }
 }
 
@@ -24,7 +25,11 @@ class FormScreen extends StatefulWidget {
   final bool isEdit;
   final int? id;
 
-  FormScreen({required this.title, required this.fields, this.isEdit = false, this.id});
+  FormScreen(
+      {required this.title,
+      required this.fields,
+      this.isEdit = false,
+      this.id});
 
   @override
   _FormScreenState createState() => _FormScreenState();
@@ -39,11 +44,19 @@ class _FormScreenState extends State<FormScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno') {
+    if (widget.title == 'Cadastro de Pontos de Ônibus' ||
+        widget.title == 'Cadastro de Aluno') {
       _fetchFaculties().then((_) {
         if (widget.isEdit) {
-          selectedFacultyId = widget.fields.firstWhere((field) => field['label'] == 'Faculdade')['controller'].text.isNotEmpty
-              ? int.parse(widget.fields.firstWhere((field) => field['label'] == 'Faculdade')['controller'].text)
+          selectedFacultyId = widget.fields
+                  .firstWhere(
+                      (field) => field['label'] == 'Faculdade')['controller']
+                  .text
+                  .isNotEmpty
+              ? int.parse(widget.fields
+                  .firstWhere(
+                      (field) => field['label'] == 'Faculdade')['controller']
+                  .text)
               : null;
         }
         setState(() {
@@ -56,11 +69,13 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _fetchFaculties() async {
-    final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/faculties/'));
+    final response = await http.get(
+        Uri.parse('https://buzzbackend-production.up.railway.app/faculties/'));
 
     if (response.statusCode == 200) {
       setState(() {
-        faculties = List<Map<String, dynamic>>.from(decodeJsonResponse(response));
+        faculties =
+            List<Map<String, dynamic>>.from(decodeJsonResponse(response));
       });
     } else {
       // Handle error
@@ -101,7 +116,7 @@ class _FormScreenState extends State<FormScreen> {
           'email': widget.fields[1]['controller'].text,
           'cpf': widget.fields[2]['controller'].text,
           'phone': widget.fields[3]['controller'].text,
-          'faculty_id': selectedFacultyId,  // Removido o campo 'course'
+          'faculty_id': selectedFacultyId, // Removido o campo 'course'
           'user_type_id': 1,
           'password': widget.fields[2]['controller'].text,
         };
@@ -160,10 +175,16 @@ class _FormScreenState extends State<FormScreen> {
     });
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      _showSnackbar(widget.isEdit ? 'Cadastro atualizado com sucesso!' : 'Cadastro realizado com sucesso!', Colors.green);
-      Navigator.pop(context, true); // Retorna true para indicar que o cadastro foi bem-sucedido
+      _showSnackbar(
+          widget.isEdit
+              ? 'Cadastro atualizado com sucesso!'
+              : 'Cadastro realizado com sucesso!',
+          Colors.green);
+      Navigator.pop(context,
+          true); // Retorna true para indicar que o cadastro foi bem-sucedido
     } else {
-      _showSnackbar('Erro ao realizar o cadastro: ${response.body}', Colors.red);
+      _showSnackbar(
+          'Erro ao realizar o cadastro: ${response.body}', Colors.red);
     }
   }
 
@@ -182,62 +203,80 @@ class _FormScreenState extends State<FormScreen> {
         padding: EdgeInsets.all(getHeightProportion(context, 16.0)),
         child: _isFacultyLoading || _isLoading
             ? Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: getHeightProportion(context, 40)),  // Proporção em altura
-                  CustomTitleWidget(title: widget.title),
-                  SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
-                  ...widget.fields.where((field) => field['label'] != 'Faculdade').map((field) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)),  // Proporção em altura
-                      child: CustomInputField(
-                        labelText: field['label'],
-                        keyboardType: field['keyboardType'],
-                        controller: field['controller'],
-                        enabled: field['enabled'] ?? true,
+            : SingleChildScrollView(
+                // Adiciona a capacidade de rolagem
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                        height: getHeightProportion(
+                            context, 40)), // Proporção em altura
+                    CustomTitleWidget(title: widget.title),
+                    SizedBox(
+                        height: getHeightProportion(
+                            context, 20)), // Proporção em altura
+                    ...widget.fields
+                        .where((field) => field['label'] != 'Faculdade')
+                        .map((field) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            bottom: getHeightProportion(
+                                context, 20.0)), // Proporção em altura
+                        child: CustomInputField(
+                          labelText: field['label'],
+                          keyboardType: field['keyboardType'],
+                          controller: field['controller'],
+                          enabled: field['enabled'] ?? true,
+                        ),
+                      );
+                    }).toList(),
+                    if (widget.title == 'Cadastro de Pontos de Ônibus' ||
+                        widget.title == 'Cadastro de Aluno')
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: getHeightProportion(
+                                context, 20.0)), // Proporção em altura
+                        child: CustomDropdownField(
+                          labelText: 'Faculdade',
+                          value: selectedFacultyId,
+                          items: faculties.map((faculty) {
+                            return DropdownMenuItem<int>(
+                              value: faculty['id'],
+                              child: Text(faculty['name']),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedFacultyId = value;
+                            });
+                          },
+                        ),
                       ),
-                    );
-                  }).toList(),
-                  if (widget.title == 'Cadastro de Pontos de Ônibus' || widget.title == 'Cadastro de Aluno')
-                    Padding(
-                      padding: EdgeInsets.only(bottom: getHeightProportion(context, 20.0)),  // Proporção em altura
-                      child: CustomDropdownField(
-                        labelText: 'Faculdade',
-                        value: selectedFacultyId,
-                        items: faculties.map((faculty) {
-                          return DropdownMenuItem<int>(
-                            value: faculty['id'],
-                            child: Text(faculty['name']),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedFacultyId = value;
-                          });
-                        },
-                      ),
+                    SizedBox(
+                        height: getHeightProportion(context,
+                            20)), // Espaço extra para ajustar a rolagem
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ButtonThree(
+                          buttonText: 'Cancelar',
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          backgroundColor: Color(0xFFDD4425),
+                        ),
+                        ButtonThree(
+                          buttonText: 'Salvar',
+                          onPressed: _saveForm,
+                          backgroundColor: Color(0xFF395BC7),
+                        ),
+                      ],
                     ),
-                  Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ButtonThree(
-                        buttonText: 'Cancelar',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        backgroundColor: Color(0xFFDD4425),
-                      ),
-                      ButtonThree(
-                        buttonText: 'Salvar',
-                        onPressed: _saveForm,
-                        backgroundColor: Color(0xFF395BC7),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: getHeightProportion(context, 20)),  // Proporção em altura
-                ],
+                    SizedBox(
+                        height: getHeightProportion(
+                            context, 20)), // Proporção em altura
+                  ],
+                ),
               ),
       ),
       bottomNavigationBar: NavBarAdmin(

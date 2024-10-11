@@ -48,7 +48,7 @@ class _ListScreenState extends State<ListScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchItems() async {
+Future<void> _fetchItems() async {
     String apiUrl;
     switch (widget.title) {
       case 'Cadastro de Motorista':
@@ -75,25 +75,63 @@ class _ListScreenState extends State<ListScreen> {
         return;
     }
 
+    // Fetch the items from the main API
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = decodeJsonResponse(response);
-      setState(() {
-        items = data.where((item) {
-          if (widget.title == 'Cadastro de Motorista') {
-            return item['user_type_id'] == 2;
-          } else if (widget.title == 'Cadastro de Aluno') {
-            return item['user_type_id'] == 1;
-          } else {
-            return item['system_deleted'] == 0;
-          }
-        }).map<Map<String, dynamic>>((item) {
-          return item as Map<String, dynamic>;
-        }).toList();
-        filteredItems = items;
-        _isLoading = false;
-      });
+
+      // Fetch the faculties data if the screen is related to bus stops
+      if (widget.title == 'Cadastro de Pontos de Ônibus') {
+        final facultiesResponse = await http.get(Uri.parse(
+            'https://buzzbackend-production.up.railway.app/faculties/'));
+
+        if (facultiesResponse.statusCode == 200) {
+          final List<dynamic> facultiesData =
+              decodeJsonResponse(facultiesResponse);
+
+          // Create a map of faculty IDs to faculty names for easy lookup
+          final Map<int, String> facultyMap = {
+            for (var faculty in facultiesData) faculty['id']: faculty['name']
+          };
+
+          // Associate each bus stop with its faculty name using the map
+          setState(() {
+            items = data
+                .where((item) => item['system_deleted'] == 0)
+                .map<Map<String, dynamic>>((item) {
+              return {
+                ...item,
+                'faculty_name':
+                    facultyMap[item['faculty_id']] ?? 'Faculdade não encontrada'
+              };
+            }).toList();
+            filteredItems = items;
+            _isLoading = false;
+          });
+        } else {
+          print('Erro ao buscar faculdades: ${facultiesResponse.body}');
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          items = data.where((item) {
+            if (widget.title == 'Cadastro de Motorista') {
+              return item['user_type_id'] == 2;
+            } else if (widget.title == 'Cadastro de Aluno') {
+              return item['user_type_id'] == 1;
+            } else {
+              return item['system_deleted'] == 0;
+            }
+          }).map<Map<String, dynamic>>((item) {
+            return item as Map<String, dynamic>;
+          }).toList();
+          filteredItems = items;
+          _isLoading = false;
+        });
+      }
     } else {
       print('Erro ao buscar itens: ${response.body}');
       setState(() {
@@ -101,6 +139,7 @@ class _ListScreenState extends State<ListScreen> {
       });
     }
   }
+
 
   void _filterItems() {
     setState(() {
@@ -245,7 +284,7 @@ class _ListScreenState extends State<ListScreen> {
             'label': 'Nome',
             'keyboardType': TextInputType.text,
             'controller': TextEditingController(text: item['name'] ?? ''),
-            'enabled': false
+            'enabled': true
           },
           {
             'label': 'Email',
@@ -271,7 +310,7 @@ class _ListScreenState extends State<ListScreen> {
             'label': 'Nome',
             'keyboardType': TextInputType.text,
             'controller': TextEditingController(text: item['name'] ?? ''),
-            'enabled': false
+            'enabled': true
           },
           {
             'label': 'Email',
@@ -440,13 +479,23 @@ class _ListScreenState extends State<ListScreen> {
           SizedBox(height: getHeightProportion(context, 40)),
           CustomTitleWidget(title: widget.title),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Pesquisar',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                hintText: '', // Remove o texto 'Pesquisar'
+                suffixIcon: Icon(
+                    Icons.search), // Ícone de pesquisa movido para a direita
+                filled: true,
+                fillColor:
+                    Colors.grey[200], // Cor de fundo da barra de pesquisa
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(30.0), // Borda arredondada
+                  borderSide: BorderSide.none, // Remove a borda padrão
+                ),
               ),
             ),
           ),
