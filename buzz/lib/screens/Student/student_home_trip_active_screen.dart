@@ -16,44 +16,66 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class StudentHomeTripActiveScreen extends StatefulWidget {
-  final int studentId; 
-  final int tripId; 
-  final int studentTripId; 
+  final int studentId;
+  final int tripId;
+  final int studentTripId;
 
   StudentHomeTripActiveScreen({
-    required this.studentId, 
-    required this.tripId, 
+    required this.studentId,
+    required this.tripId,
     required this.studentTripId,
   });
 
   @override
-  _StudentHomeTripActiveScreenState createState() => _StudentHomeTripActiveScreenState();
+  _StudentHomeTripActiveScreenState createState() =>
+      _StudentHomeTripActiveScreenState();
 }
 
-class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScreen> {
+class _StudentHomeTripActiveScreenState
+    extends State<StudentHomeTripActiveScreen> {
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
-  bool _showStatusOverlay = false; 
-  List<Map<String, dynamic>> _busList = []; 
-  List<Map<String, String>> busStopList = []; 
+  bool _showStatusOverlay = false;
+  List<Map<String, dynamic>> _busList = [];
+  List<Map<String, String>> busStopList = [];
   List<Map<String, dynamic>> _statusList = []; // Lista de status disponíveis
-  bool isLoading = false; 
-  late int _studentTripId; 
+  bool isLoading = false;
+  late int _studentTripId;
   int? _currentStatus; // Status atual do aluno como int
 
   // Mapeamento de status numérico para rótulos e cores
   final Map<int, Map<String, dynamic>> statusDetails = {
-    1: {'statusText': 'Presente', 'color': Color(0xFF3E9B4F), 'icon': PhosphorIcons.check},
-    2: {'statusText': 'Em aula', 'color': Color(0xFF395BC7), 'icon': PhosphorIcons.chalkboardTeacher},
-    3: {'statusText': 'Aguardando ônibus', 'color': Color(0xFFB0E64C), 'icon': PhosphorIcons.bus},
-    4: {'statusText': 'Não voltará', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
-    5: {'statusText': 'Fila de espera', 'color': Color(0xFFFFBA18), 'icon': PhosphorIcons.x},
+    1: {
+      'statusText': 'Presente',
+      'color': Color(0xFF3E9B4F),
+      'icon': PhosphorIcons.check
+    },
+    2: {
+      'statusText': 'Em aula',
+      'color': Color(0xFF395BC7),
+      'icon': PhosphorIcons.chalkboardTeacher
+    },
+    3: {
+      'statusText': 'Aguardando ônibus',
+      'color': Color(0xFFB0E64C),
+      'icon': PhosphorIcons.bus
+    },
+    4: {
+      'statusText': 'Não voltará',
+      'color': Color(0xFFFFBA18),
+      'icon': PhosphorIcons.x
+    },
+    5: {
+      'statusText': 'Fila de espera',
+      'color': Color(0xFFFFBA18),
+      'icon': PhosphorIcons.x
+    },
   };
 
   @override
   void initState() {
     super.initState();
-    _studentTripId = widget.studentTripId; 
+    _studentTripId = widget.studentTripId;
     _fetchCurrentStatus(); // Inicializa o status atual
   }
 
@@ -61,7 +83,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     setState(() {
       _showBusOverlay = !_showBusOverlay;
       if (_showBusOverlay) {
-        _fetchActiveBuses(); 
+        _fetchActiveBuses();
       }
     });
   }
@@ -70,7 +92,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
       if (_showBusStopOverlay) {
-        _fetchBusStops(); 
+        _fetchBusStops();
       }
     });
   }
@@ -87,7 +109,8 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
   Future<void> _fetchCurrentStatus() async {
     try {
       // Faz uma chamada HTTP para buscar o status atual do aluno
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
+      final response = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -116,8 +139,18 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
       1: [2, 3, 4], // Presente para Em aula, Aguardando ônibus, Não voltará
       2: [1, 3, 4], // Em aula para Presente, Aguardando ônibus, Não voltará
       3: [1, 2, 4], // Aguardando ônibus para Presente, Em aula, Não voltará
-      4: [1, 2, 3, 5], // Não voltará para Presente, Em aula, Aguardando ônibus, Fila de espera
-      5: [1, 2, 3, 4] // Fila de espera para Presente, Em aula, Aguardando ônibus, Não voltará
+      4: [
+        1,
+        2,
+        3,
+        5
+      ], // Não voltará para Presente, Em aula, Aguardando ônibus, Fila de espera
+      5: [
+        1,
+        2,
+        3,
+        4
+      ] // Fila de espera para Presente, Em aula, Aguardando ônibus, Não voltará
     };
 
     final List<int>? possibleStatuses = allowedTransitions[_currentStatus];
@@ -129,10 +162,12 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
 
     setState(() {
       // Cria uma lista de opções de status permitidos com base no status atual
-      _statusList = possibleStatuses.map((status) => {
-        'status': status,
-        ...statusDetails[status]!,
-      }).toList();
+      _statusList = possibleStatuses
+          .map((status) => {
+                'status': status,
+                ...statusDetails[status]!,
+              })
+          .toList();
     });
   }
 
@@ -146,7 +181,8 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
 
     try {
-      final url = Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
+      final url = Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
 
       final response = await http.put(url);
 
@@ -172,20 +208,23 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
+      final response = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 
         setState(() {
-          _busList = data.map((item) => {
-            'busId': item['bus_id'],
-            'tripId': item['trip_id'],
-            'registrationNumber': item['registration_number'],
-            'name': item['name'],
-            'capacity': item['capacity'],
-            'tripType': item['trip_type'],
-          }).toList();
+          _busList = data
+              .map((item) => {
+                    'busId': item['bus_id'],
+                    'tripId': item['trip_id'],
+                    'registrationNumber': item['registration_number'],
+                    'name': item['name'],
+                    'capacity': item['capacity'],
+                    'tripType': item['trip_type'],
+                  })
+              .toList();
         });
       } else {
         throw Exception('Failed to load available buses for student');
@@ -193,7 +232,8 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     } catch (e) {
       print('Error fetching available buses for student: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao buscar ônibus disponíveis para o aluno')),
+        SnackBar(
+            content: Text('Erro ao buscar ônibus disponíveis para o aluno')),
       );
     } finally {
       setState(() {
@@ -208,17 +248,20 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     });
 
     try {
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
+      final response = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 
         setState(() {
-          busStopList = data.map((item) => {
-            'id': item['id'].toString(),
-            'name': item['name'] as String,
-            'status': item['status'] as String,
-          }).toList();
+          busStopList = data
+              .map((item) => {
+                    'id': item['id'].toString(),
+                    'name': item['name'] as String,
+                    'status': item['status'] as String,
+                  })
+              .toList();
         });
       } else {
         throw Exception('Failed to load bus stops');
@@ -232,7 +275,7 @@ class _StudentHomeTripActiveScreenState extends State<StudentHomeTripActiveScree
     }
   }
 
-Future<void> _updateStudentTrip(int newTripId) async {
+  Future<void> _updateStudentTrip(int newTripId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -303,7 +346,6 @@ Future<void> _updateStudentTrip(int newTripId) async {
     }
   }
 
-
   Future<void> _updateStudentTripPoint(int pointId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
@@ -314,7 +356,8 @@ Future<void> _updateStudentTrip(int newTripId) async {
     }
 
     try {
-      final url = Uri.parse('https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_point?point_id=$pointId');
+      final url = Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_point?point_id=$pointId');
 
       final response = await http.put(url);
 
@@ -342,54 +385,59 @@ Future<void> _updateStudentTrip(int newTripId) async {
           Center(
             child: Column(
               children: [
-                SizedBox(height: getHeightProportion(context, 40)), // Proporção para altura
+                SizedBox(
+                    height: getHeightProportion(
+                        context, 40)), // Proporção para altura
                 FullScreenMessage(
                   message: 'Seja bem vindo ao Buzz!',
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), 
+                SizedBox(height: getHeightProportion(context, 10)),
                 CustomStatus(
                   onPressed: _toggleStatusOverlay,
-                  StatusName: 'Definir status', //Aqui o status atual do aluno
-                  iconData: PhosphorIcons.chalkboardTeacher,
+                  StatusName: statusDetails[_currentStatus]?['statusText'] ??
+                      'Definir status',
+                  iconData: statusDetails[_currentStatus]?['icon'] ??
+                      PhosphorIcons.chalkboardTeacher,
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), 
+                SizedBox(height: getHeightProportion(context, 10)),
                 CustomBusStopButton(
                   onPressed: _toggleBusStopOverlay,
-                  busStopName: "Definir ponto de ônibus", //Aqui devemos puxar o nome do ponto de onibus atual do aluno pego em student_trip
+                  busStopName:
+                      "Definir ponto de ônibus", //Aqui devemos puxar o nome do ponto de onibus atual do aluno pego em student_trip
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), 
+                SizedBox(height: getHeightProportion(context, 10)),
                 CustomBusButton(
                   onPressed: _toggleBusOverlay,
-                  busNumber: "ABC-1234", //Aqui a placa do onibus da viagem atual
-                  driverName: "Nome Do Motorista", //Aqui o nome do motorista da viagem atual
+                  busNumber:
+                      "ABC-1234", //Aqui a placa do onibus da viagem atual
+                  driverName:
+                      "Nome Do Motorista", //Aqui o nome do motorista da viagem atual
                 ),
-                SizedBox(height: getHeightProportion(context, 10)), 
+                SizedBox(height: getHeightProportion(context, 10)),
               ],
             ),
           ),
           if (_showBusOverlay)
             BuildOverlay(
               title: 'Defina seu ônibus atual',
-              content: isLoading 
-                  ? Center(child: CircularProgressIndicator()) 
+              content: isLoading
+                  ? Center(child: CircularProgressIndicator())
                   : _buildBusList(),
               onCancel: _toggleBusOverlay,
             ),
-
           if (_showBusStopOverlay)
             BuildOverlay(
               title: 'Defina seu ponto de ônibus atual',
-              content: isLoading 
-                  ? Center(child: CircularProgressIndicator()) 
+              content: isLoading
+                  ? Center(child: CircularProgressIndicator())
                   : _buildBusStopList(),
               onCancel: _toggleBusStopOverlay,
             ),
-
           if (_showStatusOverlay)
             BuildOverlay(
               title: 'Defina seu status atual',
-              content: isLoading 
-                  ? Center(child: CircularProgressIndicator()) 
+              content: isLoading
+                  ? Center(child: CircularProgressIndicator())
                   : _buildStatusList(),
               onCancel: _toggleStatusOverlay,
             ),
@@ -398,16 +446,15 @@ Future<void> _updateStudentTrip(int newTripId) async {
     );
   }
 
-
-
-
   Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
       itemBuilder: (context, index) {
         final bus = _busList[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
+          padding: EdgeInsets.only(
+              bottom:
+                  getHeightProportion(context, 20)), // Proporção para altura
           child: BusDetailsButton(
             onPressed: () {
               _updateStudentTrip(bus['tripId']);
@@ -432,7 +479,9 @@ Future<void> _updateStudentTrip(int newTripId) async {
         final busStopId = busStop['id'];
 
         return Padding(
-          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
+          padding: EdgeInsets.only(
+              bottom:
+                  getHeightProportion(context, 20)), // Proporção para altura
           child: TripBusStop(
             onPressed: () {
               if (busStopId != null) {
@@ -457,7 +506,9 @@ Future<void> _updateStudentTrip(int newTripId) async {
       itemBuilder: (context, index) {
         final status = _statusList[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)), // Proporção para altura
+          padding: EdgeInsets.only(
+              bottom:
+                  getHeightProportion(context, 20)), // Proporção para altura
           child: StatusButton(
             onPressed: () {
               _updateStudentTripStatus(status['status']);
