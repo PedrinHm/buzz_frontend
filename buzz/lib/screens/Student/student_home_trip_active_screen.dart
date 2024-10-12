@@ -40,6 +40,7 @@ class _StudentHomeTripActiveScreenState
   List<Map<String, String>> busStopList = [];
   List<Map<String, dynamic>> _statusList = []; // Lista de status disponíveis
   bool isLoading = false;
+  bool isUpdatingStatus = false;
   late int _studentTripId;
   int? _currentStatus; // Status atual do aluno como int
 
@@ -180,6 +181,10 @@ class _StudentHomeTripActiveScreenState
       return;
     }
 
+    setState(() {
+      isUpdatingStatus = true; // Começa a atualizar
+    });
+
     try {
       final url = Uri.parse(
           'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
@@ -191,6 +196,8 @@ class _StudentHomeTripActiveScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Status do aluno atualizado com sucesso!')),
         );
+        // Chama o refresh para atualizar o status exibido no botão
+        await _fetchCurrentStatus();
       } else {
         throw Exception('Failed to update student status');
       }
@@ -199,6 +206,10 @@ class _StudentHomeTripActiveScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao atualizar o status do aluno')),
       );
+    } finally {
+      setState(() {
+        isUpdatingStatus = false; // Atualização concluída
+      });
     }
   }
 
@@ -392,10 +403,13 @@ class _StudentHomeTripActiveScreenState
                   message: 'Seja bem vindo ao Buzz!',
                 ),
                 SizedBox(height: getHeightProportion(context, 10)),
+SizedBox(height: getHeightProportion(context, 10)),
                 CustomStatus(
                   onPressed: _toggleStatusOverlay,
-                  StatusName: statusDetails[_currentStatus]?['statusText'] ??
-                      'Definir status',
+                  StatusName: isUpdatingStatus
+                      ? 'Atualizando...'
+                      : statusDetails[_currentStatus]?['statusText'] ??
+                          'Definir status',
                   iconData: statusDetails[_currentStatus]?['icon'] ??
                       PhosphorIcons.chalkboardTeacher,
                 ),
