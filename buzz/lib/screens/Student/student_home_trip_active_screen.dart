@@ -36,6 +36,7 @@ class _StudentHomeTripActiveScreenState
   bool _showBusOverlay = false;
   bool _showBusStopOverlay = false;
   bool _showStatusOverlay = false;
+  bool isLoadingBusStop = true;
   List<Map<String, dynamic>> _busList = [];
   List<Map<String, String>> busStopList = [];
   List<Map<String, dynamic>> _statusList = []; // Lista de status disponíveis
@@ -43,6 +44,7 @@ class _StudentHomeTripActiveScreenState
   bool isUpdatingStatus = false;
   late int _studentTripId;
   int? _currentStatus; // Status atual do aluno como int
+  String? _busStopName;
 
   // Mapeamento de status numérico para rótulos e cores
   final Map<int, Map<String, dynamic>> statusDetails = {
@@ -77,7 +79,8 @@ class _StudentHomeTripActiveScreenState
   void initState() {
     super.initState();
     _studentTripId = widget.studentTripId;
-    _fetchCurrentStatus(); // Inicializa o status atual
+    _fetchCurrentStatus();
+    _fetchBusStopName();
   }
 
   void _toggleBusOverlay() {
@@ -105,6 +108,47 @@ class _StudentHomeTripActiveScreenState
         _fetchAvailableStatus(); // Carrega a lista de status disponíveis
       }
     });
+  }
+
+  Future<void> _fetchBusStopName() async {
+    try {
+      // Inicia o carregamento do ponto de ônibus
+      setState(() {
+        isLoadingBusStop = true;
+      });
+
+      // Busca o student_trip atual
+      final response = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final pointId = data['point_id']; // Obtemos o point_id
+
+        // Agora fazemos a segunda requisição para obter o nome do ponto de ônibus
+        final busStopResponse = await http.get(Uri.parse(
+            'https://buzzbackend-production.up.railway.app/bus_stops/$pointId'));
+
+        if (busStopResponse.statusCode == 200) {
+          final busStopData = json.decode(busStopResponse.body);
+          setState(() {
+            _busStopName =
+                busStopData['name']; // Atualiza o nome do ponto de ônibus
+          });
+        } else {
+          throw Exception('Failed to fetch bus stop name');
+        }
+      } else {
+        throw Exception('Failed to fetch student trip');
+      }
+    } catch (e) {
+      print('Error fetching bus stop name: $e');
+    } finally {
+      // Conclui o carregamento
+      setState(() {
+        isLoadingBusStop = false;
+      });
+    }
   }
 
   Future<void> _fetchCurrentStatus() async {
@@ -357,7 +401,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-  Future<void> _updateStudentTripPoint(int pointId) async {
+Future<void> _updateStudentTripPoint(int pointId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -377,6 +421,14 @@ class _StudentHomeTripActiveScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ponto de ônibus atualizado com sucesso!')),
         );
+
+        // Após atualizar o ponto, recarregue o nome do ponto de ônibus
+        await _fetchBusStopName();
+
+        // Atualizar a interface após a alteração
+        setState(() {
+          _showBusStopOverlay = false; // Fechar o overlay de pontos de ônibus
+        });
       } else {
         throw Exception('Failed to update bus stop point');
       }
@@ -387,6 +439,7 @@ class _StudentHomeTripActiveScreenState
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -403,11 +456,11 @@ class _StudentHomeTripActiveScreenState
                   message: 'Seja bem vindo ao Buzz!',
                 ),
                 SizedBox(height: getHeightProportion(context, 10)),
-SizedBox(height: getHeightProportion(context, 10)),
+                SizedBox(height: getHeightProportion(context, 10)),
                 CustomStatus(
                   onPressed: _toggleStatusOverlay,
                   StatusName: isUpdatingStatus
-                      ? 'Atualizando...'
+                      ? 'Carregando...'
                       : statusDetails[_currentStatus]?['statusText'] ??
                           'Definir status',
                   iconData: statusDetails[_currentStatus]?['icon'] ??
@@ -416,9 +469,11 @@ SizedBox(height: getHeightProportion(context, 10)),
                 SizedBox(height: getHeightProportion(context, 10)),
                 CustomBusStopButton(
                   onPressed: _toggleBusStopOverlay,
-                  busStopName:
-                      "Definir ponto de ônibus", //Aqui devemos puxar o nome do ponto de onibus atual do aluno pego em student_trip
+                  busStopName: isLoadingBusStop
+                      ? 'Carregando...'
+                      : _busStopName ?? 'Definir ponto de ônibus',
                 ),
+
                 SizedBox(height: getHeightProportion(context, 10)),
                 CustomBusButton(
                   onPressed: _toggleBusOverlay,
