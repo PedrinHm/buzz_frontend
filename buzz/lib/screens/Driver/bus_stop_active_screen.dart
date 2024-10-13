@@ -56,7 +56,7 @@ Future<void> _cancelTrip() async {
     });
 
     var url = Uri.parse(
-        'http://10.0.2.2:8000/trips/${_tripId ?? ''}/cancel');
+        'https://buzzbackend-production.up.railway.app/trips/${_tripId ?? ''}/cancel');
 
     try {
       var response = await http.delete(url);

@@ -1,4 +1,5 @@
 import 'package:buzz/controllers/trip_controller.dart';
+import 'package:buzz/screens/Admin/form_screen.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
@@ -32,7 +33,6 @@ class _StudentHomeTripInactiveScreenState
   int _selectedTripId = 0; // Armazena o tripId selecionado
   int _selectedBusStopId = 0; // Armazena o busStopId selecionado
 
-  // Função para buscar as viagens disponíveis
   Future<void> _fetchActiveBuses() async {
     setState(() {
       isLoading = true;
@@ -43,7 +43,8 @@ class _StudentHomeTripInactiveScreenState
           'https://buzzbackend-production.up.railway.app/buses/trips/active_trips'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        List<dynamic> data =
+            decodeJsonResponse(response); // Usando a função utf8
 
         setState(() {
           _busList = data
@@ -72,7 +73,6 @@ class _StudentHomeTripInactiveScreenState
     }
   }
 
-  // Função para buscar os pontos de ônibus com base no tripId selecionado
   Future<void> _fetchBusStops(int tripId) async {
     setState(() {
       isLoading = true;
@@ -83,7 +83,8 @@ class _StudentHomeTripInactiveScreenState
           'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=$tripId'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        List<dynamic> data =
+            decodeJsonResponse(response); // Usando a função utf8
 
         setState(() {
           _busStopList = data
@@ -109,7 +110,6 @@ class _StudentHomeTripInactiveScreenState
     }
   }
 
-  // Função para criar o student_trip
   Future<void> _createStudentTrip(int tripId, int pointId) async {
     setState(() {
       isCreatingTrip = true;
@@ -133,15 +133,13 @@ class _StudentHomeTripInactiveScreenState
       );
 
       if (response.statusCode == 200) {
-        // Após a criação da viagem, tenta buscar o student_trip_id
         await _waitForStudentTripId(widget.studentId, tripId);
       } else if (response.statusCode == 400 &&
           response.body.contains("Capacidade do onibus atingida")) {
-        // Exibe popup se a capacidade do ônibus estiver cheia
         showDialog(
           context: context,
           barrierDismissible:
-              false, // Define se o diálogo pode ser fechado clicando fora
+              false, 
           builder: (BuildContext dialogContext) {
             return CustomPopup(
               message: 'O ônibus está cheio. Deseja entrar na fila de espera?',
@@ -171,7 +169,7 @@ class _StudentHomeTripInactiveScreenState
     } finally {
       setState(() {
         isCreatingTrip =
-            false; // Esconde o indicador de carregamento após a criação da viagem
+            false;
       });
     }
   }
@@ -216,19 +214,18 @@ class _StudentHomeTripInactiveScreenState
     } finally {
       setState(() {
         isCreatingTrip =
-            false; // Esconde o indicador de carregamento após a criação da viagem
+            false; 
       });
     }
   }
 
   Future<void> _waitForStudentTripId(int studentId, int tripId) async {
     int retryCount = 0;
-    const int maxRetries = 10; // Número máximo de tentativas
-    const Duration retryDelay = Duration(seconds: 2); // Tempo entre tentativas
+    const int maxRetries = 10; 
+    const Duration retryDelay = Duration(seconds: 2); 
 
     while (retryCount < maxRetries) {
       try {
-        // Faz a requisição para verificar se o student_trip_id foi gerado
         final response = await http.get(Uri.parse(
             'https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
 
@@ -237,7 +234,6 @@ class _StudentHomeTripInactiveScreenState
           final studentTripId = tripData['student_trip_id'];
 
           if (studentTripId != null) {
-            // Atualiza o TripController com a nova viagem
             final tripController =
                 Provider.of<TripController>(context, listen: false);
             tripController.startStudentTrip(studentTripId, tripId);
@@ -245,24 +241,21 @@ class _StudentHomeTripInactiveScreenState
               SnackBar(
                   content: Text('Viagem do estudante criada com sucesso!')),
             );
-            return; // Sai da função quando o ID é encontrado
+            return; 
           }
         }
       } catch (e) {
         print('Erro ao buscar o student_trip_id: $e');
       }
 
-      // Espera antes de tentar novamente
       await Future.delayed(retryDelay);
       retryCount++;
     }
 
-    // Se não conseguir o student_trip_id após todas as tentativas, lança erro
     throw Exception(
         'Erro: student_trip_id não foi gerado pela API após várias tentativas.');
   }
 
-  // Função para abrir o overlay de seleção de viagem
   void _toggleBusOverlay() {
     setState(() {
       _showBusOverlay = !_showBusOverlay;
@@ -272,14 +265,13 @@ class _StudentHomeTripInactiveScreenState
     });
   }
 
-  // Função para abrir o overlay de seleção de ponto de ônibus
   void _toggleBusStopOverlay(int tripId) {
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
       if (_showBusStopOverlay) {
         _fetchBusStops(
-            tripId); // Busca os pontos de ônibus para a viagem selecionada
-        _selectedTripId = tripId; // Armazena o tripId selecionado
+            tripId);
+        _selectedTripId = tripId; 
       }
     });
   }
@@ -319,7 +311,7 @@ class _StudentHomeTripInactiveScreenState
               title: 'Selecione sua viagem',
               content: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _buildBusList(), // Exibe a lista de ônibus ativos
+                  : _buildBusList(), 
               onCancel: _toggleBusOverlay,
             ),
           if (_showBusStopOverlay)
@@ -327,16 +319,15 @@ class _StudentHomeTripInactiveScreenState
               title: 'Selecione seu ponto de ônibus',
               content: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _buildBusStopList(), // Exibe a lista de pontos de ônibus
+                  : _buildBusStopList(), 
               onCancel: () => _toggleBusStopOverlay(
-                  0), // Fecha o overlay de pontos de ônibus
+                  0), 
             ),
         ],
       ),
     );
   }
 
-  // Função para construir a lista de viagens ativas
   Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
@@ -346,7 +337,6 @@ class _StudentHomeTripInactiveScreenState
           padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
           child: BusDetailsButton(
             onPressed: () {
-              // Aqui, ao selecionar a viagem, abre o overlay para selecionar o ponto de ônibus
               _toggleBusStopOverlay(bus['tripId']);
               _toggleBusOverlay();
             },
@@ -363,7 +353,6 @@ class _StudentHomeTripInactiveScreenState
 
   Widget _buildBusStopList() {
     if (isCreatingTrip) {
-      // Mostra o indicador de carregamento enquanto a viagem está sendo criada
       return Center(child: CircularProgressIndicator());
     }
 
@@ -380,7 +369,7 @@ class _StudentHomeTripInactiveScreenState
               if (busStopId != null) {
                 print("Selecionado ponto de ônibus: ${busStop['name']}");
                 _createStudentTrip(
-                    _selectedTripId, int.parse(busStopId)); // Cria a viagem
+                    _selectedTripId, int.parse(busStopId)); 
               } else {
                 print('Erro: ID do ponto de ônibus é nulo');
               }
