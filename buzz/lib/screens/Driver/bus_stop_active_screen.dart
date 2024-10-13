@@ -190,7 +190,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             tripBusStops.length - 1;
   }
 
-  Future<void> _finalizeTrip(String action) async {
+Future<void> _finalizeTrip(String action) async {
     if (_isProcessing) return;
 
     setState(() {
@@ -256,16 +256,22 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           });
         }
       } else {
-        throw Exception('Erro ao finalizar a viagem');
+        // Caso o status da resposta seja diferente de 200, lançar erro
+        throw Exception('Erro ao finalizar a viagem: ${response.body}');
       }
     } catch (e) {
       print("Erro durante a finalização da viagem: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao finalizar a viagem: $e'),
+        backgroundColor: Colors.redAccent,
+      ));
     } finally {
       setState(() {
         _isProcessing = false;
       });
     }
   }
+
 
   Future<void> _selectNextStop(int stopId) async {
     if (_isProcessing) return;
