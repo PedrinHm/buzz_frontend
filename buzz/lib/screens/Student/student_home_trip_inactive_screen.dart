@@ -75,7 +75,6 @@ class _StudentHomeTripInactiveScreenState
     }
   }
 
-
   Future<void> _fetchBusStops(int tripId) async {
     setState(() {
       isLoading = true;
@@ -141,8 +140,7 @@ class _StudentHomeTripInactiveScreenState
           response.body.contains("Capacidade do onibus atingida")) {
         showDialog(
           context: context,
-          barrierDismissible:
-              false, 
+          barrierDismissible: false,
           builder: (BuildContext dialogContext) {
             return CustomPopup(
               message: 'O ônibus está cheio. Deseja entrar na fila de espera?',
@@ -171,8 +169,7 @@ class _StudentHomeTripInactiveScreenState
       );
     } finally {
       setState(() {
-        isCreatingTrip =
-            false;
+        isCreatingTrip = false;
       });
     }
   }
@@ -216,16 +213,15 @@ class _StudentHomeTripInactiveScreenState
       );
     } finally {
       setState(() {
-        isCreatingTrip =
-            false; 
+        isCreatingTrip = false;
       });
     }
   }
 
   Future<void> _waitForStudentTripId(int studentId, int tripId) async {
     int retryCount = 0;
-    const int maxRetries = 10; 
-    const Duration retryDelay = Duration(seconds: 2); 
+    const int maxRetries = 10;
+    const Duration retryDelay = Duration(seconds: 2);
 
     while (retryCount < maxRetries) {
       try {
@@ -233,7 +229,7 @@ class _StudentHomeTripInactiveScreenState
             'https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
 
         if (response.statusCode == 200) {
-          final tripData = json.decode(response.body);
+          final tripData = decodeJsonResponse(response);
           final studentTripId = tripData['student_trip_id'];
 
           if (studentTripId != null) {
@@ -244,7 +240,7 @@ class _StudentHomeTripInactiveScreenState
               SnackBar(
                   content: Text('Viagem do estudante criada com sucesso!')),
             );
-            return; 
+            return;
           }
         }
       } catch (e) {
@@ -272,9 +268,8 @@ class _StudentHomeTripInactiveScreenState
     setState(() {
       _showBusStopOverlay = !_showBusStopOverlay;
       if (_showBusStopOverlay) {
-        _fetchBusStops(
-            tripId);
-        _selectedTripId = tripId; 
+        _fetchBusStops(tripId);
+        _selectedTripId = tripId;
       }
     });
   }
@@ -314,7 +309,7 @@ class _StudentHomeTripInactiveScreenState
               title: 'Selecione sua viagem',
               content: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _buildBusList(), 
+                  : _buildBusList(),
               onCancel: _toggleBusOverlay,
             ),
           if (_showBusStopOverlay)
@@ -322,16 +317,15 @@ class _StudentHomeTripInactiveScreenState
               title: 'Selecione seu ponto de ônibus',
               content: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _buildBusStopList(), 
-              onCancel: () => _toggleBusStopOverlay(
-                  0), 
+                  : _buildBusStopList(),
+              onCancel: () => _toggleBusStopOverlay(0),
             ),
         ],
       ),
     );
   }
 
-Widget _buildBusList() {
+  Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
       itemBuilder: (context, index) {
@@ -362,8 +356,6 @@ Widget _buildBusList() {
     );
   }
 
-
-
   Widget _buildBusStopList() {
     if (isCreatingTrip) {
       return Center(child: CircularProgressIndicator());
@@ -381,8 +373,7 @@ Widget _buildBusList() {
             onPressed: () {
               if (busStopId != null) {
                 print("Selecionado ponto de ônibus: ${busStop['name']}");
-                _createStudentTrip(
-                    _selectedTripId, int.parse(busStopId)); 
+                _createStudentTrip(_selectedTripId, int.parse(busStopId));
               } else {
                 print('Erro: ID do ponto de ônibus é nulo');
               }

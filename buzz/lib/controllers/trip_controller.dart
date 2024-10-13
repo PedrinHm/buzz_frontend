@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../services/decodeJsonResponse.dart';
+
 class TripController extends ChangeNotifier {
   bool _hasActiveTrip = false;
   int? _activeTripId;
@@ -37,7 +39,8 @@ class TripController extends ChangeNotifier {
       notifyListeners();
     });
   }
-void endTrip() {
+
+  void endTrip() {
     print("Finalizando a viagem, tripId atual: $_activeTripId");
     _hasActiveTrip = false;
     _activeTripId = null; // Certifica-se de que activeTripId seja null
@@ -75,7 +78,7 @@ void endTrip() {
     final response = await http.get(Uri.parse(
         'https://buzzbackend-production.up.railway.app/trips/active/$driverId'));
     if (response.statusCode == 200) {
-      final tripData = json.decode(response.body);
+      final tripData = decodeJsonResponse(response);
       _activeTripId = tripData['id'];
       _tripType = tripData['trip_type'];
       _hasActiveTrip = true;
@@ -94,7 +97,7 @@ void endTrip() {
       final response = await http.get(Uri.parse(
           'https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
       if (response.statusCode == 200) {
-        final tripData = json.decode(response.body);
+        final tripData = decodeJsonResponse(response);
         _activeTripId = tripData['trip_id'];
         _tripType = tripData['trip_type'] == 'IDA' ? 1 : 2;
         _studentTripId = tripData['student_trip_id'];
@@ -130,7 +133,7 @@ void endTrip() {
     );
 
     if (response.statusCode == 200) {
-      final tripData = json.decode(response.body);
+      final tripData = decodeJsonResponse(response);
       _activeTripId = tripData['id'];
       _tripType = tripType;
       _hasActiveTrip = true;
@@ -142,13 +145,13 @@ void endTrip() {
     });
   }
 
-Future<void> completeTrip(int tripId) async {
+  Future<void> completeTrip(int tripId) async {
     String endpoint = _tripType == 1 ? 'finalizar_ida' : 'finalizar_volta';
     final response = await http.put(Uri.parse(
         'https://buzzbackend-production.up.railway.app/trips/$tripId/$endpoint'));
 
     if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
+      final responseData = decodeJsonResponse(response);
 
       if (_tripType == 1) {
         // Inicia a viagem de volta usando o new_trip_id retornado na resposta
@@ -164,6 +167,4 @@ Future<void> completeTrip(int tripId) async {
       throw Exception('Erro ao concluir a viagem');
     }
   }
-
-
 }

@@ -1,3 +1,4 @@
+import 'package:buzz/screens/Admin/form_screen.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
@@ -114,7 +115,7 @@ class _StudentHomeTripActiveScreenState
     });
   }
 
-  Future<void> _fetchBusAndDriver() async {
+Future<void> _fetchBusAndDriver() async {
     try {
       setState(() {
         isLoadingBus = true;
@@ -124,14 +125,16 @@ class _StudentHomeTripActiveScreenState
           'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}'));
 
       if (tripResponse.statusCode == 200) {
-        final tripData = json.decode(tripResponse.body);
+        final tripData =
+            decodeJsonResponse(tripResponse); // Decodificação com utf8
         final busId = tripData['bus_id'];
         final driverId = tripData['driver_id'];
 
         final busResponse = await http.get(Uri.parse(
             'https://buzzbackend-production.up.railway.app/buses/$busId'));
         if (busResponse.statusCode == 200) {
-          final busData = json.decode(busResponse.body);
+          final busData =
+              decodeJsonResponse(busResponse); // Decodificação com utf8
           setState(() {
             _busNumber = busData['registration_number'];
           });
@@ -142,7 +145,8 @@ class _StudentHomeTripActiveScreenState
         final driverResponse = await http.get(Uri.parse(
             'https://buzzbackend-production.up.railway.app/users/$driverId'));
         if (driverResponse.statusCode == 200) {
-          final driverData = json.decode(driverResponse.body);
+          final driverData =
+              decodeJsonResponse(driverResponse); 
           setState(() {
             _driverName = driverData['name'];
           });
@@ -161,7 +165,8 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-  Future<void> _fetchBusStopName() async {
+
+Future<void> _fetchBusStopName() async {
     try {
       setState(() {
         isLoadingBusStop = true;
@@ -171,16 +176,18 @@ class _StudentHomeTripActiveScreenState
           'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = decodeJsonResponse(response); // Decodificação com utf8
         final pointId = data['point_id'];
 
         final busStopResponse = await http.get(Uri.parse(
             'https://buzzbackend-production.up.railway.app/bus_stops/$pointId'));
 
         if (busStopResponse.statusCode == 200) {
-          final busStopData = json.decode(busStopResponse.body);
+          final busStopData =
+              decodeJsonResponse(busStopResponse); // Decodificação com utf8
           setState(() {
-            _busStopName = busStopData['name'];
+            _busStopName =
+                busStopData['name']; // Dados decodificados corretamente
           });
         } else {
           throw Exception('Failed to fetch bus stop name');
@@ -197,6 +204,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
+
   Future<void> _fetchCurrentStatus() async {
     try {
       // Faz uma chamada HTTP para buscar o status atual do aluno
@@ -204,7 +212,7 @@ class _StudentHomeTripActiveScreenState
           'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data =  decodeJsonResponse(response);
         setState(() {
           _currentStatus = data['status']; // status numérico recebido da API
         });
@@ -266,27 +274,50 @@ class _StudentHomeTripActiveScreenState
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Student trip ID não está definido!')),
+        SnackBar(
+          content: Text('Erro: Student trip ID não está definido!'),
+          backgroundColor: Colors.red, // Cor vermelha para erros
+        ),
       );
       return;
     }
 
-    setState(() {
-      isUpdatingStatus = true; // Começa a atualizar
-    });
-
     try {
+      // Primeiro, verifique o tipo de viagem
+      final tripResponse = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}'));
+
+      if (tripResponse.statusCode == 200) {
+        final tripData = json.decode(tripResponse.body);
+
+        // Se for uma viagem de ida, exiba um erro e não prossiga
+        if (tripData['trip_type'] == 1) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Erro: Não é possível alterar o status durante uma viagem de ida.'),
+              backgroundColor: Colors.red, // Cor vermelha para erros
+            ),
+          );
+          return; // Interrompe a execução aqui se for viagem de ida
+        }
+      } else {
+        throw Exception('Failed to fetch trip type');
+      }
+
+      // Atualiza o status do aluno
       final url = Uri.parse(
           'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
-
       final response = await http.put(url);
 
       if (response.statusCode == 200) {
         print('Status do aluno atualizado com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Status do aluno atualizado com sucesso!')),
+          SnackBar(
+            content: Text('Status do aluno atualizado com sucesso!'),
+            backgroundColor: Colors.green, // Cor verde para sucesso
+          ),
         );
-        // Chama o refresh para atualizar o status exibido no botão
         await _fetchCurrentStatus();
       } else {
         throw Exception('Failed to update student status');
@@ -294,11 +325,14 @@ class _StudentHomeTripActiveScreenState
     } catch (e) {
       print('Erro ao atualizar o status do aluno: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar o status do aluno')),
+        SnackBar(
+          content: Text('Erro ao atualizar o status do aluno'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
-        isUpdatingStatus = false; // Atualização concluída
+        isUpdatingStatus = false;
       });
     }
   }
@@ -313,7 +347,7 @@ class _StudentHomeTripActiveScreenState
           'https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        List<dynamic> data =  decodeJsonResponse(response);
 
         setState(() {
           _busList = data
@@ -353,7 +387,7 @@ class _StudentHomeTripActiveScreenState
           'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        List<dynamic> data =  decodeJsonResponse(response);
 
         setState(() {
           busStopList = data
@@ -376,7 +410,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-Future<void> _updateStudentTrip(int newTripId) async {
+  Future<void> _updateStudentTrip(int newTripId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -434,7 +468,6 @@ Future<void> _updateStudentTrip(int newTripId) async {
       );
     }
   }
-
 
 // Nova função para entrar na fila de espera
   Future<void> _enterWaitlist(int newTripId) async {

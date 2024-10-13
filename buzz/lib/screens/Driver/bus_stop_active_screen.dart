@@ -47,8 +47,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
   }
 
-
-Future<void> _cancelTrip() async {
+  Future<void> _cancelTrip() async {
     if (_isProcessing) return;
 
     setState(() {
@@ -67,13 +66,11 @@ Future<void> _cancelTrip() async {
           backgroundColor: Colors.green,
         ));
 
-        // Após cancelar a viagem, finalizar e redefinir os estados relacionados à viagem
         setState(() {
           _tripId = null;
           _isReturnTrip = false;
         });
 
-        // Utilizando o TripController para redefinir o activeTripId
         Provider.of<TripController>(context, listen: false).endTrip();
       } else {
         throw Exception('Erro ao cancelar a viagem');
@@ -226,7 +223,7 @@ Future<void> _cancelTrip() async {
       var response = await http.put(url);
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        final responseData = decodeJsonResponse(response);
 
         if (action == 'Finalizar viagem') {
           // Se for uma viagem de ida, inicia a viagem de volta
@@ -335,7 +332,7 @@ Future<void> _cancelTrip() async {
     }
   }
 
-void _showCancelTripPopup() {
+  void _showCancelTripPopup() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -345,7 +342,7 @@ void _showCancelTripPopup() {
           cancelText: "Não",
           onConfirm: () {
             Navigator.of(context).pop();
-            _cancelTrip(); 
+            _cancelTrip();
           },
           onCancel: () {
             Navigator.of(context).pop();
@@ -354,7 +351,6 @@ void _showCancelTripPopup() {
       },
     );
   }
-
 
   void _showConfirmFinalizeReturnTripPopup() {
     showDialog(
@@ -376,7 +372,6 @@ void _showCancelTripPopup() {
     );
   }
 
-  
   void _showConfirmFinalizeTripPopup() {
     showDialog(
       context: context,
