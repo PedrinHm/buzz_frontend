@@ -8,21 +8,16 @@ import 'package:buzz/models/usuario.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-// Função para lidar com notificações em segundo plano
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Inicialize o Firebase para garantir que esteja pronto para processar as mensagens
   await Firebase.initializeApp();
   print('Mensagem recebida em segundo plano: ${message.messageId}');
 }
 
 void main() async {
-  // Garantir que a inicialização dos widgets Flutter e do Firebase seja feita corretamente
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialize o Firebase antes de qualquer outra operação que dependa dele
   await Firebase.initializeApp();
 
-  // Configurar o Firebase Messaging para lidar com mensagens em segundo plano
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(MyApp());
@@ -37,18 +32,16 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          fontFamily: 'Inter', // Defina a família de fontes padrão como Inter
+          fontFamily: 'Inter', 
         ),
-        initialRoute: '/login', // Define a rota inicial como login
+        initialRoute: '/login', 
         routes: {
-          '/login': (context) => LoginScreen(), // Rota da tela de login
+          '/login': (context) => LoginScreen(), 
           '/main': (context) => MainScreen(
                 usuario: Usuario(tipoUsuario: 'student', id: 1),
-              ), // Exemplo de rota para a tela principal
-          // Adicione outras rotas conforme necessário
+              ),
         },
         onGenerateRoute: (settings) {
-          // Se a rota não estiver registrada, navegue para uma tela de erro ou a tela de login
           if (settings.name == '/login') {
             return MaterialPageRoute(
               builder: (context) => LoginScreen(),
@@ -60,7 +53,7 @@ class MyApp extends StatelessWidget {
               ),
             );
           }
-          return null; // Retorna nulo se a rota não for encontrada
+          return null; 
         },
       ),
     );

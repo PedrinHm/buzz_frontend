@@ -19,13 +19,13 @@ class BusStopInactiveScreen extends StatefulWidget {
 
 class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
   bool _showBusOverlay = false;
-  bool isLoading = false;  // Estado de carregamento global
-  bool isStartingTrip = false;  // Estado de carregamento para iniciar viagem
+  bool isLoading = false;  
+  bool isStartingTrip = false;  
   List<Map<String, dynamic>> _busList = [];
 
   Future<void> _fetchAvailableBuses() async {
     setState(() {
-      isLoading = true;  // Mostra o indicador de carregamento
+      isLoading = true; 
     });
 
     try {
@@ -51,26 +51,22 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
     }
   }
 
-  // Função para alternar o overlay de ônibus
   void _toggleBusOverlay() {
     setState(() {
       _showBusOverlay = !_showBusOverlay;
       if (_showBusOverlay) {
-        _fetchAvailableBuses();  // Busca ônibus quando o overlay é exibido
+        _fetchAvailableBuses();
       }
     });
   }
 
-  // Função para iniciar viagem e mostrar ícone de carregamento
   Future<void> _startTrip(int busId) async {
     setState(() {
-      isStartingTrip = true;  // Mostra o ícone de carregamento ao iniciar viagem
+      isStartingTrip = true;
     });
 
     try {
-      await widget.startTrip(widget.driverId, busId);  // Inicia a viagem
-
-      // Exibe confirmação de que a viagem foi iniciada
+      await widget.startTrip(widget.driverId, busId);  
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Viagem iniciada com sucesso!')),
       );
@@ -80,8 +76,8 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
       );
     } finally {
       setState(() {
-        isStartingTrip = false;  // Esconde o ícone de carregamento
-        _toggleBusOverlay();  // Fecha o overlay
+        isStartingTrip = false;  
+        _toggleBusOverlay();  
       });
     }
   }
@@ -94,22 +90,20 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
 
         final busNumber = bus['registration_number'] ?? 'Número desconhecido';
         final driverName = bus['name'] ?? 'Nome desconhecido';
-        final busId = bus['id'];  // Usando a chave correta 'id'
-        final capacity = bus['capacity'] ?? 0;  // Mantém o tipo como int, com valor padrão 0
+        final busId = bus['id'];  
 
         return Padding(
           padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
           child: BusDetailsButton(
             onPressed: () async {
               if (busId != null) {
-                await _startTrip(busId);  // Inicia a viagem e exibe o carregamento
+                await _startTrip(busId);  
               } else {
                 print('Erro: busId é nulo');
               }
             },
             busNumber: busNumber,
             driverName: driverName,
-            capacity: capacity,  // Agora passa o capacity como int
             availableSeats: 0,
             color: Color(0xFF395BC7),
           ),

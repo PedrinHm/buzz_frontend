@@ -45,6 +45,9 @@ class _StudentHomeTripActiveScreenState
   late int _studentTripId;
   int? _currentStatus; // Status atual do aluno como int
   String? _busStopName;
+  bool isLoadingBus = true;
+  String? _busNumber;
+  String? _driverName;
 
   // Mapeamento de status numérico para rótulos e cores
   final Map<int, Map<String, dynamic>> statusDetails = {
@@ -81,6 +84,7 @@ class _StudentHomeTripActiveScreenState
     _studentTripId = widget.studentTripId;
     _fetchCurrentStatus();
     _fetchBusStopName();
+    _fetchBusAndDriver();
   }
 
   void _toggleBusOverlay() {
@@ -110,30 +114,73 @@ class _StudentHomeTripActiveScreenState
     });
   }
 
+  Future<void> _fetchBusAndDriver() async {
+    try {
+      setState(() {
+        isLoadingBus = true;
+      });
+
+      final tripResponse = await http.get(Uri.parse(
+          'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}'));
+
+      if (tripResponse.statusCode == 200) {
+        final tripData = json.decode(tripResponse.body);
+        final busId = tripData['bus_id'];
+        final driverId = tripData['driver_id'];
+
+        final busResponse = await http.get(Uri.parse(
+            'https://buzzbackend-production.up.railway.app/buses/$busId'));
+        if (busResponse.statusCode == 200) {
+          final busData = json.decode(busResponse.body);
+          setState(() {
+            _busNumber = busData['registration_number'];
+          });
+        } else {
+          throw Exception('Failed to fetch bus number');
+        }
+
+        final driverResponse = await http.get(Uri.parse(
+            'https://buzzbackend-production.up.railway.app/users/$driverId'));
+        if (driverResponse.statusCode == 200) {
+          final driverData = json.decode(driverResponse.body);
+          setState(() {
+            _driverName = driverData['name'];
+          });
+        } else {
+          throw Exception('Failed to fetch driver name');
+        }
+      } else {
+        throw Exception('Failed to fetch trip details');
+      }
+    } catch (e) {
+      print('Error fetching bus and driver details: $e');
+    } finally {
+      setState(() {
+        isLoadingBus = false;
+      });
+    }
+  }
+
   Future<void> _fetchBusStopName() async {
     try {
-      // Inicia o carregamento do ponto de ônibus
       setState(() {
         isLoadingBusStop = true;
       });
 
-      // Busca o student_trip atual
       final response = await http.get(Uri.parse(
           'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final pointId = data['point_id']; // Obtemos o point_id
+        final pointId = data['point_id'];
 
-        // Agora fazemos a segunda requisição para obter o nome do ponto de ônibus
         final busStopResponse = await http.get(Uri.parse(
             'https://buzzbackend-production.up.railway.app/bus_stops/$pointId'));
 
         if (busStopResponse.statusCode == 200) {
           final busStopData = json.decode(busStopResponse.body);
           setState(() {
-            _busStopName =
-                busStopData['name']; // Atualiza o nome do ponto de ônibus
+            _busStopName = busStopData['name'];
           });
         } else {
           throw Exception('Failed to fetch bus stop name');
@@ -144,7 +191,6 @@ class _StudentHomeTripActiveScreenState
     } catch (e) {
       print('Error fetching bus stop name: $e');
     } finally {
-      // Conclui o carregamento
       setState(() {
         isLoadingBusStop = false;
       });
@@ -330,7 +376,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-  Future<void> _updateStudentTrip(int newTripId) async {
+Future<void> _updateStudentTrip(int newTripId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -348,6 +394,16 @@ class _StudentHomeTripActiveScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Viagem do aluno atualizada com sucesso!')),
         );
+
+        // Atualizar a tripId primeiro e só depois realizar as outras atualizações
+        await _fetchBusAndDriver(); // Atualizar dados do ônibus e motorista
+        await _fetchCurrentStatus(); // Atualizar o status do aluno
+        await _fetchBusStopName(); // Atualizar o ponto de ônibus
+
+        // Fechar o overlay de seleção de ônibus e garantir que a interface seja atualizada
+        setState(() {
+          _showBusOverlay = false;
+        });
       } else if (response.statusCode == 400 &&
           response.body.contains("New trip is full")) {
         // Exibe popup se a viagem estiver cheia
@@ -379,6 +435,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
+
 // Nova função para entrar na fila de espera
   Future<void> _enterWaitlist(int newTripId) async {
     try {
@@ -401,7 +458,7 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-Future<void> _updateStudentTripPoint(int pointId) async {
+  Future<void> _updateStudentTripPoint(int pointId) async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -440,7 +497,6 @@ Future<void> _updateStudentTripPoint(int pointId) async {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -477,10 +533,12 @@ Future<void> _updateStudentTripPoint(int pointId) async {
                 SizedBox(height: getHeightProportion(context, 10)),
                 CustomBusButton(
                   onPressed: _toggleBusOverlay,
-                  busNumber:
-                      "ABC-1234", //Aqui a placa do onibus da viagem atual
-                  driverName:
-                      "Nome Do Motorista", //Aqui o nome do motorista da viagem atual
+                  busNumber: isLoadingBus
+                      ? 'Carregando...'
+                      : _busNumber ?? "Placa não definida",
+                  driverName: isLoadingBus
+                      ? 'Carregando...'
+                      : _driverName ?? "Motorista não definido",
                 ),
                 SizedBox(height: getHeightProportion(context, 10)),
               ],

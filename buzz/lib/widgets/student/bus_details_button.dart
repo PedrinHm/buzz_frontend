@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:buzz/utils/size_config.dart';  // Import correto
+import 'package:buzz/utils/size_config.dart'; // Import correto
 
 class BusDetailsButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String busNumber;
   final String driverName;
-  final int capacity;
-  final int? availableSeats; // Fazendo este campo opcional
+  final int? capacity; 
+  final int? availableSeats; 
   final Color color;
 
   BusDetailsButton({
     required this.onPressed,
     required this.busNumber,
     required this.driverName,
-    required this.capacity,
-    this.availableSeats, // Removendo o 'required' para tornar opcional
-    this.color = const Color(0xFF395BC7), // Cor padrão
+    this.capacity, 
+    this.availableSeats, 
+    this.color = const Color(0xFF395BC7),
   });
 
   @override
@@ -26,23 +26,27 @@ class BusDetailsButton extends StatelessWidget {
         onTap: onPressed,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: getHeightProportion(context, 130),  // Proporção de altura
+          height: getHeightProportion(context, 130),  
           padding: EdgeInsets.symmetric(
-            vertical: getHeightProportion(context, 15.0), 
-            horizontal: getWidthProportion(context, 20.0), // Proporção de padding
+            vertical: getHeightProportion(context, 15.0),
+            horizontal:
+                getWidthProportion(context, 20.0), 
           ),
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
+            borderRadius: BorderRadius.circular(
+                getHeightProportion(context, 10)), 
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(getHeightProportion(context, 15)),  // Proporção de padding
+                padding: EdgeInsets.all(
+                    getHeightProportion(context, 15)), 
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(getHeightProportion(context, 10)), // Proporção de borda
+                  borderRadius: BorderRadius.circular(
+                      getHeightProportion(context, 10)), 
                   border: Border.all(
                     color: Colors.white,
                     width: 1,
@@ -51,10 +55,13 @@ class BusDetailsButton extends StatelessWidget {
                 child: Icon(
                   PhosphorIcons.bus,
                   color: Colors.white,
-                  size: getHeightProportion(context, 35),  // Tamanho do ícone proporcional
+                  size: getHeightProportion(
+                      context, 35), 
                 ),
               ),
-              SizedBox(width: getWidthProportion(context, 20)), // Proporção de espaçamento
+              SizedBox(
+                  width: getWidthProportion(
+                      context, 20)), 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -62,7 +69,8 @@ class BusDetailsButton extends StatelessWidget {
                   Text(
                     'Ônibus',
                     style: TextStyle(
-                      fontSize: getHeightProportion(context, 16),  // Tamanho do texto proporcional
+                      fontSize: getHeightProportion(
+                          context, 16), 
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -70,29 +78,36 @@ class BusDetailsButton extends StatelessWidget {
                   Text(
                     busNumber,
                     style: TextStyle(
-                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
+                      fontSize: getHeightProportion(
+                          context, 12), 
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     driverName,
                     style: TextStyle(
-                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
+                      fontSize: getHeightProportion(
+                          context, 12), 
                       color: Colors.white,
                     ),
                   ),
-                  Text(
-                    'Capacidade: $capacity',
-                    style: TextStyle(
-                      fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
-                      color: Colors.white,
+                  if (capacity != null) 
+                    Text(
+                      'Capacidade: $capacity',
+                      style: TextStyle(
+                        fontSize: getHeightProportion(
+                            context, 12), 
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  if (availableSeats != null) // Condicional para exibir ou não as vagas disponíveis
+                  if (capacity != null &&
+                      availableSeats !=
+                          null) 
                     Text(
                       'Vagas disponíveis: $availableSeats',
                       style: TextStyle(
-                        fontSize: getHeightProportion(context, 12),  // Tamanho do texto proporcional
+                        fontSize: getHeightProportion(
+                            context, 12), 
                         color: Colors.white,
                       ),
                     ),
