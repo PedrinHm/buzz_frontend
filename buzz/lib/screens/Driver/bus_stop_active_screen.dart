@@ -47,6 +47,50 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
   }
 
+
+Future<void> _cancelTrip() async {
+    if (_isProcessing) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    var url = Uri.parse(
+        'http://10.0.2.2:8000/trips/${_tripId ?? ''}/cancel');
+
+    try {
+      var response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Viagem cancelada com sucesso.'),
+          backgroundColor: Colors.green,
+        ));
+
+        // Após cancelar a viagem, finalizar e redefinir os estados relacionados à viagem
+        setState(() {
+          _tripId = null;
+          _isReturnTrip = false;
+        });
+
+        // Utilizando o TripController para redefinir o activeTripId
+        Provider.of<TripController>(context, listen: false).endTrip();
+      } else {
+        throw Exception('Erro ao cancelar a viagem');
+      }
+    } catch (e) {
+      print("Erro ao cancelar a viagem: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao cancelar a viagem: $e'),
+        backgroundColor: Colors.redAccent,
+      ));
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
   Future<void> toggleBusIssue() async {
     if (_isProcessing) return;
 
@@ -291,7 +335,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     }
   }
 
-  void _showCancelTripPopup() {
+void _showCancelTripPopup() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -301,7 +345,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           cancelText: "Não",
           onConfirm: () {
             Navigator.of(context).pop();
-            print('Cancelar Viagem Confirmado');
+            _cancelTrip(); 
           },
           onCancel: () {
             Navigator.of(context).pop();
@@ -310,6 +354,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       },
     );
   }
+
 
   void _showConfirmFinalizeReturnTripPopup() {
     showDialog(
