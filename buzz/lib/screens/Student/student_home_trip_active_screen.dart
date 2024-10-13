@@ -337,7 +337,7 @@ Future<void> _fetchBusStopName() async {
     }
   }
 
-  Future<void> _fetchActiveBuses() async {
+Future<void> _fetchActiveBuses() async {
     setState(() {
       isLoading = true;
     });
@@ -347,9 +347,9 @@ Future<void> _fetchBusStopName() async {
           'https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data =  decodeJsonResponse(response);
+        List<dynamic> data = decodeJsonResponse(response); // Decodificação utf8
 
-        setState(() {
+setState(() {
           _busList = data
               .map((item) => {
                     'busId': item['bus_id'],
@@ -358,9 +358,12 @@ Future<void> _fetchBusStopName() async {
                     'name': item['name'],
                     'capacity': item['capacity'],
                     'tripType': item['trip_type'],
+                    'availableSeats': item['available_seats'] ??
+                        0, // Garantindo que não seja null
                   })
               .toList();
         });
+
       } else {
         throw Exception('Failed to load available buses for student');
       }
@@ -376,6 +379,7 @@ Future<void> _fetchBusStopName() async {
       });
     }
   }
+
 
   Future<void> _fetchBusStops() async {
     setState(() {
@@ -606,11 +610,18 @@ Future<void> _fetchBusStopName() async {
     );
   }
 
-  Widget _buildBusList() {
+Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
       itemBuilder: (context, index) {
         final bus = _busList[index];
+        final int availableSeats = bus['availableSeats'];
+
+        // Definir a cor do botão com base no número de vagas disponíveis
+        final Color buttonColor = availableSeats == 0
+            ? Color(0xFFFFBA18) // Amarelo se não houver vagas
+            : Color(0xFF395BC7); // Azul padrão se houver vagas
+
         return Padding(
           padding: EdgeInsets.only(
               bottom:
@@ -623,13 +634,15 @@ Future<void> _fetchBusStopName() async {
             busNumber: bus['registrationNumber'],
             driverName: bus['name'],
             capacity: bus['capacity'],
-            availableSeats: 0,
-            color: Color(0xFF395BC7),
+            availableSeats:
+                availableSeats, // Passando availableSeats corretamente
+            color: buttonColor, // Aplicando a cor condicional
           ),
         );
       },
     );
   }
+
 
   Widget _buildBusStopList() {
     return ListView.builder(

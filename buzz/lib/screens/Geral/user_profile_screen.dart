@@ -38,12 +38,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> _logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('authToken');
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
-
   Future<void> _pickImage() async {
     try {
       final ImagePicker picker = ImagePicker();
@@ -100,6 +94,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         },
       ),
     );
+  }
+
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => CustomPopup(
+        message: 'Tem certeza de que deseja sair?',
+        confirmText: 'Sim',
+        cancelText: 'Não',
+        onConfirm: () {
+          Navigator.of(context).pop(); // Fechar o popup
+          _logout(); // Executar o logout
+        },
+        onCancel: () {
+          Navigator.of(context).pop(); // Apenas fechar o popup
+        },
+      ),
+    );
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('authToken');
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   Future<void> _removeProfilePicture() async {
@@ -189,7 +207,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   IconButton(
                     icon: Icon(Icons.logout, color: Colors.white),
-                    onPressed: _logout,
+                    onPressed:
+                        _confirmLogout, // Alterado para chamar o popup de confirmação
                   ),
                 ],
               ),
