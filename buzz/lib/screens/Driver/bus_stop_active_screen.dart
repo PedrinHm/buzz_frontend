@@ -91,6 +91,28 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   Future<void> toggleBusIssue() async {
     if (_isProcessing) return;
 
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomPopup(
+          message: _busIssue
+              ? "Tem certeza de que deseja remover o problema do ônibus?"
+              : "Tem certeza de que deseja reportar um problema no ônibus?",
+          confirmText: "Sim",
+          cancelText: "Não",
+          onConfirm: () {
+            Navigator.of(context).pop(); // Fecha o popup
+            _reportOrRemoveBusIssue(); // Chama o método para reportar/remover o problema
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Apenas fecha o popup
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _reportOrRemoveBusIssue() async {
     setState(() {
       _isProcessing = true;
     });
@@ -190,7 +212,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
             tripBusStops.length - 1;
   }
 
-Future<void> _finalizeTrip(String action) async {
+  Future<void> _finalizeTrip(String action) async {
     if (_isProcessing) return;
 
     setState(() {
@@ -271,7 +293,6 @@ Future<void> _finalizeTrip(String action) async {
       });
     }
   }
-
 
   Future<void> _selectNextStop(int stopId) async {
     if (_isProcessing) return;
