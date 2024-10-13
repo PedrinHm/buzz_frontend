@@ -55,6 +55,8 @@ class _StudentHomeTripInactiveScreenState
                     'name': item['name'],
                     'capacity': item['capacity'],
                     'tripType': item['trip_type'],
+                    'availableSeats':
+                        item['available_seats'], // Inclui as vagas disponíveis
                   })
               .toList();
         });
@@ -72,6 +74,7 @@ class _StudentHomeTripInactiveScreenState
       });
     }
   }
+
 
   Future<void> _fetchBusStops(int tripId) async {
     setState(() {
@@ -328,11 +331,18 @@ class _StudentHomeTripInactiveScreenState
     );
   }
 
-  Widget _buildBusList() {
+Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
       itemBuilder: (context, index) {
         final bus = _busList[index];
+        final int availableSeats = bus['availableSeats'];
+
+        // Definir a cor do botão com base no número de vagas disponíveis
+        final Color buttonColor = availableSeats == 0
+            ? Color(0xFFFFBA18) // Amarelo se não houver vagas
+            : Color(0xFF395BC7); // Azul padrão se houver vagas
+
         return Padding(
           padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
           child: BusDetailsButton(
@@ -343,13 +353,16 @@ class _StudentHomeTripInactiveScreenState
             busNumber: bus['registrationNumber'],
             driverName: bus['name'],
             capacity: bus['capacity'],
-            availableSeats: 0,
-            color: Color(0xFF395BC7),
+            availableSeats:
+                availableSeats, // Passando availableSeats corretamente
+            color: buttonColor, // Aplicando a cor condicional
           ),
         );
       },
     );
   }
+
+
 
   Widget _buildBusStopList() {
     if (isCreatingTrip) {
