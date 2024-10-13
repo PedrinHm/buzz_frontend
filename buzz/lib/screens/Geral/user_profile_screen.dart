@@ -1,4 +1,5 @@
 import 'package:buzz/models/usuario.dart';
+import 'package:buzz/services/decodeJsonResponse.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,7 +32,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         'https://buzzbackend-production.up.railway.app/users/$userId'));
 
     if (response.statusCode == 200) {
-      return Usuario.fromJson(jsonDecode(response.body));
+      return Usuario.fromJson(decodeJsonResponse(response));
     } else {
       throw Exception('Failed to load user');
     }
