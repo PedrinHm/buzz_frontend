@@ -13,4 +13,8 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31" />
 
+        <meta-data
+          android:name="com.google.firebase.messaging.default_notification_icon"
+          android:resource="@mipmap/buzz_notification" />
+
 </manifest>
