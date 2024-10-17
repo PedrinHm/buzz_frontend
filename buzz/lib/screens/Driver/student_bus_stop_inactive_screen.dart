@@ -3,12 +3,14 @@ import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
+import 'package:buzz/config/config.dart';
 
 class StudentBusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
   final int driverId;
 
-  StudentBusStopInactiveScreen({required this.startTrip, required this.driverId});
+  StudentBusStopInactiveScreen(
+      {required this.startTrip, required this.driverId});
 
   Future<void> _showBusSelectionDialog(BuildContext context) async {
     final busId = await showDialog<int>(
@@ -22,7 +24,7 @@ class StudentBusStopInactiveScreen extends StatelessWidget {
               onBusSelected: (selectedBusId) {
                 Navigator.of(context).pop(selectedBusId);
               },
-              url: 'https://buzzbackend-production.up.railway.app/buses/available',
+              url: '${Config.backendUrl}/buses/available',
             ),
             () => Navigator.of(context).pop(), // Função para cancelar
           ),
@@ -57,14 +59,15 @@ class StudentBusStopInactiveScreen extends StatelessWidget {
                   'Nenhuma viagem em andamento.',
                   style: TextStyle(
                     color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: getHeightProportion(context, 16),  // Proporção ajustada
+                    fontSize:
+                        getHeightProportion(context, 16), // Proporção ajustada
                   ),
                 ),
               ],
             ),
           ),
           Positioned(
-            bottom: getHeightProportion(context, 20.0),  // Proporção ajustada
+            bottom: getHeightProportion(context, 20.0), // Proporção ajustada
             left: 0,
             right: 0,
             child: Center(

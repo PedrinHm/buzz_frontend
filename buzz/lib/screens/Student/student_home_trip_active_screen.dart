@@ -15,6 +15,7 @@ import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Student/status_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:buzz/config/config.dart';
 
 class StudentHomeTripActiveScreen extends StatefulWidget {
   final int studentId;
@@ -115,14 +116,14 @@ class _StudentHomeTripActiveScreenState
     });
   }
 
-Future<void> _fetchBusAndDriver() async {
+  Future<void> _fetchBusAndDriver() async {
     try {
       setState(() {
         isLoadingBus = true;
       });
 
-      final tripResponse = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}'));
+      final tripResponse = await http
+          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
       if (tripResponse.statusCode == 200) {
         final tripData =
@@ -130,8 +131,8 @@ Future<void> _fetchBusAndDriver() async {
         final busId = tripData['bus_id'];
         final driverId = tripData['driver_id'];
 
-        final busResponse = await http.get(Uri.parse(
-            'https://buzzbackend-production.up.railway.app/buses/$busId'));
+        final busResponse =
+            await http.get(Uri.parse('${Config.backendUrl}/buses/$busId'));
         if (busResponse.statusCode == 200) {
           final busData =
               decodeJsonResponse(busResponse); // Decodificação com utf8
@@ -142,11 +143,10 @@ Future<void> _fetchBusAndDriver() async {
           throw Exception('Failed to fetch bus number');
         }
 
-        final driverResponse = await http.get(Uri.parse(
-            'https://buzzbackend-production.up.railway.app/users/$driverId'));
+        final driverResponse =
+            await http.get(Uri.parse('${Config.backendUrl}/users/$driverId'));
         if (driverResponse.statusCode == 200) {
-          final driverData =
-              decodeJsonResponse(driverResponse); 
+          final driverData = decodeJsonResponse(driverResponse);
           setState(() {
             _driverName = driverData['name'];
           });
@@ -165,22 +165,21 @@ Future<void> _fetchBusAndDriver() async {
     }
   }
 
-
-Future<void> _fetchBusStopName() async {
+  Future<void> _fetchBusStopName() async {
     try {
       setState(() {
         isLoadingBusStop = true;
       });
 
       final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
+          '${Config.backendUrl}/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
         final data = decodeJsonResponse(response); // Decodificação com utf8
         final pointId = data['point_id'];
 
-        final busStopResponse = await http.get(Uri.parse(
-            'https://buzzbackend-production.up.railway.app/bus_stops/$pointId'));
+        final busStopResponse = await http
+            .get(Uri.parse('${Config.backendUrl}/bus_stops/$pointId'));
 
         if (busStopResponse.statusCode == 200) {
           final busStopData =
@@ -204,15 +203,14 @@ Future<void> _fetchBusStopName() async {
     }
   }
 
-
   Future<void> _fetchCurrentStatus() async {
     try {
       // Faz uma chamada HTTP para buscar o status atual do aluno
       final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/${widget.studentTripId}'));
+          '${Config.backendUrl}/student_trips/${widget.studentTripId}'));
 
       if (response.statusCode == 200) {
-        final data =  decodeJsonResponse(response);
+        final data = decodeJsonResponse(response);
         setState(() {
           _currentStatus = data['status']; // status numérico recebido da API
         });
@@ -228,7 +226,10 @@ Future<void> _fetchBusStopName() async {
     if (_currentStatus == null) {
       print('Current status is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Status atual não está definido!')),
+        SnackBar(content: Text('Erro: Status atual não está definido!'),
+         backgroundColor: Colors.red,
+        ),
+        
       );
       return;
     }
@@ -284,8 +285,8 @@ Future<void> _fetchBusStopName() async {
 
     try {
       // Primeiro, verifique o tipo de viagem
-      final tripResponse = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}'));
+      final tripResponse = await http
+          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
       if (tripResponse.statusCode == 200) {
         final tripData = json.decode(tripResponse.body);
@@ -307,7 +308,7 @@ Future<void> _fetchBusStopName() async {
 
       // Atualiza o status do aluno
       final url = Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_status?new_status=$newStatus');
+          '${Config.backendUrl}/student_trips/$_studentTripId/update_status?new_status=$newStatus');
       final response = await http.put(url);
 
       if (response.statusCode == 200) {
@@ -337,19 +338,19 @@ Future<void> _fetchBusStopName() async {
     }
   }
 
-Future<void> _fetchActiveBuses() async {
+  Future<void> _fetchActiveBuses() async {
     setState(() {
       isLoading = true;
     });
 
     try {
       final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/buses/available_for_student?student_id=${widget.studentId}'));
+          '${Config.backendUrl}/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = decodeJsonResponse(response); // Decodificação utf8
 
-setState(() {
+        setState(() {
           _busList = data
               .map((item) => {
                     'busId': item['bus_id'],
@@ -363,15 +364,16 @@ setState(() {
                   })
               .toList();
         });
-
       } else {
         throw Exception('Failed to load available buses for student');
       }
     } catch (e) {
-      print('Error fetching available buses for student: $e');
+      print('$e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Erro ao buscar ônibus disponíveis para o aluno')),
+            content: Text('Erro ao buscar ônibus disponíveis para o aluno'),
+             backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
@@ -380,7 +382,6 @@ setState(() {
     }
   }
 
-
   Future<void> _fetchBusStops() async {
     setState(() {
       isLoading = true;
@@ -388,10 +389,10 @@ setState(() {
 
     try {
       final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
+          '${Config.backendUrl}/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=${widget.tripId}'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data =  decodeJsonResponse(response);
+        List<dynamic> data = decodeJsonResponse(response);
 
         setState(() {
           busStopList = data
@@ -418,19 +419,23 @@ setState(() {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Student trip ID não está definido!')),
+        SnackBar(content: Text('Erro: Student trip ID não está definido!'),
+         backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
     try {
       final response = await http.put(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
+          '${Config.backendUrl}/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
       if (response.statusCode == 200) {
         print('Viagem do aluno atualizada com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Viagem do aluno atualizada com sucesso!')),
+          SnackBar(content: Text('Viagem do aluno atualizada com sucesso!'),
+           backgroundColor: Colors.green,
+          ),
         );
 
         // Atualizar a tripId primeiro e só depois realizar as outras atualizações
@@ -468,7 +473,9 @@ setState(() {
     } catch (e) {
       print('Erro ao atualizar a viagem do aluno: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar a viagem do aluno')),
+        SnackBar(content: Text('Erro ao atualizar a viagem do aluno'),
+         backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -477,12 +484,14 @@ setState(() {
   Future<void> _enterWaitlist(int newTripId) async {
     try {
       final response = await http.put(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId&waitlist=true'));
+          '${Config.backendUrl}/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId&waitlist=true'));
 
       if (response.statusCode == 200) {
         print('Aluno entrou na fila de espera com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Você entrou na fila de espera com sucesso!')),
+          SnackBar(content: Text('Você entrou na fila de espera com sucesso!'),
+           backgroundColor: Colors.green,
+          ),
         );
       } else {
         throw Exception('Failed to join waitlist');
@@ -490,7 +499,9 @@ setState(() {
     } catch (e) {
       print('Erro ao entrar na fila de espera: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao entrar na fila de espera')),
+        SnackBar(content: Text('Erro ao entrar na fila de espera'),
+         backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -499,21 +510,25 @@ setState(() {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Student trip ID não está definido!')),
+        SnackBar(content: Text('Erro: Student trip ID não está definido!'),
+         backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
     try {
       final url = Uri.parse(
-          'https://buzzbackend-production.up.railway.app/student_trips/$_studentTripId/update_point?point_id=$pointId');
+          '${Config.backendUrl}/student_trips/$_studentTripId/update_point?point_id=$pointId');
 
       final response = await http.put(url);
 
       if (response.statusCode == 200) {
         print('Ponto de ônibus atualizado com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ponto de ônibus atualizado com sucesso!')),
+          SnackBar(content: Text('Ponto de ônibus atualizado com sucesso!'),
+           backgroundColor: Colors.green,
+          ),
         );
 
         // Após atualizar o ponto, recarregue o nome do ponto de ônibus
@@ -529,7 +544,9 @@ setState(() {
     } catch (e) {
       print('Erro ao atualizar o ponto de ônibus: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar o ponto de ônibus')),
+        SnackBar(content: Text('Erro ao atualizar o ponto de ônibus'),
+         backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -610,7 +627,7 @@ setState(() {
     );
   }
 
-Widget _buildBusList() {
+  Widget _buildBusList() {
     return ListView.builder(
       itemCount: _busList.length,
       itemBuilder: (context, index) {
@@ -642,7 +659,6 @@ Widget _buildBusList() {
       },
     );
   }
-
 
   Widget _buildBusStopList() {
     return ListView.builder(

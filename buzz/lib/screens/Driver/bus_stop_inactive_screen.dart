@@ -3,9 +3,10 @@ import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
-import 'package:buzz/widgets/Student/bus_details_button.dart'; // Importar o botão de detalhes do ônibus
+import 'package:buzz/widgets/Student/bus_details_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:buzz/config/config.dart';
 
 class BusStopInactiveScreen extends StatefulWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
@@ -19,17 +20,18 @@ class BusStopInactiveScreen extends StatefulWidget {
 
 class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
   bool _showBusOverlay = false;
-  bool isLoading = false;  
-  bool isStartingTrip = false;  
+  bool isLoading = false;
+  bool isStartingTrip = false;
   List<Map<String, dynamic>> _busList = [];
 
   Future<void> _fetchAvailableBuses() async {
     setState(() {
-      isLoading = true; 
+      isLoading = true;
     });
 
     try {
-      final response = await http.get(Uri.parse('https://buzzbackend-production.up.railway.app/buses/available'));
+      final response =
+          await http.get(Uri.parse('${Config.backendUrl}/buses/available'));
 
       if (response.statusCode == 200) {
         final data = decodeJsonResponse(response);
@@ -42,11 +44,14 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
     } catch (e) {
       print('Erro ao buscar ônibus: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar ônibus disponíveis')),
+        SnackBar(
+          content: Text('Erro ao carregar ônibus disponíveis'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
-        isLoading = false;  
+        isLoading = false;
       });
     }
   }
@@ -66,18 +71,24 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
     });
 
     try {
-      await widget.startTrip(widget.driverId, busId);  
+      await widget.startTrip(widget.driverId, busId);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Viagem iniciada com sucesso!')),
+        SnackBar(
+          content: Text('Viagem iniciada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao iniciar a viagem')),
+        SnackBar(
+          content: Text('Erro ao iniciar a viagem'),
+          backgroundColor: Colors.red, 
+        ),
       );
     } finally {
       setState(() {
-        isStartingTrip = false;  
-        _toggleBusOverlay();  
+        isStartingTrip = false;
+        _toggleBusOverlay();
       });
     }
   }
@@ -90,14 +101,14 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
 
         final busNumber = bus['registration_number'] ?? 'Número desconhecido';
         final driverName = bus['name'] ?? 'Nome desconhecido';
-        final busId = bus['id'];  
+        final busId = bus['id'];
 
         return Padding(
           padding: EdgeInsets.only(bottom: getHeightProportion(context, 20)),
           child: BusDetailsButton(
             onPressed: () async {
               if (busId != null) {
-                await _startTrip(busId);  
+                await _startTrip(busId);
               } else {
                 print('Erro: busId é nulo');
               }
@@ -125,20 +136,21 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
                   'Nenhuma viagem em andamento.',
                   style: TextStyle(
                     color: Color(0xFF000000).withOpacity(0.70),
-                    fontSize: getHeightProportion(context, 16),  // Proporção ajustada
+                    fontSize:
+                        getHeightProportion(context, 16), 
                   ),
                 ),
               ],
             ),
           ),
           Positioned(
-            bottom: getHeightProportion(context, 20.0),  // Proporção ajustada
+            bottom: getHeightProportion(context, 20.0), 
             left: 0,
             right: 0,
             child: Center(
               child: ButtonThree(
                 buttonText: 'Iniciar Viagem',
-                onPressed: _toggleBusOverlay,  // Exibe o overlay de ônibus
+                onPressed: _toggleBusOverlay, 
                 backgroundColor: Color(0xFF395BC7),
               ),
             ),
@@ -146,13 +158,17 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
           if (_showBusOverlay)
             BuildOverlay(
               title: 'Selecione um Ônibus',
-              content: isLoading 
-                  ? Center(child: CircularProgressIndicator())  // Mostra carregamento se estiver buscando ônibus
-                  : _buildBusList(),  // Exibe a lista de ônibus
-              onCancel: _toggleBusOverlay,  // Fecha o overlay ao cancelar
+              content: isLoading
+                  ? Center(
+                      child:
+                          CircularProgressIndicator())
+                  : _buildBusList(), 
+              onCancel: _toggleBusOverlay, 
             ),
           if (isStartingTrip)
-            Center(child: CircularProgressIndicator()),  // Mostra carregamento enquanto inicia a viagem
+            Center(
+                child:
+                    CircularProgressIndicator()), 
         ],
       ),
     );

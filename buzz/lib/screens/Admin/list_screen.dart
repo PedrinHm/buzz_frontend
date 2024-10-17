@@ -1,4 +1,5 @@
 import 'package:buzz/screens/Admin/form_screen.dart';
+import 'package:buzz/utils/error_handling.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -8,7 +9,7 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
-
+import 'package:buzz/config/config.dart';
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
   if (response.statusCode == 200) {
@@ -34,6 +35,12 @@ class _ListScreenState extends State<ListScreen> {
   List<Map<String, dynamic>> filteredItems = [];
   bool _isLoading = true;
   TextEditingController _searchController = TextEditingController();
+  String _truncateText(String text, {int maxLength = 30}) {
+    return text.length > maxLength
+        ? text.substring(0, maxLength) + '...'
+        : text;
+  }
+
 
   @override
   void initState() {
@@ -48,25 +55,23 @@ class _ListScreenState extends State<ListScreen> {
     super.dispose();
   }
 
-Future<void> _fetchItems() async {
+  Future<void> _fetchItems() async {
     String apiUrl;
     switch (widget.title) {
       case 'Cadastro de Motorista':
-        apiUrl =
-            'https://buzzbackend-production.up.railway.app/users/?user_type_id=2';
+        apiUrl = '${Config.backendUrl}/users/?user_type_id=2';
         break;
       case 'Cadastro de Aluno':
-        apiUrl =
-            'https://buzzbackend-production.up.railway.app/users/?user_type_id=1';
+        apiUrl = '${Config.backendUrl}/users/?user_type_id=1';
         break;
       case 'Cadastro de Pontos de Ônibus':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/';
+        apiUrl = '${Config.backendUrl}/bus_stops/';
         break;
       case 'Cadastro de Ônibus':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/buses/';
+        apiUrl = '${Config.backendUrl}/buses/';
         break;
       case 'Cadastro de Faculdades':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/';
+        apiUrl = '${Config.backendUrl}/faculties/';
         break;
       default:
         setState(() {
@@ -75,27 +80,23 @@ Future<void> _fetchItems() async {
         return;
     }
 
-    // Fetch the items from the main API
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = decodeJsonResponse(response);
 
-      // Fetch the faculties data if the screen is related to bus stops
       if (widget.title == 'Cadastro de Pontos de Ônibus') {
-        final facultiesResponse = await http.get(Uri.parse(
-            'https://buzzbackend-production.up.railway.app/faculties/'));
+        final facultiesResponse =
+            await http.get(Uri.parse('${Config.backendUrl}/faculties/'));
 
         if (facultiesResponse.statusCode == 200) {
           final List<dynamic> facultiesData =
               decodeJsonResponse(facultiesResponse);
 
-          // Create a map of faculty IDs to faculty names for easy lookup
           final Map<int, String> facultyMap = {
             for (var faculty in facultiesData) faculty['id']: faculty['name']
           };
 
-          // Associate each bus stop with its faculty name using the map
           setState(() {
             items = data
                 .where((item) => item['system_deleted'] == 0)
@@ -139,7 +140,6 @@ Future<void> _fetchItems() async {
       });
     }
   }
-
 
   void _filterItems() {
     setState(() {
@@ -209,7 +209,8 @@ Future<void> _fetchItems() async {
           {
             'label': 'Faculdade',
             'keyboardType': TextInputType.number,
-            'controller': TextEditingController()
+            'controller': TextEditingController(),
+            'enabled': true 
           },
         ];
         break;
@@ -230,7 +231,7 @@ Future<void> _fetchItems() async {
       case 'Cadastro de Ônibus':
         fields = [
           {
-            'label': 'Modelo',
+            'label': 'Nome',
             'keyboardType': TextInputType.text,
             'controller': TextEditingController()
           },
@@ -358,7 +359,7 @@ Future<void> _fetchItems() async {
       case 'Cadastro de Ônibus':
         fields = [
           {
-            'label': 'Modelo',
+            'label': 'Nome',
             'keyboardType': TextInputType.text,
             'controller': TextEditingController(text: item['name'] ?? '')
           },
@@ -414,30 +415,25 @@ Future<void> _fetchItems() async {
       builder: (BuildContext context) {
         return CustomPopup(
           message: 'Deseja realmente excluir este item?',
-          confirmText: 'Confirmar',
-          cancelText: 'Cancelar',
+          confirmText: 'Sim',
+          cancelText: 'Não',
           onConfirm: () async {
             String apiUrl;
             switch (widget.title) {
               case 'Cadastro de Motorista':
-                apiUrl =
-                    'https://buzzbackend-production.up.railway.app/users/$id/';
+                apiUrl = '${Config.backendUrl}/users/$id';
                 break;
               case 'Cadastro de Aluno':
-                apiUrl =
-                    'https://buzzbackend-production.up.railway.app/users/$id/';
+                apiUrl = '${Config.backendUrl}/users/$id';
                 break;
               case 'Cadastro de Pontos de Ônibus':
-                apiUrl =
-                    'https://buzzbackend-production.up.railway.app/bus_stops/$id/';
+                apiUrl = '${Config.backendUrl}/bus_stops/$id';
                 break;
               case 'Cadastro de Ônibus':
-                apiUrl =
-                    'https://buzzbackend-production.up.railway.app/buses/$id/';
+                apiUrl = '${Config.backendUrl}/buses/$id';
                 break;
               case 'Cadastro de Faculdades':
-                apiUrl =
-                    'https://buzzbackend-production.up.railway.app/faculties/$id/';
+                apiUrl = '${Config.backendUrl}/faculties/$id';
                 break;
               default:
                 return;
@@ -449,8 +445,7 @@ Future<void> _fetchItems() async {
               _showSnackbar('Registro excluído com sucesso!', Colors.green);
               _fetchItems();
             } else {
-              _showSnackbar(
-                  'Erro ao excluir registro: ${response.body}', Colors.red);
+            showErrorMessage(context, response.body);
             }
 
             Navigator.of(context).pop(); // Fecha o diálogo após a exclusão
@@ -483,18 +478,18 @@ Future<void> _fetchItems() async {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '', // Remove o texto 'Pesquisar'
+                hintText: '', 
                 suffixIcon: Icon(
-                    Icons.search), // Ícone de pesquisa movido para a direita
+                    Icons.search),
                 filled: true,
                 fillColor:
-                    Colors.grey[200], // Cor de fundo da barra de pesquisa
+                    Colors.grey[200], 
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
                 border: OutlineInputBorder(
                   borderRadius:
-                      BorderRadius.circular(30.0), // Borda arredondada
-                  borderSide: BorderSide.none, // Remove a borda padrão
+                      BorderRadius.circular(30.0), 
+                  borderSide: BorderSide.none, 
                 ),
               ),
             ),
@@ -519,8 +514,8 @@ Future<void> _fetchItems() async {
                       }
                       return Center(
                         child: ListItem(
-                          primaryText: item['name'] ?? '',
-                          secondaryText: secondaryText,
+                          primaryText: _truncateText(item['name'] ?? ''),
+                          secondaryText: _truncateText(secondaryText),
                           onEdit: () => _navigateToEditForm(context, item),
                           onDelete: () => _deleteItem(item['id']),
                           index: index,

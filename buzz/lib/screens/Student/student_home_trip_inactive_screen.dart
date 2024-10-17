@@ -10,6 +10,7 @@ import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Student/bus_details_button.dart';
 import 'package:provider/provider.dart';
+import 'package:buzz/config/config.dart';
 
 class StudentHomeTripInactiveScreen extends StatefulWidget {
   final int studentId;
@@ -39,12 +40,12 @@ class _StudentHomeTripInactiveScreenState
     });
 
     try {
-      final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/buses/trips/active_trips'));
+      final response =
+          await http.get(Uri.parse('${Config.backendUrl}/buses/active_trips/'));
 
       if (response.statusCode == 200) {
         List<dynamic> data =
-            decodeJsonResponse(response); // Usando a função utf8
+            decodeJsonResponse(response); 
 
         setState(() {
           _busList = data
@@ -66,7 +67,9 @@ class _StudentHomeTripInactiveScreenState
     } catch (e) {
       print('Error fetching active buses: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao buscar viagens ativas')),
+        SnackBar(content: Text('Erro ao buscar viagens ativas'),
+         backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
@@ -82,7 +85,7 @@ class _StudentHomeTripInactiveScreenState
 
     try {
       final response = await http.get(Uri.parse(
-          'https://buzzbackend-production.up.railway.app/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=$tripId'));
+          '${Config.backendUrl}/bus_stops/action/trip?student_id=${widget.studentId}&trip_id=$tripId'));
 
       if (response.statusCode == 200) {
         List<dynamic> data =
@@ -103,7 +106,9 @@ class _StudentHomeTripInactiveScreenState
     } catch (e) {
       print('Error fetching bus stops: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao buscar pontos de ônibus')),
+        SnackBar(content: Text('Erro ao buscar pontos de ônibus'),
+         backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
@@ -117,7 +122,7 @@ class _StudentHomeTripInactiveScreenState
       isCreatingTrip = true;
     });
 
-    final url = 'https://buzzbackend-production.up.railway.app/student_trips/';
+    final url = '${Config.backendUrl}/student_trips/';
 
     final body = json.encode({
       'trip_id': tripId,
@@ -159,13 +164,17 @@ class _StudentHomeTripInactiveScreenState
       } else {
         print('Erro ao criar viagem: ${response.reasonPhrase}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar viagem do estudante')),
+          SnackBar(content: Text('Erro ao criar viagem do estudante'),
+           backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
       print('Erro ao criar viagem: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao criar viagem do estudante')),
+        SnackBar(content: Text('Erro ao criar viagem do estudante'),
+         backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
@@ -180,8 +189,7 @@ class _StudentHomeTripInactiveScreenState
       isCreatingTrip = true;
     });
 
-    final url =
-        'https://buzzbackend-production.up.railway.app/student_trips/?waitlist=true';
+    final url = '${Config.backendUrl}/student_trips/?waitlist=true';
     final body = json.encode({
       'trip_id': tripId,
       'student_id': widget.studentId,
@@ -198,18 +206,23 @@ class _StudentHomeTripInactiveScreenState
       if (response.statusCode == 200) {
         await _waitForStudentTripId(widget.studentId, tripId);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Você entrou na fila de espera com sucesso!')),
+          SnackBar(content: Text('Você entrou na fila de espera com sucesso!'),
+           backgroundColor: Colors.green,
+          ),
         );
       } else {
         print('Erro ao entrar na fila de espera: ${response.reasonPhrase}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao entrar na fila de espera')),
+          SnackBar(content: Text('Erro ao entrar na fila de espera'),
+           backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
       print('Erro ao entrar na fila de espera: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao entrar na fila de espera')),
+        SnackBar(content: Text('Erro ao entrar na fila de espera'),
+         backgroundColor: Colors.red,),
       );
     } finally {
       setState(() {
@@ -225,8 +238,8 @@ class _StudentHomeTripInactiveScreenState
 
     while (retryCount < maxRetries) {
       try {
-        final response = await http.get(Uri.parse(
-            'https://buzzbackend-production.up.railway.app/student_trips/active/$studentId'));
+        final response = await http.get(
+            Uri.parse('${Config.backendUrl}/student_trips/active/$studentId'));
 
         if (response.statusCode == 200) {
           final tripData = decodeJsonResponse(response);
@@ -238,7 +251,9 @@ class _StudentHomeTripInactiveScreenState
             tripController.startStudentTrip(studentTripId, tripId);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content: Text('Viagem do estudante criada com sucesso!')),
+                  content: Text('Viagem do estudante criada com sucesso!'),
+                   backgroundColor: Colors.green,
+              ),
             );
             return;
           }

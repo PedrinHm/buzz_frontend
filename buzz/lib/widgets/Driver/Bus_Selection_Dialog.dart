@@ -67,7 +67,9 @@ class BusSelectionDialog extends StatelessWidget {
                               } else {
                                 print('Erro: ID do ônibus é nulo');
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Erro ao selecionar o ônibus: ID inválido.')),
+                                  SnackBar(content: Text('Erro ao selecionar o ônibus: ID inválido.'),
+                                   backgroundColor: Colors.red,
+                                  ),
                                 );
                               }
                             },

@@ -1,6 +1,7 @@
 import 'package:buzz/controllers/trip_controller.dart';
 import 'package:buzz/screens/Driver/bus_stop_inactive_screen.dart';
 import 'package:buzz/screens/Driver/student_bus_stop_active_screen.dart';
+import 'package:buzz/services/decodeJsonResponse.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,8 +11,8 @@ import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
-import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
-
+import 'package:buzz/utils/size_config.dart';
+import 'package:buzz/config/config.dart';
 class BusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
@@ -54,8 +55,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       _isProcessing = true;
     });
 
-    var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trips/${_tripId ?? ''}/cancel');
+    var url = Uri.parse('${Config.backendUrl}/trips/${_tripId ?? ''}/cancel');
 
     try {
       var response = await http.delete(url);
@@ -117,8 +117,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       _isProcessing = true;
     });
 
-    var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trips/$_tripId/report_bus_issue');
+    var url = Uri.parse('${Config.backendUrl}/trips/$_tripId/report_bus_issue');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {
@@ -130,6 +129,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
               Text('Erro ao reportar problema no ônibus: ${response.body}'),
+              backgroundColor: Colors.redAccent,
         ));
       }
     } catch (e) {
@@ -142,8 +142,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   }
 
   Future<List<Map<String, String>>> fetchBusStops() async {
-    var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trips/$_tripId/bus_stops');
+    var url = Uri.parse('${Config.backendUrl}/trips/$_tripId/bus_stops');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var data = decodeJsonResponse(response);
@@ -170,7 +169,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
 
   Future<List<Map<String, String>>> fetchStopsOnTheWay() async {
     var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trip_bus_stops/pontos_a_caminho/$_tripId');
+        '${Config.backendUrl}/trip_bus_stops/stops_on_the_way/$_tripId');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       List<dynamic> data = decodeJsonResponse(response);
@@ -226,11 +225,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     String endpoint;
 
     if (action == 'Encerrar viagem de ida') {
-      endpoint = 'trip_bus_stops/finalizar_ponto_atual/$_tripId';
+      endpoint = 'trip_bus_stops/finalize_current_stop/$_tripId';
     } else if (action == 'Encerrar viagem de volta') {
-      endpoint = 'trips/${_tripId ?? ''}/finalizar_volta';
+      endpoint = 'trips/${_tripId ?? ''}/finalize_return_trip';
     } else if (action == 'Finalizar viagem') {
-      endpoint = 'trips/${_tripId ?? ''}/finalizar_ida';
+      endpoint = 'trips/${_tripId ?? ''}/finalize_outbound_trip';
     } else {
       setState(() {
         _isProcessing = false;
@@ -238,8 +237,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       return;
     }
 
-    var url =
-        Uri.parse('https://buzzbackend-production.up.railway.app/$endpoint');
+    var url = Uri.parse('${Config.backendUrl}/$endpoint');
 
     try {
       var response = await http.put(url);
@@ -302,7 +300,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
 
     var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trip_bus_stops/selecionar_proximo_ponto/$_tripId?new_stop_id=$stopId');
+        '${Config.backendUrl}/trip_bus_stops/select_next_stop/$_tripId?new_stop_id=$stopId');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {
@@ -315,6 +313,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Erro ao definir o próximo ponto: ${response.body}'),
+          backgroundColor: Colors.redAccent,
         ));
       }
     } catch (e) {
@@ -334,7 +333,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     });
 
     var url = Uri.parse(
-        'https://buzzbackend-production.up.railway.app/trip_bus_stops/atualizar_proximo_para_no_ponto/$_tripId');
+        '${Config.backendUrl}/trip_bus_stops/update_next_bus_stop/$_tripId');
     try {
       var response = await http.put(url);
       if (response.statusCode == 200) {
@@ -348,6 +347,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
               Text('Erro ao atualizar o status do ponto: ${response.body}'),
+              backgroundColor: Colors.redAccent,
         ));
       }
     } catch (e) {

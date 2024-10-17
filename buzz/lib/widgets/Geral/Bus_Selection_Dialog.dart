@@ -93,7 +93,9 @@ class BusSelectionDialog extends StatelessWidget {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content: Text(
-                                          'Erro ao selecionar o ônibus: dados inválidos.')),
+                                          'Erro ao selecionar o ônibus: dados inválidos.'),
+                                           backgroundColor: Colors.red,
+                                  ),
                                 );
                               }
                             },

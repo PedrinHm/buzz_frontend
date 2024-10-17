@@ -2,7 +2,7 @@ import 'package:buzz/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:buzz/config/config.dart';
 // Widgets
 import 'package:buzz/widgets/Geral/Bus_Stop_Trip.dart';
 import 'package:buzz/widgets/Geral/Title.dart';
@@ -13,7 +13,8 @@ dynamic decodeJsonResponse(http.Response response) {
     String responseBody = utf8.decode(response.bodyBytes);
     return json.decode(responseBody);
   } else {
-    throw Exception('Failed to parse JSON, status code: ${response.statusCode}');
+    throw Exception(
+        'Failed to parse JSON, status code: ${response.statusCode}');
   }
 }
 
@@ -23,7 +24,8 @@ class StudentTripActiveScreen extends StatefulWidget {
   StudentTripActiveScreen({required this.tripId});
 
   @override
-  _StudentTripActiveScreenState createState() => _StudentTripActiveScreenState();
+  _StudentTripActiveScreenState createState() =>
+      _StudentTripActiveScreenState();
 }
 
 class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
@@ -38,7 +40,7 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
   }
 
   Future<void> fetchBusStops() async {
-    final String url = 'https://buzzbackend-production.up.railway.app/trips/${widget.tripId}/bus_stops';
+    final String url = '${Config.backendUrl}/trips/${widget.tripId}/bus_stops';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -47,19 +49,19 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
         var data = decodeJsonResponse(response);
 
         setState(() {
-          _busIssue = data['bus_issue'] ?? false; // Verifica o estado do problema
-          busStops = (data['bus_stops'] as List<dynamic>)
-              .map((item) {
-                // Verifica se o status é "Já passou" e mantém o status original
-                String status = item['status'] as String;
-                if (_busIssue && status != 'Já passou') {
-                  status = 'Ônibus com problema';
-                }
-                return {
-                  'name': item['name'] as String,
-                  'status': status,
-                };
-              }).toList();
+          _busIssue =
+              data['bus_issue'] ?? false; // Verifica o estado do problema
+          busStops = (data['bus_stops'] as List<dynamic>).map((item) {
+            // Verifica se o status é "Já passou" e mantém o status original
+            String status = item['status'] as String;
+            if (_busIssue && status != 'Já passou') {
+              status = 'Ônibus com problema';
+            }
+            return {
+              'name': item['name'] as String,
+              'status': status,
+            };
+          }).toList();
           isLoading = false;
         });
       } else {
@@ -79,7 +81,9 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
           ? 'Ônibus com problema'
           : data['status']!;
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: getHeightProportion(context, 5.0)), // Proporção para o espaçamento vertical
+        padding: EdgeInsets.symmetric(
+            vertical: getHeightProportion(
+                context, 5.0)), // Proporção para o espaçamento vertical
         child: TripBusStop(
           onPressed: () {
             // Adicione a ação a ser executada ao pressionar
@@ -99,9 +103,13 @@ class _StudentTripActiveScreenState extends State<StudentTripActiveScreen> {
             ? CircularProgressIndicator() // Exibe o loading enquanto os dados são carregados
             : Column(
                 children: [
-                  SizedBox(height: getHeightProportion(context, 40)), // Proporção para o espaçamento vertical
+                  SizedBox(
+                      height: getHeightProportion(context,
+                          40)), // Proporção para o espaçamento vertical
                   CustomTitleWidget(title: 'Viagem atual'),
-                  SizedBox(height: getHeightProportion(context, 10)), // Proporção para o espaçamento vertical
+                  SizedBox(
+                      height: getHeightProportion(context,
+                          10)), // Proporção para o espaçamento vertical
                   Expanded(
                     child: ListView(
                       children: _generateTripBusStopWidgets(),

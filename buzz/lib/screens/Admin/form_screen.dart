@@ -1,3 +1,4 @@
+import 'package:buzz/utils/error_handling.dart';
 import 'package:buzz/widgets/Admin/Nav_Bar_Admin.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz/widgets/Geral/Button_Three.dart';
@@ -7,6 +8,7 @@ import 'package:buzz/widgets/Geral/CustomDropdownField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
+import 'package:buzz/config/config.dart';
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -69,8 +71,8 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _fetchFaculties() async {
-    final response = await http.get(
-        Uri.parse('https://buzzbackend-production.up.railway.app/faculties/'));
+    final response =
+        await http.get(Uri.parse('${Config.backendUrl}/faculties/'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -93,7 +95,7 @@ class _FormScreenState extends State<FormScreen> {
 
     switch (widget.title) {
       case 'Cadastro de Motorista':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
+        apiUrl = '${Config.backendUrl}/users/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}';
         }
@@ -107,22 +109,32 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Aluno':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/users/';
+        apiUrl = '${Config.backendUrl}/users/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}';
         }
+
+        if (selectedFacultyId == null) {
+          showSnackbar(context, 'Selecione uma faculdade.', Colors.red);
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+
         body = {
           'name': widget.fields[0]['controller'].text,
           'email': widget.fields[1]['controller'].text,
           'cpf': widget.fields[2]['controller'].text,
           'phone': widget.fields[3]['controller'].text,
-          'faculty_id': selectedFacultyId, // Removido o campo 'course'
+          'faculty_id': selectedFacultyId,
           'user_type_id': 1,
           'password': widget.fields[2]['controller'].text,
         };
         break;
+
       case 'Cadastro de Pontos de Ônibus':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/bus_stops/';
+        apiUrl = '${Config.backendUrl}/bus_stops/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -132,7 +144,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Ônibus':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/buses/';
+        apiUrl = '${Config.backendUrl}/buses/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -143,7 +155,7 @@ class _FormScreenState extends State<FormScreen> {
         };
         break;
       case 'Cadastro de Faculdades':
-        apiUrl = 'https://buzzbackend-production.up.railway.app/faculties/';
+        apiUrl = '${Config.backendUrl}/faculties/';
         if (widget.isEdit) {
           apiUrl += '${widget.id}/';
         }
@@ -175,16 +187,15 @@ class _FormScreenState extends State<FormScreen> {
     });
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      _showSnackbar(
+      showSnackbar(
+          context,
           widget.isEdit
               ? 'Cadastro atualizado com sucesso!'
               : 'Cadastro realizado com sucesso!',
           Colors.green);
-      Navigator.pop(context,
-          true); // Retorna true para indicar que o cadastro foi bem-sucedido
+      Navigator.pop(context, true);
     } else {
-      _showSnackbar(
-          'Erro ao realizar o cadastro: ${response.body}', Colors.red);
+      showErrorMessage(context, response.body);
     }
   }
 

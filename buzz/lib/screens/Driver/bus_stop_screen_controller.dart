@@ -38,6 +38,7 @@ class _BusStopScreenControllerState extends State<BusStopScreenController> {
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text("Erro ao finalizar a viagem: $e"),
+                  backgroundColor: Colors.redAccent,
                 ));
               }
             },

@@ -5,6 +5,7 @@ import 'package:buzz/widgets/Geral/Input_Field.dart'; // Importando CustomInputF
 import 'package:buzz/widgets/Geral/Button_One.dart'; // Importando Button_One
 import 'package:buzz/utils/size_config.dart'; // Importando o SizeConfig
 import 'package:buzz/screens/Auth/login_screen.dart'; // Importando a tela de login
+import 'package:buzz/config/config.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final int userId;
@@ -44,8 +45,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse(
-            'https://buzzbackend-production.up.railway.app/auth/set-new-password'),
+        Uri.parse('${Config.backendUrl}/auth/set-new-password'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

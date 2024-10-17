@@ -3,7 +3,7 @@ import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:buzz/config/config.dart';
 // Widgets
 import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
@@ -15,8 +15,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   Future<void> _sendResetPasswordRequest(BuildContext context) async {
     final cpf = cpfController.text;
-    final url =
-        'https://buzzbackend-production.up.railway.app/auth/forgot-password'; // URL da API
+    final url = '${Config.backendUrl}/auth/forgot-password'; // URL da API
 
     try {
       final response = await http.post(

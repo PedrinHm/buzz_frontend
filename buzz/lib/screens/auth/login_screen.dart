@@ -11,7 +11,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:buzz/utils/size_config.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import 'package:buzz/config/config.dart';
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final String password = passwordController.text;
 
       final response = await http.post(
-        Uri.parse('https://buzzbackend-production.up.railway.app/auth/'),
+        Uri.parse('${Config.backendUrl}/auth/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -59,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final int userId = responseBody['id'];
 
       if (status == 'first_login') {
-        // Redireciona para a tela de redefinição de senha
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -209,8 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _atualizarDeviceToken(int userId, String deviceToken) async {
-    const url =
-        'https://buzzbackend-production.up.railway.app/auth/update-device-token';
+    const url = '${Config.backendUrl}/auth/update-device-token';
     final response = await http.put(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json; charset=UTF-8'},

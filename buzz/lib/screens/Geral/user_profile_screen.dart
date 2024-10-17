@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
+import 'package:buzz/utils/size_config.dart'; 
+import 'package:buzz/config/config.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final int userId;
@@ -28,8 +29,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<Usuario> _fetchUser(int userId) async {
-    final response = await http.get(Uri.parse(
-        'https://buzzbackend-production.up.railway.app/users/$userId'));
+    final response =
+        await http.get(Uri.parse('${Config.backendUrl}/users/$userId'));
 
     if (response.statusCode == 200) {
       return Usuario.fromJson(decodeJsonResponse(response));
@@ -60,7 +61,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       try {
         final response = await http.put(
           Uri.parse(
-              'https://buzzbackend-production.up.railway.app/users/${widget.userId}/profile-picture'),
+              '${Config.backendUrl}/users/${widget.userId}/profile-picture'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'picture': _base64Image}),
         );
@@ -124,7 +125,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       final response = await http.delete(
         Uri.parse(
-            'https://buzzbackend-production.up.railway.app/users/${widget.userId}/profile-picture'),
+            '${Config.backendUrl}/users/${widget.userId}/profile-picture'),
       );
 
       if (response.statusCode == 200) {
