@@ -220,35 +220,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: GestureDetector(
                   onTap: _pickImage,
                   child: Container(
+                    width: getHeightProportion(context, 175),
+                    height: getHeightProportion(context, 175),
                     decoration: BoxDecoration(
+                      color: user.profilePicture == null ? Colors.grey[300] : null,
                       border: Border.all(
-                          color: Colors.white,
-                          width: getHeightProportion(
-                              context, 1)), // Proporção ajustada
-                      borderRadius: BorderRadius.circular(getHeightProportion(
-                          context, 10)), // Proporção ajustada
+                        color: Colors.white,
+                        width: getHeightProportion(context, 1),
+                      ),
+                      borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(getHeightProportion(
-                          context, 10)), // Proporção ajustada
-                      child: user.profilePicture != null
-                          ? Image.memory(
-                              base64Decode(user.profilePicture!),
-                              width: getHeightProportion(
-                                  context, 175), // Proporção ajustada
-                              height: getHeightProportion(
-                                  context, 175), // Proporção ajustada
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              'assets/images/default_profile.jpeg',
-                              width: getHeightProportion(
-                                  context, 175), // Proporção ajustada
-                              height: getHeightProportion(
-                                  context, 175), // Proporção ajustada
-                              fit: BoxFit.cover,
+                    child: user.profilePicture != null
+                        ? Image.memory(
+                            base64Decode(user.profilePicture!),
+                            fit: BoxFit.cover,
+                          )
+                        : Center(
+                            child: Text(
+                              user.name != null && user.name!.isNotEmpty
+                                  ? user.name![0].toUpperCase()
+                                  : '?',
+                              style: TextStyle(
+                                fontSize: getHeightProportion(context, 60),
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                    ),
+                          ),
                   ),
                 ),
               ),

@@ -164,6 +164,7 @@ class _StudentBusStopActiveScreenState
                 studentStatus: student['status'] ?? 'N/A',
                 profilePictureBase64: student['profilePictureBase64'] ?? '',
                 busStopName: stop['name']!,
+                firstLetter: (student['name'] ?? '?')[0].toUpperCase(),
               ),
             );
           }).toList(),

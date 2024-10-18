@@ -7,12 +7,14 @@ class StudentStatus extends StatelessWidget {
   final String studentStatus;
   final String profilePictureBase64;
   final String busStopName;
+  final String firstLetter;
 
   StudentStatus({
     required this.studentName,
     required this.studentStatus,
     required this.profilePictureBase64,
     required this.busStopName,
+    required this.firstLetter,
   });
 
   Color _getColorFromStatus(String status) {
@@ -32,32 +34,6 @@ class StudentStatus extends StatelessWidget {
     }
   }
 
-  Widget _buildUserProfileImage(
-      String profilePictureBase64, BuildContext context) {
-    if (profilePictureBase64.isNotEmpty) {
-      try {
-        // Tenta decodificar a imagem de base64
-        final decodedBytes = base64Decode(profilePictureBase64);
-        return CircleAvatar(
-          radius: getWidthProportion(context, 25), // Aplicando proporção
-          backgroundImage: MemoryImage(decodedBytes),
-        );
-      } catch (e) {
-        // Caso haja um erro na decodificação, usa a imagem padrão
-        return CircleAvatar(
-          radius: getWidthProportion(context, 25), // Aplicando proporção
-          backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
-        );
-      }
-    } else {
-      // Usa a imagem padrão se o caminho da imagem estiver vazio
-      return CircleAvatar(
-        radius: getWidthProportion(context, 25), // Aplicando proporção
-        backgroundImage: AssetImage('assets/images/default_profile.jpeg'),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -73,8 +49,24 @@ class StudentStatus extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildUserProfileImage(profilePictureBase64,
-              context), // Passando o context para a função
+          if (profilePictureBase64.isNotEmpty)
+            CircleAvatar(
+              radius: getHeightProportion(context, 20),
+              backgroundImage: MemoryImage(base64Decode(profilePictureBase64)),
+            )
+          else
+            CircleAvatar(
+              radius: getHeightProportion(context, 20),
+              backgroundColor: Colors.grey[300],
+              child: Text(
+                firstLetter,
+                style: TextStyle(
+                  fontSize: getHeightProportion(context, 16),
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           SizedBox(
               width: getWidthProportion(context, 10)), // Proporção em largura
           Column(
