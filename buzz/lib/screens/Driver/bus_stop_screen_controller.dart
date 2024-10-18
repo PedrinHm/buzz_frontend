@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/trip_controller.dart';
 import 'bus_stop_active_screen.dart';
+import 'package:buzz/utils/error_handling.dart';
 
 class BusStopScreenController extends StatefulWidget {
   final int driverId;
@@ -36,10 +37,7 @@ class _BusStopScreenControllerState extends State<BusStopScreenController> {
                   });
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Erro ao finalizar a viagem: $e"),
-                  backgroundColor: Colors.redAccent,
-                ));
+                showErrorMessage(context, e.toString());
               }
             },
             tripId: tripController.activeTripId ?? 0,

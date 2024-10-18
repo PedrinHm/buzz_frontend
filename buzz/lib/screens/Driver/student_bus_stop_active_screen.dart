@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/utils/size_config.dart'; // Importar funções de tamanho
 import 'package:buzz/config/config.dart';
+import 'package:buzz/utils/error_handling.dart';
 
 import '../../services/decodeJsonResponse.dart';
 
@@ -47,8 +48,8 @@ class _StudentBusStopActiveScreenState
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(
-                  child: Text('Erro ao carregar dados: ${snapshot.error}'));
+              showErrorMessage(context, json.encode({'detail': [{'msg': 'Erro ao carregar dados: ${snapshot.error}'}]}));
+              return Center(child: Text('Erro ao carregar dados. Puxe para atualizar.'));
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
@@ -216,11 +217,8 @@ Future<Map<String, dynamic>> fetchData(int tripId) async {
       'bus_issue': busStopsResult['bus_issue'],
     };
   } catch (e) {
-    return {
-      'students': [],
-      'busStops': [],
-      'bus_issue': false,
-    };
+    print("Erro ao buscar dados: $e");
+    throw Exception(json.encode({'detail': [{'msg': 'Falha ao carregar dados da viagem'}]}));
   }
 }
 
@@ -243,9 +241,8 @@ Future<List<Map<String, String>>> fetchStudents(int tripId) async {
     print("Nenhum dado encontrado para o tripId: $tripId");
     return [];
   } else {
-    print(
-        "Erro ao carregar os detalhes da viagem dos estudantes, status code: ${response.statusCode}");
-    throw Exception('Failed to load student trip details');
+    print("Erro ao carregar os detalhes da viagem dos estudantes, status code: ${response.statusCode}");
+    throw Exception(json.encode({'detail': [{'msg': 'Falha ao carregar detalhes da viagem dos estudantes'}]}));
   }
 }
 
@@ -258,8 +255,7 @@ Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
 
     bool busIssue = data['bus_issue'] ?? false;
 
-    List<Map<String, String>> busStops =
-        (data['bus_stops'] as List).map((item) {
+    List<Map<String, String>> busStops = (data['bus_stops'] as List).map((item) {
       String status = item['status'] as String? ?? 'N/A';
       if (busIssue && status != 'Já passou') {
         status = 'Ônibus com problema';
@@ -280,6 +276,6 @@ Future<Map<String, dynamic>> fetchBusStops(int tripId) async {
       'busStops': [],
     };
   } else {
-    throw Exception('Failed to load bus stop details');
+    throw Exception(json.encode({'detail': [{'msg': 'Falha ao carregar detalhes dos pontos de ônibus'}]}));
   }
 }

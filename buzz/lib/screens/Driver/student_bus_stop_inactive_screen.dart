@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/widgets/Geral/buildOverlay.dart';
 import 'package:buzz/config/config.dart';
+import 'package:buzz/utils/error_handling.dart';
+import 'dart:convert';
 
 class StudentBusStopInactiveScreen extends StatelessWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
@@ -33,7 +35,13 @@ class StudentBusStopInactiveScreen extends StatelessWidget {
     );
 
     if (busId != null) {
-      await startTrip(driverId, busId);
+      try {
+        await startTrip(driverId, busId);
+      } catch (e) {
+        showErrorMessage(context, json.encode({
+          'detail': [{'msg': 'Erro ao iniciar a viagem: ${e.toString()}'}]
+        }));
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:buzz/widgets/Student/bus_details_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/config/config.dart';
+import 'package:buzz/utils/error_handling.dart';
 
 class BusStopInactiveScreen extends StatefulWidget {
   final Future<void> Function(int driverId, int busId) startTrip;
@@ -43,12 +44,7 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
       }
     } catch (e) {
       print('Erro ao buscar ônibus: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao carregar ônibus disponíveis'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         isLoading = false;
@@ -72,19 +68,9 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
 
     try {
       await widget.startTrip(widget.driverId, busId);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Viagem iniciada com sucesso!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      showSnackbar(context, 'Viagem iniciada com sucesso!', Colors.green);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao iniciar a viagem'),
-          backgroundColor: Colors.red, 
-        ),
-      );
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         isStartingTrip = false;

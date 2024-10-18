@@ -6,6 +6,7 @@ import 'package:buzz/widgets/Geral/Button_One.dart'; // Importando Button_One
 import 'package:buzz/utils/size_config.dart'; // Importando o SizeConfig
 import 'package:buzz/screens/Auth/login_screen.dart'; // Importando a tela de login
 import 'package:buzz/config/config.dart';
+import 'package:buzz/utils/error_handling.dart'; // Adicione esta importação
 
 class ResetPasswordScreen extends StatefulWidget {
   final int userId;
@@ -70,25 +71,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       } else {
-        // Exibir o Snackbar vermelho em caso de erro
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao redefinir a senha'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Substituir o Snackbar vermelho pela função showErrorMessage
+        showErrorMessage(context, response.body);
         setState(() {
           _errorMessage = 'Erro ao redefinir a senha';
         });
       }
     } catch (e) {
-      // Exibir o Snackbar vermelho em caso de exceção
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro durante a redefinição de senha'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Substituir o Snackbar vermelho pela função showErrorMessage
+      showErrorMessage(context, 'Erro durante a redefinição de senha');
       setState(() {
         _errorMessage = 'Erro durante a redefinição de senha';
       });

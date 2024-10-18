@@ -13,6 +13,8 @@ import 'package:buzz/widgets/Geral/Title.dart';
 import 'package:buzz/widgets/Geral/Custom_Pop_up.dart';
 import 'package:buzz/utils/size_config.dart';
 import 'package:buzz/config/config.dart';
+import 'package:buzz/utils/error_handling.dart';
+
 class BusStopActiveScreen extends StatefulWidget {
   final VoidCallback endTrip;
   final int tripId;
@@ -34,18 +36,33 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   List<Map<String, String>> tripBusStops = [];
   bool _isProcessing = false;
   bool _busIssue = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _tripId = widget.tripId;
     _isReturnTrip = widget.isReturnTrip;
-    fetchBusStops().then((data) {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final data = await fetchBusStops();
       setState(() {
         tripBusStops = data;
         tripBusStops.sort(_compareBusStopStatus);
+        _isLoading = false;
       });
-    });
+    } catch (e) {
+      print('Erro ao carregar dados: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _cancelTrip() async {
@@ -77,10 +94,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       }
     } catch (e) {
       print("Erro ao cancelar a viagem: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Erro ao cancelar a viagem: $e'),
-        backgroundColor: Colors.redAccent,
-      ));
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         _isProcessing = false;
@@ -126,14 +140,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           _busIssue = data['bus_issue'];
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text('Erro ao reportar problema no ônibus: ${response.body}'),
-              backgroundColor: Colors.redAccent,
-        ));
+        showErrorMessage(context, response.body);
       }
     } catch (e) {
       print('Erro ao reportar problema no ônibus: $e');
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         _isProcessing = false;
@@ -281,10 +292,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
       }
     } catch (e) {
       print("Erro durante a finalização da viagem: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Erro ao finalizar a viagem: $e'),
-        backgroundColor: Colors.redAccent,
-      ));
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         _isProcessing = false;
@@ -311,13 +319,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           });
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Erro ao definir o próximo ponto: ${response.body}'),
-          backgroundColor: Colors.redAccent,
-        ));
+        showErrorMessage(context, response.body);
       }
     } catch (e) {
       print('Erro ao definir o próximo ponto: $e');
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         _isProcessing = false;
@@ -344,14 +350,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
           });
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text('Erro ao atualizar o status do ponto: ${response.body}'),
-              backgroundColor: Colors.redAccent,
-        ));
+        showErrorMessage(context, response.body);
       }
     } catch (e) {
       print('Erro ao atualizar o status: $e');
+      showErrorMessage(context, e.toString());
     } finally {
       setState(() {
         _isProcessing = false;
@@ -466,71 +469,72 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 40)), // Proporção ajustada
-              CustomTitleWidget(title: 'Pontos de Ônibus'),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              Expanded(
-                child: tripBusStops.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Nenhum ponto de ônibus encontrado.',
-                          style: TextStyle(
-                            color: Color(0xFF000000).withOpacity(0.70),
-                            fontSize: getHeightProportion(
-                                context, 16), // Proporção ajustada
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: tripBusStops.length,
-                        itemBuilder: (context, index) {
-                          final stop = tripBusStops[index];
-                          final status =
-                              _busIssue && stop['status'] != 'Já passou'
-                                  ? 'Ônibus com problema'
-                                  : stop['status']!;
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: getHeightProportion(
-                                    context, 10.0)), // Proporção ajustada
-                            child: TripBusStop(
-                              onPressed: () {
-                                // Ação para cada ponto de ônibus
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                Column(
+                  children: [
+                    SizedBox(
+                        height:
+                            getHeightProportion(context, 40)), // Proporção ajustada
+                    CustomTitleWidget(title: 'Pontos de Ônibus'),
+                    SizedBox(
+                        height:
+                            getHeightProportion(context, 20)), // Proporção ajustada
+                    Expanded(
+                      child: tripBusStops.isEmpty
+                          ? Center(
+                              child: Text(
+                                'Nenhum ponto de ônibus encontrado.',
+                                style: TextStyle(
+                                  color: Color(0xFF000000).withOpacity(0.70),
+                                  fontSize: getHeightProportion(
+                                      context, 16), // Proporção ajustada
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: tripBusStops.length,
+                              itemBuilder: (context, index) {
+                                final stop = tripBusStops[index];
+                                final status =
+                                    _busIssue && stop['status'] != 'Já passou'
+                                        ? 'Ônibus com problema'
+                                        : stop['status']!;
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: getHeightProportion(
+                                          context, 10.0)), // Proporção ajustada
+                                  child: TripBusStop(
+                                    onPressed: () {
+                                      // Ação para cada ponto de ônibus
+                                    },
+                                    busStopName: stop['name']!,
+                                    busStopStatus: status,
+                                  ),
+                                );
                               },
-                              busStopName: stop['name']!,
-                              busStopStatus: status,
                             ),
-                          );
-                        },
-                      ),
-              ),
-              if (_isReturnTrip)
-                _buildReturnTripButtons()
-              else
-                _buildDepartureTripButtons(),
-            ],
-          ),
-          // Exibir o fundo com a cor do tema e o indicador de carregamento quando uma requisição estiver em andamento
-          if (_isProcessing)
-            Positioned.fill(
-              child: Container(
-                color: Theme.of(context)
-                    .scaffoldBackgroundColor, // Cor do fundo do tema
-                child: Center(
-                  child: CircularProgressIndicator(),
+                    ),
+                    if (_isReturnTrip)
+                      _buildReturnTripButtons()
+                    else
+                      _buildDepartureTripButtons(),
+                  ],
                 ),
-              ),
+                if (_isProcessing)
+                  Positioned.fill(
+                    child: Container(
+                      color: Theme.of(context)
+                          .scaffoldBackgroundColor, // Cor do fundo do tema
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
     );
   }
 

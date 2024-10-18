@@ -32,7 +32,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             message:
                 'Um e-mail foi enviado com instruções para redefinir sua senha.',
             confirmText: 'OK',
-            cancelText: 'Cancelar',
+            cancelText: 'sair',
             onConfirm: () {
               Navigator.of(context).pop();
               Navigator.pushReplacement(
@@ -52,7 +52,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           builder: (context) => CustomPopup(
             message: 'Falha ao enviar o e-mail de redefinição de senha.',
             confirmText: 'Ok',
-            cancelText: 'Cancelar',
+            cancelText: 'sair',
             onConfirm: () {
               Navigator.of(context).pop();
             },
@@ -70,7 +70,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           message:
               'Ocorreu um erro ao enviar o pedido de redefinição de senha. Tente novamente mais tarde.',
           confirmText: 'OK',
-          cancelText: 'Cancelar',
+          cancelText: 'sair',
           onConfirm: () {
             Navigator.of(context).pop();
           },
