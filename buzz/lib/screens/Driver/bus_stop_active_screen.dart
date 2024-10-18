@@ -544,8 +544,7 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
     if (tripBusStops.any((stop) => stop['status'] == 'Próximo ponto')) {
       buttonText = 'Estou no ponto';
     } else if (_isFinalStop()) {
-      buttonText =
-          _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
+      buttonText = _isReturnTrip ? 'Encerrar viagem de volta' : 'Encerrar viagem de ida';
     }
 
     return Column(
@@ -602,18 +601,16 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
               ],
             ),
           ),
-        if (_allStopsPassed() &&
-            tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
+        if (_allStopsPassed() && tripBusStops.isNotEmpty) // Mostrar o botão de encerrar viagem
           Padding(
-            padding: EdgeInsets.all(
-                getHeightProportion(context, 8.0)), // Proporção ajustada
+            padding: EdgeInsets.all(getHeightProportion(context, 8.0)),
             child: Center(
               child: ButtonThree(
                 buttonText: 'Finalizar viagem',
                 backgroundColor: Colors.red,
                 onPressed: _isProcessing
                     ? () {}
-                    : () => _finalizeTrip('Finalizar viagem'),
+                    : () => _finalizeTrip(_isReturnTrip ? 'Encerrar viagem de volta' : 'Finalizar viagem'),
               ),
             ),
           ),
