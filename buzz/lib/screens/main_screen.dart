@@ -9,6 +9,8 @@ import 'package:buzz/screens/Admin/home_screen.dart';
 import 'package:buzz/models/usuario.dart';
 import 'package:provider/provider.dart';
 import 'package:buzz/controllers/trip_controller.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 
 class MainScreen extends StatefulWidget {
   final Usuario usuario;
@@ -31,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
     // Usar addPostFrameCallback para chamar _verifyControllers após a construção do widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyControllers();
+      _requestNotificationPermission();
     });
   }
 
@@ -40,6 +43,25 @@ class _MainScreenState extends State<MainScreen> {
           .checkActiveTrip(widget.usuario.id);
     }
     // Adicione mais verificações se necessário
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isDenied) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomPopup(
+          message: 'Você permite que o aplicativo envie notificações?',
+          confirmText: 'Sim',
+          cancelText: 'Não',
+          onConfirm: () async {
+            Navigator.of(context).pop();
+            await Permission.notification.request();
+          },
+          onCancel: () => Navigator.of(context).pop(),
+        ),
+      );
+    }
   }
 
   List<Widget> _getScreensForUser(String tipoUsuario) {
