@@ -494,7 +494,15 @@ class _StudentHomeTripActiveScreenState
           },
         );
       } else {
-        throw Exception('Failed to update student trip');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar a viagem do aluno';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Erro ao atualizar a viagem do aluno: $e');
@@ -506,7 +514,6 @@ class _StudentHomeTripActiveScreenState
     }
   }
 
-// Nova função para entrar na fila de espera
   Future<void> _enterWaitlist(int newTripId) async {
     try {
       final response = await http.put(Uri.parse(
@@ -520,7 +527,15 @@ class _StudentHomeTripActiveScreenState
           ),
         );
       } else {
-        throw Exception('Failed to join waitlist');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao entrar na fila de espera';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Erro ao entrar na fila de espera: $e');
@@ -565,7 +580,15 @@ class _StudentHomeTripActiveScreenState
           _showBusStopOverlay = false; // Fechar o overlay de pontos de ônibus
         });
       } else {
-        throw Exception('Failed to update bus stop point');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar o ponto de ônibus';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Erro ao atualizar o ponto de ônibus: $e');
