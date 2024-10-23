@@ -62,7 +62,15 @@ class _StudentHomeTripInactiveScreenState
               .toList();
         });
       } else {
-        throw Exception('Failed to load available buses');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao carregar ônibus disponíveis';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Error fetching active buses: $e');
@@ -101,7 +109,15 @@ class _StudentHomeTripInactiveScreenState
               .toList();
         });
       } else {
-        throw Exception('Failed to load bus stops');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao carregar pontos de ônibus';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Error fetching bus stops: $e');
@@ -162,10 +178,13 @@ class _StudentHomeTripInactiveScreenState
           },
         );
       } else {
-        print('Erro ao criar viagem: ${response.reasonPhrase}');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao criar viagem do estudante';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar viagem do estudante'),
-           backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -183,7 +202,6 @@ class _StudentHomeTripInactiveScreenState
     }
   }
 
-// Função para criar student_trip na fila de espera
   Future<void> _createStudentTripWaitlist(int tripId, int pointId) async {
     setState(() {
       isCreatingTrip = true;
@@ -211,10 +229,13 @@ class _StudentHomeTripInactiveScreenState
           ),
         );
       } else {
-        print('Erro ao entrar na fila de espera: ${response.reasonPhrase}');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao entrar na fila de espera';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao entrar na fila de espera'),
-           backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -257,6 +278,16 @@ class _StudentHomeTripInactiveScreenState
             );
             return;
           }
+        } else {
+          // Decodifica a resposta de erro e exibe o detalhe
+          final errorData = json.decode(utf8.decode(response.bodyBytes));
+          final errorDetail = errorData['detail'] ?? 'Erro ao buscar o student_trip_id';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorDetail),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } catch (e) {
         print('Erro ao buscar o student_trip_id: $e');
