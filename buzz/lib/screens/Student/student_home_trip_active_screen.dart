@@ -339,7 +339,15 @@ class _StudentHomeTripActiveScreenState
         );
         await _fetchCurrentStatus();
       } else {
-        throw Exception('Failed to update student status');
+        // Decodifica a resposta de erro e exibe o detalhe
+        final errorData = json.decode(utf8.decode(response.bodyBytes));
+        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar o status do aluno';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorDetail),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       print('Erro ao atualizar o status do aluno: $e');
