@@ -7,8 +7,7 @@ import 'package:buzz/utils/size_config.dart';
 import '../../services/decodeJsonResponse.dart';
 
 class BusSelectionDialog extends StatelessWidget {
-  final Function(int, int, int)
-      onBusSelected; 
+  final Function(int, int, int) onBusSelected; // Atualizado para incluir tripType
   final String url;
 
   BusSelectionDialog({required this.onBusSelected, required this.url});
@@ -16,14 +15,8 @@ class BusSelectionDialog extends StatelessWidget {
   Future<List<Map<String, dynamic>>> _fetchAvailableBuses() async {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      final List<Map<String, dynamic>> buses =
-          List<Map<String, dynamic>>.from(decodeJsonResponse(response));
-      print(
-          'Dados recebidos dos ônibus: $buses'); // Debug print dos dados recebidos dos ônibus
-      return buses;
+      return List<Map<String, dynamic>>.from(decodeJsonResponse(response));
     } else {
-      print(
-          'Erro ao carregar ônibus: ${response.statusCode} - ${response.reasonPhrase}'); // Debug print em caso de erro
       throw Exception('Failed to load buses');
     }
   }
@@ -50,8 +43,6 @@ class BusSelectionDialog extends StatelessWidget {
               return Center(child: Text('No available buses'));
             } else {
               final buses = snapshot.data!;
-              print(
-                  'Ônibus disponíveis: $buses'); // Debug print dos ônibus disponíveis
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -72,19 +63,15 @@ class BusSelectionDialog extends StatelessWidget {
                       itemCount: buses.length,
                       itemBuilder: (context, index) {
                         final bus = buses[index];
-                        print(
-                            'Dados do ônibus: $bus'); // Debug print dos dados de cada ônibus
                         return Padding(
                           padding: EdgeInsets.only(
                               bottom: getHeightProportion(
                                   context, 20.0)), // Proporção aplicada
                           child: BusDetailsButton(
                             onPressed: () {
-                              // Use as chaves corretas 'bus_id', 'trip_id', e 'trip_type'
                               if (bus['bus_id'] != null &&
                                   bus['trip_id'] != null &&
                                   bus['trip_type'] != null) {
-                                // Chame a função de seleção com as chaves corretas
                                 onBusSelected(bus['bus_id'], bus['trip_id'],
                                     bus['trip_type'] == 'Ida' ? 1 : 2);
                               } else {
@@ -103,6 +90,7 @@ class BusSelectionDialog extends StatelessWidget {
                             driverName: bus['name'],
                             capacity: bus['capacity'],
                             color: Color(0xFF395BC7),
+                            tripType: bus['trip_type'],
                           ),
                         );
                       },

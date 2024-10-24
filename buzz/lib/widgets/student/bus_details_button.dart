@@ -9,6 +9,7 @@ class BusDetailsButton extends StatelessWidget {
   final int? capacity; 
   final int? availableSeats; 
   final Color color;
+  final String? tripType; // Torna o campo opcional
 
   BusDetailsButton({
     required this.onPressed,
@@ -17,6 +18,7 @@ class BusDetailsButton extends StatelessWidget {
     this.capacity, 
     this.availableSeats, 
     this.color = const Color(0xFF395BC7),
+    this.tripType, // Torna o campo opcional
   });
 
   @override
@@ -26,11 +28,10 @@ class BusDetailsButton extends StatelessWidget {
         onTap: onPressed,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: getHeightProportion(context, 130),  
+          height: getHeightProportion(context, 150),  // Aumenta a altura para 150
           padding: EdgeInsets.symmetric(
             vertical: getHeightProportion(context, 15.0),
-            horizontal:
-                getWidthProportion(context, 20.0), 
+            horizontal: getWidthProportion(context, 20.0), 
           ),
           decoration: BoxDecoration(
             color: color,
@@ -62,56 +63,67 @@ class BusDetailsButton extends StatelessWidget {
               SizedBox(
                   width: getWidthProportion(
                       context, 20)), 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Ônibus',
-                    style: TextStyle(
-                      fontSize: getHeightProportion(
-                          context, 16), 
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    busNumber,
-                    style: TextStyle(
-                      fontSize: getHeightProportion(
-                          context, 12), 
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    driverName,
-                    style: TextStyle(
-                      fontSize: getHeightProportion(
-                          context, 12), 
-                      color: Colors.white,
-                    ),
-                  ),
-                  if (capacity != null) 
+              Flexible( // Adiciona flexibilidade ao Column
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      'Capacidade: $capacity',
+                      'Ônibus',
+                      style: TextStyle(
+                        fontSize: getHeightProportion(
+                            context, 16), 
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      busNumber,
                       style: TextStyle(
                         fontSize: getHeightProportion(
                             context, 12), 
                         color: Colors.white,
                       ),
                     ),
-                  if (capacity != null &&
-                      availableSeats !=
-                          null) 
                     Text(
-                      'Vagas disponíveis: $availableSeats',
+                      driverName,
                       style: TextStyle(
                         fontSize: getHeightProportion(
                             context, 12), 
                         color: Colors.white,
                       ),
                     ),
-                ],
+                    if (tripType != null) // Exibe o tipo de viagem apenas se não for nulo
+                      Text(
+                        'Tipo de viagem: $tripType',
+                        style: TextStyle(
+                          fontSize: getHeightProportion(
+                              context, 12), 
+                          color: Colors.white,
+                        ),
+                      ),
+                    if (capacity != null) 
+                      Text(
+                        'Capacidade: $capacity',
+                        style: TextStyle(
+                          fontSize: getHeightProportion(
+                              context, 12), 
+                          color: Colors.white,
+                        ),
+                      ),
+                    if (capacity != null &&
+                        availableSeats !=
+                            null) 
+                      Text(
+                        'Vagas disponíveis: $availableSeats',
+                        style: TextStyle(
+                          fontSize: getHeightProportion(
+                              context, 12), 
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),

@@ -703,6 +703,7 @@ class _StudentHomeTripActiveScreenState
             availableSeats:
                 availableSeats, // Passando availableSeats corretamente
             color: buttonColor, // Aplicando a cor condicional
+            tripType: bus['tripType'], // Passa o tipo de viagem
           ),
         );
       },

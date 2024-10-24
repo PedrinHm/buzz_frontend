@@ -84,7 +84,6 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
       itemCount: _busList.length,
       itemBuilder: (context, index) {
         final bus = _busList[index];
-
         final busNumber = bus['registration_number'] ?? 'Número desconhecido';
         final driverName = bus['name'] ?? 'Nome desconhecido';
         final busId = bus['id'];
@@ -103,6 +102,7 @@ class _BusStopInactiveScreenState extends State<BusStopInactiveScreen> {
             driverName: driverName,
             availableSeats: 0,
             color: Color(0xFF395BC7),
+            tripType: bus['trip_type'], // Passa o tipo de viagem
           ),
         );
       },

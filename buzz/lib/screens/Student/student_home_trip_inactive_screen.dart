@@ -55,9 +55,8 @@ class _StudentHomeTripInactiveScreenState
                     'registrationNumber': item['registration_number'],
                     'name': item['name'],
                     'capacity': item['capacity'],
-                    'tripType': item['trip_type'],
-                    'availableSeats':
-                        item['available_seats'], // Inclui as vagas disponíveis
+                    'tripType': item['trip_type'], // Inclui o tipo de viagem
+                    'availableSeats': item['available_seats'],
                   })
               .toList();
         });
@@ -393,9 +392,9 @@ class _StudentHomeTripInactiveScreenState
             busNumber: bus['registrationNumber'],
             driverName: bus['name'],
             capacity: bus['capacity'],
-            availableSeats:
-                availableSeats, // Passando availableSeats corretamente
-            color: buttonColor, // Aplicando a cor condicional
+            availableSeats: availableSeats,
+            color: buttonColor,
+            tripType: bus['tripType'], // Passa o tipo de viagem
           ),
         );
       },
