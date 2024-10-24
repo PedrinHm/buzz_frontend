@@ -53,7 +53,20 @@ class _StudentBusStopActiveScreenState
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
-              return Center(child: Text('Nenhum dado encontrado.'));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Nenhum dado encontrado.',
+                      style: TextStyle(
+                        color: Color(0xFF000000).withOpacity(0.70),
+                        fontSize: getHeightProportion(context, 16), // Proporção ajustada
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }
 
             var students = (snapshot.data!['students'] as List)
@@ -95,28 +108,32 @@ class _StudentBusStopActiveScreenState
                   )
                 else ...[
                   if (busStops.isEmpty)
-                    Padding(
-                      padding: EdgeInsets.all(getHeightProportion(
-                          context, 8.0)), // Proporção ajustada
-                      child: Text(
-                        'Nenhum ponto de ônibus encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(
-                              context, 16), // Proporção ajustada
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(getHeightProportion(
+                            context, 8.0)), // Proporção ajustada
+                        child: Text(
+                          'Nenhum ponto de ônibus encontrado.',
+                          style: TextStyle(
+                            color: Color(0xFF000000).withOpacity(0.70),
+                            fontSize: getHeightProportion(
+                                context, 16), // Proporção ajustada
+                          ),
                         ),
                       ),
                     ),
                   if (students.isEmpty)
-                    Padding(
-                      padding: EdgeInsets.all(getHeightProportion(
-                          context, 8.0)), // Proporção ajustada
-                      child: Text(
-                        'Nenhum aluno encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(
-                              context, 16), // Proporção ajustada
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(getHeightProportion(
+                            context, 8.0)), // Proporção ajustada
+                        child: Text(
+                          'Nenhum aluno encontrado.',
+                          style: TextStyle(
+                            color: Color(0xFF000000).withOpacity(0.70),
+                            fontSize: getHeightProportion(
+                                context, 16), // Proporção ajustada
+                          ),
                         ),
                       ),
                     ),
