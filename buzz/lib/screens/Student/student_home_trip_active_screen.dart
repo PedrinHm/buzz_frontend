@@ -247,37 +247,26 @@ class _StudentHomeTripActiveScreenState
         SnackBar(content: Text('Erro: Status atual não está definido!'),
          backgroundColor: Colors.red,
         ),
-        
       );
       return;
     }
-
+ 
     // Definindo os status permitidos para cada status atual
     final Map<int, List<int>> allowedTransitions = {
-      1: [2, 3, 4], // Presente para Em aula, Aguardando ônibus, Não voltará
-      2: [1, 3, 4], // Em aula para Presente, Aguardando ônibus, Não voltará
-      3: [1, 2, 4], // Aguardando ônibus para Presente, Em aula, Não voltará
-      4: [
-        1,
-        2,
-        3,
-        5
-      ], // Não voltará para Presente, Em aula, Aguardando ônibus, Fila de espera
-      5: [
-        1,
-        2,
-        3,
-        4
-      ] // Fila de espera para Presente, Em aula, Aguardando ônibus, Não voltará
+      2: [3, 4, 1], // Em aula para Aguardando no ponto, Não voltará, Presente
+      3: [1, 2, 4], // Aguardando no ponto para Presente, Em aula, Não voltará
+      4: [1, 2, 3], // Não voltará para Presente, Em aula, Aguardando no ponto
+      5: [1, 2, 3, 4], // Fila de espera para Presente, Em aula, Aguardando no ponto, Não voltará
+      1: [4] // Presente para Não voltará
     };
-
+ 
     final List<int>? possibleStatuses = allowedTransitions[_currentStatus];
-
+ 
     if (possibleStatuses == null) {
       print('Erro: Transições permitidas não encontradas para o status atual!');
       return;
     }
-
+ 
     setState(() {
       // Cria uma lista de opções de status permitidos com base no status atual
       _statusList = possibleStatuses
