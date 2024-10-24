@@ -90,38 +90,38 @@ class _StudentHomeTripActiveScreenState
   }
 
   void _toggleBusOverlay() {
-    if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
-      setState(() {
-        _showBusOverlay = !_showBusOverlay;
-        if (_showBusOverlay) {
-          _fetchActiveBuses();
-        }
-      });
+    if (_currentStatus == 2 || _currentStatus == 5 || _currentStatus == 3) { // 2 = "Em aula", 5 = "Fila de espera", 3 = "Desembarque"
+        setState(() {
+            _showBusOverlay = !_showBusOverlay;
+            if (_showBusOverlay) {
+                _fetchActiveBuses();
+            }
+        });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Você só pode alterar o ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
-          backgroundColor: Colors.red,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Você só pode alterar o ônibus quando estiver com o status "Em aula", "Fila de espera" ou "Desembarque".'),
+                backgroundColor: Colors.red,
+            ),
+        );
     }
   }
 
   void _toggleBusStopOverlay() {
-    if (_currentStatus == 2) { // 2 representa o status "Em aula"
-      setState(() {
-        _showBusStopOverlay = !_showBusStopOverlay;
-        if (_showBusStopOverlay) {
-          _fetchBusStops();
-        }
-      });
+    if (_currentStatus == 2 || _currentStatus == 5 || _currentStatus == 3) { // 2 = "Em aula", 5 = "Fila de espera", 3 = "Desembarque"
+        setState(() {
+            _showBusStopOverlay = !_showBusStopOverlay;
+            if (_showBusStopOverlay) {
+                _fetchBusStops();
+            }
+        });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula".'),
-          backgroundColor: Colors.red,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula", "Fila de espera" ou "Desembarque".'),
+                backgroundColor: Colors.red,
+            ),
+        );
     }
   }
 
