@@ -86,6 +86,14 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _saveForm() async {
+    // Verifica se algum campo está vazio
+    for (var field in widget.fields) {
+      if (field['controller'].text.isEmpty) {
+        _showSnackbar('O campo "${field['label']}" deve ser preenchido.', Colors.red);
+        return;
+      }
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -136,7 +144,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Pontos de Ônibus':
         apiUrl = '${Config.backendUrl}/bus_stops/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}';
+          apiUrl += '${widget.id}/';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
