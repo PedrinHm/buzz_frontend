@@ -86,12 +86,20 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _saveForm() async {
-    // Verifica se algum campo está vazio
-    for (var field in widget.fields) {
+    // Verifica se algum campo está vazio, exceto o campo Faculdade
+    for (var field in widget.fields.where((field) => field['label'] != 'Faculdade')) {
       if (field['controller'].text.isEmpty) {
         _showSnackbar('O campo "${field['label']}" deve ser preenchido.', Colors.red);
         return;
       }
+    }
+
+    // Verifica a seleção da faculdade separadamente para os formulários relevantes
+    if ((widget.title == 'Cadastro de Pontos de Ônibus' || 
+         widget.title == 'Cadastro de Aluno') && 
+        selectedFacultyId == null) {
+      _showSnackbar('O campo "Faculdade" deve ser preenchido.', Colors.red);
+      return;
     }
 
     setState(() {
@@ -144,7 +152,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Pontos de Ônibus':
         apiUrl = '${Config.backendUrl}/bus_stops/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
@@ -248,7 +256,7 @@ class _FormScreenState extends State<FormScreen> {
                     SizedBox(
                         height: getHeightProportion(
                             context, 20)), // Proporção em altura
-                    ...widget.fields.map((field) {
+                    ...widget.fields.where((field) => field['label'] != 'Faculdade').map((field) {
                       return Padding(
                         padding: EdgeInsets.only(
                             bottom: getHeightProportion(
