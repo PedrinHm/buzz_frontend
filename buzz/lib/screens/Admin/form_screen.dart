@@ -215,7 +215,6 @@ class _FormScreenState extends State<FormScreen> {
         child: _isFacultyLoading || _isLoading
             ? Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-                // Adiciona a capacidade de rolagem
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -226,9 +225,7 @@ class _FormScreenState extends State<FormScreen> {
                     SizedBox(
                         height: getHeightProportion(
                             context, 20)), // Proporção em altura
-                    ...widget.fields
-                        .where((field) => field['label'] != 'Faculdade')
-                        .map((field) {
+                    ...widget.fields.map((field) {
                       return Padding(
                         padding: EdgeInsets.only(
                             bottom: getHeightProportion(
@@ -237,7 +234,7 @@ class _FormScreenState extends State<FormScreen> {
                           labelText: field['label'],
                           keyboardType: field['keyboardType'],
                           controller: field['controller'],
-                          enabled: field['enabled'] ?? true,
+                          enabled: field['label'] == 'Capacidade' ? true : (field['enabled'] ?? true),
                         ),
                       );
                     }).toList(),
