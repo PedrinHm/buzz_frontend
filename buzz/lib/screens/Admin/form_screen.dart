@@ -203,7 +203,22 @@ class _FormScreenState extends State<FormScreen> {
           Colors.green);
       Navigator.pop(context, true);
     } else {
-      showErrorMessage(context, response.body);
+      try {
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        final errorData = json.decode(decodedResponse);
+        
+        if (errorData['detail'] is List) {
+          // Extrair apenas a mensagem de erro, removendo "Value error, "
+          String errorMessage = errorData['detail'][0]['msg'];
+          errorMessage = errorMessage.replaceAll('Value error, ', '');
+          showSnackbar(context, errorMessage, Colors.red);
+        } else {
+          // Se detail é uma string direta
+          showSnackbar(context, errorData['detail'], Colors.red);
+        }
+      } catch (e) {
+        showSnackbar(context, 'Erro ao processar a resposta do servidor', Colors.red);
+      }
     }
   }
 
