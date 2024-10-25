@@ -136,7 +136,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Pontos de Ônibus':
         apiUrl = '${Config.backendUrl}/bus_stops/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
@@ -146,7 +146,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Ônibus':
         apiUrl = '${Config.backendUrl}/buses/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'registration_number': widget.fields[1]['controller'].text,
@@ -157,7 +157,7 @@ class _FormScreenState extends State<FormScreen> {
       case 'Cadastro de Faculdades':
         apiUrl = '${Config.backendUrl}/faculties/';
         if (widget.isEdit) {
-          apiUrl += '${widget.id}/';
+          apiUrl += '${widget.id}';
         }
         body = {
           'name': widget.fields[0]['controller'].text,
