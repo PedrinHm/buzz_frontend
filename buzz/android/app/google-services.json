@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:580285264993:android:df905ac7bacc95b6bce620",
+        "mobilesdk_app_id": "1:580285264993:android:fdb7fc799a41f0e3bce620",
         "android_client_info": {
-          "package_name": "com.example.myapplication"
+          "package_name": "com.fasoft.buzz"
         }
       },
       "oauth_client": [],
