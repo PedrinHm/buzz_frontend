@@ -498,7 +498,12 @@ class _ListScreenState extends State<ListScreen> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    padding: EdgeInsets.all(getHeightProportion(context, 16.0)),
+                    padding: EdgeInsets.only(
+                      left: getHeightProportion(context, 16.0),
+                      right: getHeightProportion(context, 16.0),
+                      top: getHeightProportion(context, 16.0),
+                      bottom: getHeightProportion(context, 80.0),
+                    ),
                     itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
                       final item = filteredItems[index];
