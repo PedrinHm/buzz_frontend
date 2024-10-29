@@ -1,5 +1,5 @@
 import 'package:buzz/models/usuario.dart';
-import 'package:buzz/services/decodeJsonResponse.dart';
+import 'package:buzz/screens/Admin/form_screen.dart';
 import 'package:buzz/widgets/Geral/Custom_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +21,8 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<Usuario> _userFuture;
   String? _base64Image;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
@@ -29,11 +31,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<Usuario> _fetchUser(int userId) async {
-    final response =
-        await http.get(Uri.parse('${Config.backendUrl}/users/$userId'));
+    final response = await http.get(Uri.parse('${Config.backendUrl}/users/$userId'));
 
     if (response.statusCode == 200) {
-      return Usuario.fromJson(decodeJsonResponse(response));
+      String responseBody = utf8.decode(response.bodyBytes);
+      return Usuario.fromJson(json.decode(responseBody));
     } else {
       throw Exception('Failed to load user');
     }
@@ -157,6 +159,42 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  Future<void> _editUserData(Usuario user) async {
+    _nameController.text = user.name ?? '';
+    _emailController.text = user.email ?? '';
+
+    List<Map<String, dynamic>> fields = [
+      {
+        'label': 'Nome',
+        'controller': _nameController,
+        'keyboardType': TextInputType.name,
+      },
+      {
+        'label': 'Email',
+        'controller': _emailController,
+        'keyboardType': TextInputType.emailAddress,
+      },
+    ];
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FormScreen(
+          title: 'Editar Meus Dados',
+          fields: fields,
+          isEdit: true,
+          id: widget.userId,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        _userFuture = _fetchUser(widget.userId);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Usuario>(
@@ -181,116 +219,131 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: getHeightProportion(context, 811), // Proporção ajustada
-          padding: EdgeInsets.all(
-              getHeightProportion(context, 20.0)), // Proporção ajustada
+          height: getHeightProportion(context, 811),
+          padding: EdgeInsets.all(getHeightProportion(context, 20.0)),
           decoration: BoxDecoration(
             color: Color(0xFF395BC7),
-            borderRadius: BorderRadius.circular(
-                getHeightProportion(context, 10.0)), // Proporção ajustada
+            borderRadius: BorderRadius.circular(getHeightProportion(context, 10.0)),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _getTitle(user.tipoUsuario),
-                    style: TextStyle(
-                      fontSize: getHeightProportion(
-                          context, 24), // Proporção ajustada
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white),
-                    onPressed:
-                        _confirmLogout, // Alterado para chamar o popup de confirmação
-                  ),
-                ],
-              ),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: getHeightProportion(context, 175),
-                    height: getHeightProportion(context, 175),
-                    decoration: BoxDecoration(
-                      color: user.profilePicture == null ? Colors.grey[300] : null,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: getHeightProportion(context, 1),
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _getTitle(user.tipoUsuario),
+                        style: TextStyle(
+                          fontSize: getHeightProportion(
+                              context, 24),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),
-                    ),
-                    child: user.profilePicture != null
-                        ? Image.memory(
-                            base64Decode(user.profilePicture!),
-                            fit: BoxFit.cover,
-                          )
-                        : Center(
-                            child: Text(
-                              user.name != null && user.name!.isNotEmpty
-                                  ? user.name![0].toUpperCase()
-                                  : '?',
-                              style: TextStyle(
-                                fontSize: getHeightProportion(context, 60),
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.logout, color: Colors.white),
+                            onPressed: _confirmLogout,
                           ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.add_a_photo, color: Colors.white),
-                    onPressed: _pickImage,
-                    tooltip: 'Adicionar Foto',
+                        ],
+                      ),
+                    ],
                   ),
                   SizedBox(
-                      width: getHeightProportion(
-                          context, 20)), // Proporção ajustada
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.white),
-                    onPressed: _confirmDeleteProfilePicture,
-                    tooltip: 'Remover Foto',
+                      height:
+                          getHeightProportion(context, 20)),
+                  Center(
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: getHeightProportion(context, 175),
+                        height: getHeightProportion(context, 175),
+                        decoration: BoxDecoration(
+                          color: user.profilePicture == null ? Colors.grey[300] : null,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: getHeightProportion(context, 1),
+                          ),
+                          borderRadius: BorderRadius.circular(getHeightProportion(context, 10)),
+                        ),
+                        child: user.profilePicture != null
+                            ? Image.memory(
+                                base64Decode(user.profilePicture!),
+                                fit: BoxFit.cover,
+                              )
+                            : Center(
+                                child: Text(
+                                  user.name != null && user.name!.isNotEmpty
+                                      ? user.name![0].toUpperCase()
+                                      : '?',
+                                  style: TextStyle(
+                                    fontSize: getHeightProportion(context, 60),
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
+                  SizedBox(
+                      height:
+                          getHeightProportion(context, 20)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.add_a_photo, color: Colors.white),
+                        onPressed: _pickImage,
+                        tooltip: 'Adicionar Foto',
+                      ),
+                      SizedBox(
+                          width: getHeightProportion(
+                              context, 20)),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.white),
+                        onPressed: _confirmDeleteProfilePicture,
+                        tooltip: 'Remover Foto',
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                      height:
+                          getHeightProportion(context, 20)),
+                  _buildInfoColumn(_getLabel(user.tipoUsuario),
+                      user.name ?? 'Nome não disponível'),
+                  SizedBox(
+                      height:
+                          getHeightProportion(context, 20)),
+                  _buildInfoColumn('E-mail', user.email ?? 'Email não disponível'),
+                  SizedBox(
+                      height:
+                          getHeightProportion(context, 20)),
+                  _buildInfoColumn('CPF', user.cpf ?? 'CPF não disponível'),
+                  if (user.tipoUsuario == 'student') ...[
+                    SizedBox(
+                        height:
+                            getHeightProportion(context, 20)),
+                    _buildInfoColumn('Faculdade',
+                        user.facultyName ?? 'Faculdade não disponível'),
+                  ],
                 ],
               ),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              _buildInfoColumn(_getLabel(user.tipoUsuario),
-                  user.name ?? 'Nome não disponível'),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              _buildInfoColumn('E-mail', user.email ?? 'Email não disponível'),
-              SizedBox(
-                  height:
-                      getHeightProportion(context, 20)), // Proporção ajustada
-              _buildInfoColumn('CPF', user.cpf ?? 'CPF não disponível'),
-              if (user.tipoUsuario == 'student') ...[
-                SizedBox(
-                    height:
-                        getHeightProportion(context, 20)), // Proporção ajustada
-                _buildInfoColumn('Faculdade',
-                    user.facultyName ?? 'Faculdade não disponível'),
-              ],
+              if (user.tipoUsuario == 'admin')
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white),
+                    onPressed: () => _editUserData(user),
+                    tooltip: 'Editar meus dados',
+                  ),
+                ),
             ],
           ),
         ),
@@ -331,7 +384,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Text(
           '$label',
           style: TextStyle(
-            fontSize: getHeightProportion(context, 18), // Proporção ajustada
+            fontSize: getHeightProportion(context, 18),
             color: Colors.white,
             fontWeight: FontWeight.w600,
             fontFamily: 'Inter',
@@ -340,7 +393,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: getHeightProportion(context, 16), // Proporção ajustada
+            fontSize: getHeightProportion(context, 16),
             color: Colors.white,
             fontFamily: 'Inter',
           ),
