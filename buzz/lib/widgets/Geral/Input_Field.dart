@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:buzz/utils/size_config.dart';  // Import correto
 
 class CustomInputField extends StatefulWidget {
@@ -8,6 +9,7 @@ class CustomInputField extends StatefulWidget {
   final TextEditingController controller;
   final bool enabled;
   final String? hintText;
+  final List<TextInputFormatter>? inputFormatters;
 
   CustomInputField({
     required this.labelText,
@@ -16,6 +18,7 @@ class CustomInputField extends StatefulWidget {
     required this.controller,
     this.enabled = true,
     this.hintText,
+    this.inputFormatters,
   });
 
   @override
@@ -51,6 +54,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
             obscureText: _obscureText,
             keyboardType: widget.keyboardType,
             enabled: widget.enabled,
+            inputFormatters: widget.inputFormatters,
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: TextStyle(

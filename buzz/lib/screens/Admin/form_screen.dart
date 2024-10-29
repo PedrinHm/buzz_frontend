@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
 import 'package:buzz/config/config.dart';
+import 'package:flutter/services.dart';
 
 // Função utilitária para decodificar as respostas HTTP
 dynamic decodeJsonResponse(http.Response response) {
@@ -18,6 +19,61 @@ dynamic decodeJsonResponse(http.Response response) {
   } else {
     throw Exception(
         'Failed to parse JSON, status code: ${response.statusCode}');
+  }
+}
+
+class CpfInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    var text = newValue.text;
+    
+    // Remove tudo que não é dígito
+    text = text.replaceAll(RegExp(r'[^\d]'), '');
+    
+    // Limita a 11 dígitos
+    if (text.length > 11) {
+      text = text.substring(0, 11);
+    }
+    
+    var newText = '';
+    for (var i = 0; i < text.length; i++) {
+      if (i == 3 || i == 6) newText += '.';
+      if (i == 9) newText += '-';
+      newText += text[i];
+    }
+    
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
+  }
+}
+
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    var text = newValue.text;
+    
+    // Remove tudo que não é dígito
+    text = text.replaceAll(RegExp(r'[^\d]'), '');
+    
+    // Limita a 11 dígitos (para celular) ou 10 dígitos (para fixo)
+    if (text.length > 11) {
+      text = text.substring(0, 11);
+    }
+    
+    var newText = '';
+    for (var i = 0; i < text.length; i++) {
+      if (i == 0) newText += '(';
+      if (i == 2) newText += ') ';
+      if (i == 7) newText += '-';  // Ajustado para a posição correta
+      newText += text[i];
+    }
+    
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
   }
 }
 
@@ -46,6 +102,30 @@ class _FormScreenState extends State<FormScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Formata os campos se estiver em modo de edição
+    if (widget.isEdit) {
+      for (var field in widget.fields) {
+        if (field['label'] == 'CPF') {
+          String cpf = field['controller'].text;
+          if (cpf.length == 11) {
+            field['controller'].text = '${cpf.substring(0,3)}.${cpf.substring(3,6)}.${cpf.substring(6,9)}-${cpf.substring(9)}';
+          }
+        }
+        if (field['label'] == 'Telefone') {
+          String phone = field['controller'].text;
+          if (phone.length >= 10) {
+            if (phone.length == 11) {
+              field['controller'].text = '(${phone.substring(0,2)}) ${phone.substring(2,7)}-${phone.substring(7)}';
+            } else {
+              field['controller'].text = '(${phone.substring(0,2)}) ${phone.substring(2,6)}-${phone.substring(6)}';
+            }
+          }
+        }
+      }
+    }
+
+    // Código existente do initState
     if (widget.title == 'Cadastro de Pontos de Ônibus' ||
         widget.title == 'Cadastro de Aluno') {
       _fetchFaculties().then((_) {
@@ -109,6 +189,11 @@ class _FormScreenState extends State<FormScreen> {
     String apiUrl;
     Map<String, dynamic> body = {};
 
+    // Funço auxiliar para limpar máscaras
+    String removeMask(String text) {
+      return text.replaceAll(RegExp(r'[^\d]'), '');
+    }
+
     switch (widget.title) {
       case 'Cadastro de Motorista':
         apiUrl = '${Config.backendUrl}/users/';
@@ -118,10 +203,10 @@ class _FormScreenState extends State<FormScreen> {
         body = {
           'name': widget.fields[0]['controller'].text,
           'email': widget.fields[1]['controller'].text,
-          'cpf': widget.fields[2]['controller'].text,
-          'phone': widget.fields[3]['controller'].text,
+          'cpf': removeMask(widget.fields[2]['controller'].text),
+          'phone': removeMask(widget.fields[3]['controller'].text),
           'user_type_id': 2,
-          'password': widget.fields[2]['controller'].text,
+          'password': removeMask(widget.fields[2]['controller'].text),
         };
         break;
       case 'Cadastro de Aluno':
@@ -141,11 +226,11 @@ class _FormScreenState extends State<FormScreen> {
         body = {
           'name': widget.fields[0]['controller'].text,
           'email': widget.fields[1]['controller'].text,
-          'cpf': widget.fields[2]['controller'].text,
-          'phone': widget.fields[3]['controller'].text,
+          'cpf': removeMask(widget.fields[2]['controller'].text),
+          'phone': removeMask(widget.fields[3]['controller'].text),
           'faculty_id': selectedFacultyId,
           'user_type_id': 1,
-          'password': widget.fields[2]['controller'].text,
+          'password': removeMask(widget.fields[2]['controller'].text),
         };
         break;
 
@@ -245,9 +330,9 @@ class _FormScreenState extends State<FormScreen> {
       case 'Email':
         return 'Ex: joao.silva@email.com';
       case 'CPF':
-        return 'Ex: 12345678900';
+        return 'Ex: 123.456.789-00';
       case 'Telefone':
-        return 'Ex: 11987654321';
+        return 'Ex: (43) 98765-4321';
       case 'Capacidade':
         return 'Ex: 45';
 
@@ -259,6 +344,17 @@ class _FormScreenState extends State<FormScreen> {
         return 'Ex: Faculdade de Engenharia';
       default:
         return '';
+    }
+  }
+
+  List<TextInputFormatter>? _getInputFormatters(String label) {
+    switch (label) {
+      case 'CPF':
+        return [CpfInputFormatter()];
+      case 'Telefone':
+        return [PhoneInputFormatter()];
+      default:
+        return null;
     }
   }
 
@@ -292,6 +388,7 @@ class _FormScreenState extends State<FormScreen> {
                           controller: field['controller'],
                           enabled: field['label'] == 'Capacidade' ? true : (field['enabled'] ?? true),
                           hintText: hintText,
+                          inputFormatters: _getInputFormatters(field['label']),
                         ),
                       );
                     }).toList(),
