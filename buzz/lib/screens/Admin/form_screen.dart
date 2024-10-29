@@ -262,7 +262,7 @@ class _FormScreenState extends State<FormScreen> {
                             bottom: getHeightProportion(
                                 context, 20.0)), // Proporção em altura
                         child: CustomInputField(
-                          labelText: field['label'],
+                          labelText: "${field['label']} *",
                           keyboardType: field['keyboardType'],
                           controller: field['controller'],
                           enabled: field['label'] == 'Capacidade' ? true : (field['enabled'] ?? true),
@@ -276,7 +276,7 @@ class _FormScreenState extends State<FormScreen> {
                             bottom: getHeightProportion(
                                 context, 20.0)), // Proporção em altura
                         child: CustomDropdownField(
-                          labelText: 'Faculdade',
+                          labelText: 'Faculdade *',
                           value: selectedFacultyId,
                           items: faculties.map((faculty) {
                             return DropdownMenuItem<int>(
