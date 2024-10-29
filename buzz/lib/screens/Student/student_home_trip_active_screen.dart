@@ -50,6 +50,7 @@ class _StudentHomeTripActiveScreenState
   bool isLoadingBus = true;
   String? _busNumber;
   String? _driverName;
+  late int _currentTripId;
 
   // Mapeamento de status numérico para rótulos e cores
   final Map<int, Map<String, dynamic>> statusDetails = {
@@ -84,6 +85,7 @@ class _StudentHomeTripActiveScreenState
   void initState() {
     super.initState();
     _studentTripId = widget.studentTripId;
+    _currentTripId = widget.tripId;
     _fetchCurrentStatus();
     _fetchBusStopName();
     _fetchBusAndDriver();
@@ -237,42 +239,49 @@ class _StudentHomeTripActiveScreenState
         isLoadingBus = true;
       });
 
+      print('Buscando dados do ônibus e motorista...');
+      print('Trip ID atual: $_currentTripId');
+
       final tripResponse = await http
-          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
+          .get(Uri.parse('${Config.backendUrl}/trips/$_currentTripId'));
 
       if (tripResponse.statusCode == 200) {
-        final tripData =
-            decodeJsonResponse(tripResponse); // Decodificação com utf8
+        final tripData = decodeJsonResponse(tripResponse);
         final busId = tripData['bus_id'];
         final driverId = tripData['driver_id'];
+
+        print('Dados da viagem:');
+        print('Bus ID: $busId');
+        print('Driver ID: $driverId');
 
         final busResponse =
             await http.get(Uri.parse('${Config.backendUrl}/buses/$busId'));
         if (busResponse.statusCode == 200) {
-          final busData =
-              decodeJsonResponse(busResponse); // Decodificação com utf8
+          final busData = decodeJsonResponse(busResponse);
+          print('Dados do ônibus antes da atualização:');
+          print('Número atual: $_busNumber');
+          print('Novo número: ${busData['registration_number']}');
+          
           setState(() {
             _busNumber = busData['registration_number'];
           });
-        } else {
-          throw Exception('Failed to fetch bus number');
         }
 
         final driverResponse =
             await http.get(Uri.parse('${Config.backendUrl}/users/$driverId'));
         if (driverResponse.statusCode == 200) {
           final driverData = decodeJsonResponse(driverResponse);
+          print('Dados do motorista antes da atualização:');
+          print('Nome atual: $_driverName');
+          print('Novo nome: ${driverData['name']}');
+          
           setState(() {
             _driverName = driverData['name'];
           });
-        } else {
-          throw Exception('Failed to fetch driver name');
         }
-      } else {
-        throw Exception('Failed to fetch trip details');
       }
     } catch (e) {
-      print('Error fetching bus and driver details: $e');
+      print('Erro ao buscar dados do ônibus e motorista: $e');
     } finally {
       setState(() {
         isLoadingBus = false;
@@ -555,17 +564,34 @@ class _StudentHomeTripActiveScreenState
       return;
     }
 
+    print('Iniciando atualização da viagem...');
+    print('Trip ID atual: $_currentTripId');
+    print('Novo Trip ID: $newTripId');
+
+    setState(() {
+      isLoadingBus = true;
+    });
+
     try {
       final response = await http.put(Uri.parse(
           '${Config.backendUrl}/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
-      // Adicionando prints de debug
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      print('Response Headers: ${response.headers}');
-
       if (response.statusCode == 200) {
+        setState(() {
+          _currentTripId = newTripId; // Atualiza o ID da viagem atual
+        });
+        
         print('Viagem do aluno atualizada com sucesso!');
+        print('Atualizando Trip ID de ${_currentTripId} para $newTripId');
+        
+        // Atualiza os dados do ônibus e motorista
+        print('Buscando novos dados do ônibus e motorista...');
+        await _fetchBusAndDriver();
+        
+        print('Dados após atualização:');
+        print('Número do ônibus: $_busNumber');
+        print('Nome do motorista: $_driverName');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Viagem do aluno atualizada com sucesso!'),
@@ -573,25 +599,20 @@ class _StudentHomeTripActiveScreenState
           ),
         );
 
-        await _fetchBusAndDriver();
-        await _fetchCurrentStatus();
-        await _fetchBusStopName();
         setState(() {
           _showBusOverlay = false;
         });
+        
       } else if (response.statusCode == 400) {
-        // Decodificando e printando o corpo da resposta
         final decodedBody = utf8.decode(response.bodyBytes);
         print('Decoded Response Body: $decodedBody');
 
         if (response.body.contains("Nova viagem estÃ¡ cheia")) {
-
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return CustomPopup(
-                message:
-                    'A viagem está cheia. Deseja entrar na fila de espera?',
+                message: 'A viagem está cheia. Deseja entrar na fila de espera?',
                 confirmText: 'Sim',
                 cancelText: 'Não',
                 onConfirm: () {
@@ -606,10 +627,8 @@ class _StudentHomeTripActiveScreenState
           );
         }
       } else {
-        // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
-        final errorDetail =
-            errorData['detail'] ?? 'Erro ao atualizar a viagem do aluno';
+        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar a viagem do aluno';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorDetail),
@@ -625,6 +644,10 @@ class _StudentHomeTripActiveScreenState
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        isLoadingBus = false;
+      });
     }
   }
 
@@ -634,13 +657,31 @@ class _StudentHomeTripActiveScreenState
           '${Config.backendUrl}/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId&waitlist=true'));
 
       if (response.statusCode == 200) {
+        setState(() {
+          _currentTripId = newTripId; // Atualiza o ID da viagem atual
+        });
+        
         print('Aluno entrou na fila de espera com sucesso!');
+        print('Atualizando Trip ID de $_currentTripId para $newTripId');
+        
+        // Atualiza os dados do ônibus e motorista
+        print('Buscando novos dados do ônibus e motorista...');
+        await _fetchBusAndDriver();
+        
+        print('Dados após atualização:');
+        print('Número do ônibus: $_busNumber');
+        print('Nome do motorista: $_driverName');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Você entrou na fila de espera com sucesso!'),
             backgroundColor: Colors.green,
           ),
         );
+
+        setState(() {
+          _showBusOverlay = false;
+        });
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
