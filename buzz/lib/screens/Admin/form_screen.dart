@@ -395,7 +395,9 @@ class _FormScreenState extends State<FormScreen> {
                           labelText: "${field['label']} *",
                           keyboardType: field['keyboardType'],
                           controller: field['controller'],
-                          enabled: field['label'] == 'Capacidade' ? true : (field['enabled'] ?? true),
+                          enabled: field['label'] == 'Capacidade' || field['label'] == 'Placa' 
+                              ? true 
+                              : (field['enabled'] ?? true),
                           hintText: hintText,
                           inputFormatters: _getInputFormatters(field['label']),
                         ),
