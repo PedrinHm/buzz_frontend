@@ -452,7 +452,7 @@ void _toggleBusStopOverlay() async {
           '${Config.backendUrl}/buses/available_for_student?student_id=${widget.studentId}'));
 
       if (response.statusCode == 200) {
-        List<dynamic> data = decodeJsonResponse(response); // Decodificação utf8
+        List<dynamic> data = decodeJsonResponse(response);
 
         setState(() {
           _busList = data
@@ -463,11 +463,20 @@ void _toggleBusStopOverlay() async {
                     'name': item['name'],
                     'capacity': item['capacity'],
                     'tripType': item['trip_type'],
-                    'availableSeats': item['available_seats'] ??
-                        0, // Garantindo que não seja null
+                    'availableSeats': item['available_seats'] ?? 0,
                   })
               .toList();
         });
+
+        // Adiciona verificação para lista vazia
+        if (_busList.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Não há viagens em andamento no momento'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } else {
         throw Exception('Failed to load available buses for student');
       }
@@ -475,8 +484,8 @@ void _toggleBusStopOverlay() async {
       print('$e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Erro ao buscar ônibus disponíveis para o aluno'),
-             backgroundColor: Colors.red,
+          content: Text('Não há viagens em andamento no momento'),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
