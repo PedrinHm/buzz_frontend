@@ -238,6 +238,30 @@ class _FormScreenState extends State<FormScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  String _getHintText(String label) {
+    switch (label) {
+      case 'Nome':
+        return 'Ex: João da Silva';
+      case 'Email':
+        return 'Ex: joao.silva@email.com';
+      case 'CPF':
+        return 'Ex: 12345678900';
+      case 'Telefone':
+        return 'Ex: 11987654321';
+      case 'Capacidade':
+        return 'Ex: 45';
+
+      case 'Placa':
+        return 'Ex: ABC1234';
+      case 'Nome do Ponto':
+        return 'Ex: Ponto Terminal Central';
+      case 'Nome da Faculdade':
+        return 'Ex: Faculdade de Engenharia';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,6 +281,7 @@ class _FormScreenState extends State<FormScreen> {
                         height: getHeightProportion(
                             context, 20)), // Proporção em altura
                     ...widget.fields.where((field) => field['label'] != 'Faculdade').map((field) {
+                      String hintText = _getHintText(field['label']);
                       return Padding(
                         padding: EdgeInsets.only(
                             bottom: getHeightProportion(
@@ -266,6 +291,7 @@ class _FormScreenState extends State<FormScreen> {
                           keyboardType: field['keyboardType'],
                           controller: field['controller'],
                           enabled: field['label'] == 'Capacidade' ? true : (field['enabled'] ?? true),
+                          hintText: hintText,
                         ),
                       );
                     }).toList(),
@@ -278,6 +304,7 @@ class _FormScreenState extends State<FormScreen> {
                         child: CustomDropdownField(
                           labelText: 'Faculdade *',
                           value: selectedFacultyId,
+                          hintText: 'Ex: Faculdade de Tecnologia',
                           items: faculties.map((faculty) {
                             return DropdownMenuItem<int>(
                               value: faculty['id'],

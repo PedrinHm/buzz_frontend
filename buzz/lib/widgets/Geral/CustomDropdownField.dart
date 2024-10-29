@@ -6,12 +6,14 @@ class CustomDropdownField extends StatelessWidget {
   final int? value;
   final List<DropdownMenuItem<int>> items;
   final void Function(int?) onChanged;
+  final String? hintText;
 
   CustomDropdownField({
     required this.labelText,
     required this.value,
     required this.items,
     required this.onChanged,
+    this.hintText,
   });
 
   @override
@@ -27,6 +29,22 @@ class CustomDropdownField extends StatelessWidget {
             fontSize: getHeightProportion(context, 16.0),  // Tamanho do texto proporcional
           ),
         ),
+        if (hintText != null)
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: getHeightProportion(context, 4.0),
+              left: getWidthProportion(context, 2.0),
+            ),
+            child: Text(
+              hintText!,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: getHeightProportion(context, 12.0),
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
         FractionallySizedBox(
           widthFactor: 0.8,
           child: DropdownButtonHideUnderline(
