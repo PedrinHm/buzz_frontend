@@ -89,41 +89,99 @@ class _StudentHomeTripActiveScreenState
     _fetchBusAndDriver();
   }
 
-  void _toggleBusOverlay() {
-    if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
-        setState(() {
-            _showBusOverlay = !_showBusOverlay;
-            if (_showBusOverlay) {
-                _fetchActiveBuses();
-            }
-        });
-    } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Você só pode alterar o ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
-                backgroundColor: Colors.red,
-            ),
-        );
-    }
-  }
+  void _toggleBusOverlay() async {
+    try {
+        final tripResponse = await http.get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
-  void _toggleBusStopOverlay() {
-    if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
-        setState(() {
-            _showBusStopOverlay = !_showBusStopOverlay;
-            if (_showBusStopOverlay) {
-                _fetchBusStops();
+        if (tripResponse.statusCode == 200) {
+            final tripData = json.decode(tripResponse.body);
+            
+            // Se for viagem de volta (trip_type = 2), aplica as restrições de status
+            if (tripData['trip_type'] == 2) {
+                if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
+                    setState(() {
+                        _showBusOverlay = !_showBusOverlay;
+                        if (_showBusOverlay) {
+                            _fetchActiveBuses();
+                        }
+                    });
+                } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Você só pode alterar o ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
+                            backgroundColor: Colors.red,
+                        ),
+                    );
+                }
+            } else {
+                // Se for viagem de ida, permite alteração sem restrições
+                setState(() {
+                    _showBusOverlay = !_showBusOverlay;
+                    if (_showBusOverlay) {
+                        _fetchActiveBuses();
+                    }
+                });
             }
-        });
-    } else {
+        } else {
+            throw Exception('Failed to fetch trip type');
+        }
+    } catch (e) {
+        print('Error checking trip type: $e');
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula" ou "Fila de espera.'),
+                content: Text('Erro ao verificar tipo de viagem'),
                 backgroundColor: Colors.red,
             ),
         );
     }
-  }
+}
+
+void _toggleBusStopOverlay() async {
+    try {
+        final tripResponse = await http.get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
+
+        if (tripResponse.statusCode == 200) {
+            final tripData = json.decode(tripResponse.body);
+            
+            // Se for viagem de volta (trip_type = 2), aplica as restrições de status
+            if (tripData['trip_type'] == 2) {
+                if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
+                    setState(() {
+                        _showBusStopOverlay = !_showBusStopOverlay;
+                        if (_showBusStopOverlay) {
+                            _fetchBusStops();
+                        }
+                    });
+                } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
+                            backgroundColor: Colors.red,
+                        ),
+                    );
+                }
+            } else {
+                // Se for viagem de ida, permite alteração sem restrições
+                setState(() {
+                    _showBusStopOverlay = !_showBusStopOverlay;
+                    if (_showBusStopOverlay) {
+                        _fetchBusStops();
+                    }
+                });
+            }
+        } else {
+            throw Exception('Failed to fetch trip type');
+        }
+    } catch (e) {
+        print('Error checking trip type: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Erro ao verificar tipo de viagem'),
+                backgroundColor: Colors.red,
+            ),
+        );
+    }
+}
 
   void _toggleStatusOverlay() async {
     try {
