@@ -166,6 +166,15 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _saveForm() async {
+    // Adicionar validação de capacidade para o formulário de ônibus
+    if (widget.title == 'Cadastro de Ônibus') {
+      int? capacity = int.tryParse(widget.fields[2]['controller'].text);
+      if (capacity == null || capacity < 1) {
+        _showSnackbar('A capacidade deve ser maior que zero.', Colors.red);
+        return;
+      }
+    }
+
     // Verifica se algum campo está vazio, exceto o campo Faculdade
     for (var field in widget.fields.where((field) => field['label'] != 'Faculdade')) {
       if (field['controller'].text.isEmpty) {
