@@ -91,135 +91,143 @@ class _StudentHomeTripActiveScreenState
 
   void _toggleBusOverlay() async {
     try {
-        final tripResponse = await http.get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
+      final tripResponse = await http
+          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
-        if (tripResponse.statusCode == 200) {
-            final tripData = json.decode(tripResponse.body);
-            
-            // Se for viagem de volta (trip_type = 2), aplica as restrições de status
-            if (tripData['trip_type'] == 2) {
-                if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
-                    setState(() {
-                        _showBusOverlay = !_showBusOverlay;
-                        if (_showBusOverlay) {
-                            _fetchActiveBuses();
-                        }
-                    });
-                } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('Você só pode alterar o ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
-                            backgroundColor: Colors.red,
-                        ),
-                    );
-                }
-            } else {
-                // Se for viagem de ida, permite alteração sem restrições
-                setState(() {
-                    _showBusOverlay = !_showBusOverlay;
-                    if (_showBusOverlay) {
-                        _fetchActiveBuses();
-                    }
-                });
-            }
-        } else {
-            throw Exception('Failed to fetch trip type');
-        }
-    } catch (e) {
-        print('Error checking trip type: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Erro ao verificar tipo de viagem'),
+      if (tripResponse.statusCode == 200) {
+        final tripData = json.decode(tripResponse.body);
+
+        // Se for viagem de volta (trip_type = 2), aplica as restrições de status
+        if (tripData['trip_type'] == 2) {
+          if (_currentStatus == 2 || _currentStatus == 5) {
+            // 2 = "Em aula", 5 = "Fila de espera"
+            setState(() {
+              _showBusOverlay = !_showBusOverlay;
+              if (_showBusOverlay) {
+                _fetchActiveBuses();
+              }
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    'Você só pode alterar o ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
                 backgroundColor: Colors.red,
-            ),
-        );
+              ),
+            );
+          }
+        } else {
+          // Se for viagem de ida, permite alteração sem restrições
+          setState(() {
+            _showBusOverlay = !_showBusOverlay;
+            if (_showBusOverlay) {
+              _fetchActiveBuses();
+            }
+          });
+        }
+      } else {
+        throw Exception('Failed to fetch trip type');
+      }
+    } catch (e) {
+      print('Error checking trip type: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao verificar tipo de viagem'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
-}
+  }
 
-void _toggleBusStopOverlay() async {
+  void _toggleBusStopOverlay() async {
     try {
-        final tripResponse = await http.get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
+      final tripResponse = await http
+          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
-        if (tripResponse.statusCode == 200) {
-            final tripData = json.decode(tripResponse.body);
-            
-            // Se for viagem de volta (trip_type = 2), aplica as restrições de status
-            if (tripData['trip_type'] == 2) {
-                if (_currentStatus == 2 || _currentStatus == 5) { // 2 = "Em aula", 5 = "Fila de espera"
-                    setState(() {
-                        _showBusStopOverlay = !_showBusStopOverlay;
-                        if (_showBusStopOverlay) {
-                            _fetchBusStops();
-                        }
-                    });
-                } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
-                            backgroundColor: Colors.red,
-                        ),
-                    );
-                }
-            } else {
-                // Se for viagem de ida, permite alteração sem restrições
-                setState(() {
-                    _showBusStopOverlay = !_showBusStopOverlay;
-                    if (_showBusStopOverlay) {
-                        _fetchBusStops();
-                    }
-                });
-            }
-        } else {
-            throw Exception('Failed to fetch trip type');
-        }
-    } catch (e) {
-        print('Error checking trip type: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Erro ao verificar tipo de viagem'),
+      if (tripResponse.statusCode == 200) {
+        final tripData = json.decode(tripResponse.body);
+
+        // Se for viagem de volta (trip_type = 2), aplica as restrições de status
+        if (tripData['trip_type'] == 2) {
+          if (_currentStatus == 2 || _currentStatus == 5) {
+            // 2 = "Em aula", 5 = "Fila de espera"
+            setState(() {
+              _showBusStopOverlay = !_showBusStopOverlay;
+              if (_showBusStopOverlay) {
+                _fetchBusStops();
+              }
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    'Você só pode alterar o ponto de ônibus quando estiver com o status "Em aula" ou "Fila de espera".'),
                 backgroundColor: Colors.red,
-            ),
-        );
+              ),
+            );
+          }
+        } else {
+          // Se for viagem de ida, permite alteração sem restrições
+          setState(() {
+            _showBusStopOverlay = !_showBusStopOverlay;
+            if (_showBusStopOverlay) {
+              _fetchBusStops();
+            }
+          });
+        }
+      } else {
+        throw Exception('Failed to fetch trip type');
+      }
+    } catch (e) {
+      print('Error checking trip type: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao verificar tipo de viagem'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
-}
+  }
 
   void _toggleStatusOverlay() async {
     try {
-        // Verifica o tipo de viagem antes de permitir alteração de status
-        final tripResponse = await http.get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
+      // Verifica o tipo de viagem antes de permitir alteração de status
+      final tripResponse = await http
+          .get(Uri.parse('${Config.backendUrl}/trips/${widget.tripId}'));
 
-        if (tripResponse.statusCode == 200) {
-            final tripData = json.decode(tripResponse.body);
-            
-            // Se for viagem de ida (trip_type = 1), não permite alteração
-            if (tripData['trip_type'] == 1) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('Não é possível alterar o status durante uma viagem de ida.'),
-                        backgroundColor: Colors.red,
-                    ),
-                );
-                return;
-            }
-            
-            // Se não for viagem de ida, continua normalmente
-            setState(() {
-                _showStatusOverlay = !_showStatusOverlay;
-                if (_showStatusOverlay) {
-                    _fetchAvailableStatus();
-                }
-            });
-        } else {
-            throw Exception('Failed to fetch trip type');
-        }
-    } catch (e) {
-        print('Error checking trip type: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
+      if (tripResponse.statusCode == 200) {
+        final tripData = json.decode(tripResponse.body);
+
+        // Se for viagem de ida (trip_type = 1), não permite alteração
+        if (tripData['trip_type'] == 1) {
+          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Erro ao verificar tipo de viagem'),
-                backgroundColor: Colors.red,
+              content: Text(
+                  'Não é possível alterar o status durante uma viagem de ida.'),
+              backgroundColor: Colors.red,
             ),
-        );
+          );
+          return;
+        }
+
+        // Se não for viagem de ida, continua normalmente
+        setState(() {
+          _showStatusOverlay = !_showStatusOverlay;
+          if (_showStatusOverlay) {
+            _fetchAvailableStatus();
+          }
+        });
+      } else {
+        throw Exception('Failed to fetch trip type');
+      }
+    } catch (e) {
+      print('Error checking trip type: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao verificar tipo de viagem'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -333,29 +341,35 @@ void _toggleBusStopOverlay() async {
     if (_currentStatus == null) {
       print('Current status is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Status atual não está definido!'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro: Status atual não está definido!'),
+          backgroundColor: Colors.red,
         ),
       );
       return;
     }
- 
+
     // Definindo os status permitidos para cada status atual
     final Map<int, List<int>> allowedTransitions = {
       2: [3, 4, 1], // Em aula para Aguardando no ponto, Não voltará, Presente
       3: [1, 2, 4], // Aguardando no ponto para Presente, Em aula, Não voltará
       4: [1, 2, 3], // Não voltará para Presente, Em aula, Aguardando no ponto
-      5: [1, 2, 3, 4], // Fila de espera para Presente, Em aula, Aguardando no ponto, Não voltará
+      5: [
+        1,
+        2,
+        3,
+        4
+      ], // Fila de espera para Presente, Em aula, Aguardando no ponto, Não voltará
       1: [4] // Presente para Não voltará
     };
- 
+
     final List<int>? possibleStatuses = allowedTransitions[_currentStatus];
- 
+
     if (possibleStatuses == null) {
       print('Erro: Transições permitidas não encontradas para o status atual!');
       return;
     }
- 
+
     setState(() {
       // Cria uma lista de opções de status permitidos com base no status atual
       _statusList = possibleStatuses
@@ -419,7 +433,8 @@ void _toggleBusStopOverlay() async {
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
-        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar o status do aluno';
+        final errorDetail =
+            errorData['detail'] ?? 'Erro ao atualizar o status do aluno';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorDetail),
@@ -532,8 +547,9 @@ void _toggleBusStopOverlay() async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Student trip ID não está definido!'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro: Student trip ID não está definido!'),
+          backgroundColor: Colors.red,
         ),
       );
       return;
@@ -543,47 +559,57 @@ void _toggleBusStopOverlay() async {
       final response = await http.put(Uri.parse(
           '${Config.backendUrl}/student_trips/$_studentTripId/update_trip?new_trip_id=$newTripId'));
 
+      // Adicionando prints de debug
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
+
       if (response.statusCode == 200) {
         print('Viagem do aluno atualizada com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Viagem do aluno atualizada com sucesso!'),
-           backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Viagem do aluno atualizada com sucesso!'),
+            backgroundColor: Colors.green,
           ),
         );
 
-        // Atualizar a tripId primeiro e só depois realizar as outras atualizações
-        await _fetchBusAndDriver(); // Atualizar dados do ônibus e motorista
-        await _fetchCurrentStatus(); // Atualizar o status do aluno
-        await _fetchBusStopName(); // Atualizar o ponto de ônibus
-
-        // Fechar o overlay de seleção de ônibus e garantir que a interface seja atualizada
+        await _fetchBusAndDriver();
+        await _fetchCurrentStatus();
+        await _fetchBusStopName();
         setState(() {
           _showBusOverlay = false;
         });
-      } else if (response.statusCode == 400 &&
-          response.body.contains("New trip is full")) {
-        // Exibe popup se a viagem estiver cheia
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CustomPopup(
-              message: 'A viagem está cheia. Deseja entrar na fila de espera?',
-              confirmText: 'Sim',
-              cancelText: 'Não',
-              onConfirm: () {
-                Navigator.of(context).pop();
-                _enterWaitlist(newTripId);
-              },
-              onCancel: () {
-                Navigator.of(context).pop();
-              },
-            );
-          },
-        );
+      } else if (response.statusCode == 400) {
+        // Decodificando e printando o corpo da resposta
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Response Body: $decodedBody');
+
+        if (response.body.contains("Nova viagem estÃ¡ cheia")) {
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomPopup(
+                message:
+                    'A viagem está cheia. Deseja entrar na fila de espera?',
+                confirmText: 'Sim',
+                cancelText: 'Não',
+                onConfirm: () {
+                  Navigator.of(context).pop();
+                  _enterWaitlist(newTripId);
+                },
+                onCancel: () {
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          );
+        }
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
-        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar a viagem do aluno';
+        final errorDetail =
+            errorData['detail'] ?? 'Erro ao atualizar a viagem do aluno';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorDetail),
@@ -594,8 +620,9 @@ void _toggleBusStopOverlay() async {
     } catch (e) {
       print('Erro ao atualizar a viagem do aluno: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar a viagem do aluno'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro ao atualizar a viagem do aluno'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -609,14 +636,16 @@ void _toggleBusStopOverlay() async {
       if (response.statusCode == 200) {
         print('Aluno entrou na fila de espera com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Você entrou na fila de espera com sucesso!'),
-           backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Você entrou na fila de espera com sucesso!'),
+            backgroundColor: Colors.green,
           ),
         );
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
-        final errorDetail = errorData['detail'] ?? 'Erro ao entrar na fila de espera';
+        final errorDetail =
+            errorData['detail'] ?? 'Erro ao entrar na fila de espera';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorDetail),
@@ -627,8 +656,9 @@ void _toggleBusStopOverlay() async {
     } catch (e) {
       print('Erro ao entrar na fila de espera: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao entrar na fila de espera'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro ao entrar na fila de espera'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -638,8 +668,9 @@ void _toggleBusStopOverlay() async {
     if (_studentTripId == null) {
       print('Student trip ID is not set');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: Student trip ID não está definido!'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro: Student trip ID não está definido!'),
+          backgroundColor: Colors.red,
         ),
       );
       return;
@@ -654,8 +685,9 @@ void _toggleBusStopOverlay() async {
       if (response.statusCode == 200) {
         print('Ponto de ônibus atualizado com sucesso!');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ponto de ônibus atualizado com sucesso!'),
-           backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Ponto de ônibus atualizado com sucesso!'),
+            backgroundColor: Colors.green,
           ),
         );
 
@@ -669,7 +701,8 @@ void _toggleBusStopOverlay() async {
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
-        final errorDetail = errorData['detail'] ?? 'Erro ao atualizar o ponto de ônibus';
+        final errorDetail =
+            errorData['detail'] ?? 'Erro ao atualizar o ponto de ônibus';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorDetail),
@@ -680,8 +713,9 @@ void _toggleBusStopOverlay() async {
     } catch (e) {
       print('Erro ao atualizar o ponto de ônibus: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar o ponto de ônibus'),
-         backgroundColor: Colors.red,
+        SnackBar(
+          content: Text('Erro ao atualizar o ponto de ônibus'),
+          backgroundColor: Colors.red,
         ),
       );
     }
