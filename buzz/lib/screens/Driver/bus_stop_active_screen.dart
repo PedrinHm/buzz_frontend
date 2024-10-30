@@ -234,13 +234,17 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
         "tripId atual: $_tripId, activeTripId atual: ${Provider.of<TripController>(context, listen: false).activeTripId}");
 
     String endpoint;
+    String successMessage;
 
     if (action == 'Encerrar viagem de ida') {
       endpoint = 'trip_bus_stops/finalize_current_stop/$_tripId';
+      successMessage = 'Ponto atual finalizado com sucesso.';
     } else if (action == 'Encerrar viagem de volta') {
       endpoint = 'trips/${_tripId ?? ''}/finalize_return_trip';
+      successMessage = 'Viagem de volta finalizada com sucesso!';
     } else if (action == 'Finalizar viagem') {
       endpoint = 'trips/${_tripId ?? ''}/finalize_outbound_trip';
+      successMessage = 'Viagem de ida finalizada com sucesso! Iniciando viagem de volta.';
     } else {
       setState(() {
         _isProcessing = false;
@@ -255,6 +259,11 @@ class _BusStopActiveScreenState extends State<BusStopActiveScreen> {
 
       if (response.statusCode == 200) {
         final responseData = decodeJsonResponse(response);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(successMessage),
+          backgroundColor: Colors.green,
+        ));
 
         if (action == 'Finalizar viagem') {
           // Se for uma viagem de ida, inicia a viagem de volta
