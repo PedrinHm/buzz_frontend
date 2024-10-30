@@ -9,13 +9,16 @@ import 'package:buzz/widgets/Geral/Input_Field.dart';
 import 'package:buzz/widgets/Geral/Button_One.dart';
 import 'package:buzz/widgets/Geral/Text_Button.dart';
 import 'package:buzz/utils/size_config.dart'; // Importa o arquivo de utilitários de tamanho
+import 'package:buzz/widgets/Geral/Cpf_input_formatter.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController cpfController = TextEditingController();
 
+  final cpfFormatter = CpfInputFormatter();
+
   Future<void> _sendResetPasswordRequest(BuildContext context) async {
-    final cpf = cpfController.text;
-    final url = '${Config.backendUrl}/auth/forgot-password'; // URL da API
+    final cpf = cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
+    final url = '${Config.backendUrl}/auth/forgot-password';
 
     try {
       final response = await http.post(
@@ -99,6 +102,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                     labelText: 'CPF',
                     keyboardType: TextInputType.number,
                     controller: cpfController,
+                    hintText: 'Ex: 123.456.789-00',
+                    inputFormatters: [cpfFormatter],
                   ),
                 ],
               ),
