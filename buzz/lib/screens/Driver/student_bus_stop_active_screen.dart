@@ -93,53 +93,60 @@ class _StudentBusStopActiveScreenState
                 SizedBox(
                     height:
                         getHeightProportion(context, 20)), // Proporção ajustada
-                if (busStops.isEmpty && students.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Nenhum ponto de ônibus ou aluno encontrado.',
-                        style: TextStyle(
-                          color: Color(0xFF000000).withOpacity(0.70),
-                          fontSize: getHeightProportion(
-                              context, 16), // Proporção ajustada
-                        ),
-                      ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        if (busStops.isEmpty && students.isEmpty)
+                          Center(
+                            child: Text(
+                              'Nenhum ponto de ônibus ou aluno encontrado.',
+                              style: TextStyle(
+                                color: Color(0xFF000000).withOpacity(0.70),
+                                fontSize: getHeightProportion(
+                                    context, 16), // Proporção ajustada
+                              ),
+                            ),
+                          )
+                        else ...[
+                          if (busStops.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(getHeightProportion(
+                                    context, 8.0)), // Proporção ajustada
+                                child: Text(
+                                  'Nenhum ponto de ônibus encontrado.',
+                                  style: TextStyle(
+                                    color: Color(0xFF000000).withOpacity(0.70),
+                                    fontSize: getHeightProportion(
+                                        context, 16), // Proporção ajustada
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (students.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(getHeightProportion(
+                                    context, 8.0)), // Proporção ajustada
+                                child: Text(
+                                  'Nenhum aluno encontrado.',
+                                  style: TextStyle(
+                                    color: Color(0xFF000000).withOpacity(0.70),
+                                    fontSize: getHeightProportion(
+                                        context, 16), // Proporção ajustada
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (busStops.isNotEmpty)
+                            ..._buildBusStopSections(busStops, students),
+                        ],
+                      ],
                     ),
-                  )
-                else ...[
-                  if (busStops.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(getHeightProportion(
-                            context, 8.0)), // Proporção ajustada
-                        child: Text(
-                          'Nenhum ponto de ônibus encontrado.',
-                          style: TextStyle(
-                            color: Color(0xFF000000).withOpacity(0.70),
-                            fontSize: getHeightProportion(
-                                context, 16), // Proporção ajustada
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (students.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(getHeightProportion(
-                            context, 8.0)), // Proporção ajustada
-                        child: Text(
-                          'Nenhum aluno encontrado.',
-                          style: TextStyle(
-                            color: Color(0xFF000000).withOpacity(0.70),
-                            fontSize: getHeightProportion(
-                                context, 16), // Proporção ajustada
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (busStops.isNotEmpty)
-                    ..._buildBusStopSections(busStops, students),
-                ],
+                  ),
+                ),
               ],
             );
           },
