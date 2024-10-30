@@ -156,26 +156,38 @@ class _StudentHomeTripInactiveScreenState
 
       if (response.statusCode == 200) {
         await _waitForStudentTripId(widget.studentId, tripId);
-      } else if (response.statusCode == 400 &&
-          response.body.contains("Capacidade do onibus atingida")) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext dialogContext) {
-            return CustomPopup(
-              message: 'O ônibus está cheio. Deseja entrar na fila de espera?',
-              confirmText: 'Sim',
-              cancelText: 'Não',
-              onConfirm: () {
-                Navigator.of(dialogContext).pop();
-                _createStudentTripWaitlist(tripId, pointId);
-              },
-              onCancel: () {
-                Navigator.of(dialogContext).pop();
-              },
-            );
-          },
-        );
+      } else if (response.statusCode == 400) {
+        print('Resposta de erro 400: ${response.body}');
+        if (response.body.contains("Capacidade do Ã´nibus atingida")) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return CustomPopup(
+                message: 'O ônibus está cheio. Deseja entrar na fila de espera?',
+                confirmText: 'Sim',
+                cancelText: 'Não',
+                onConfirm: () {
+                  Navigator.of(dialogContext).pop();
+                  _createStudentTripWaitlist(tripId, pointId);
+                },
+                onCancel: () {
+                  Navigator.of(dialogContext).pop();
+                },
+              );
+            },
+          );
+        } else {
+          // Decodifica a resposta de erro e exibe o detalhe
+          final errorData = json.decode(utf8.decode(response.bodyBytes));
+          final errorDetail = errorData['detail'] ?? 'Erro ao criar viagem do estudante';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorDetail),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } else {
         // Decodifica a resposta de erro e exibe o detalhe
         final errorData = json.decode(utf8.decode(response.bodyBytes));
