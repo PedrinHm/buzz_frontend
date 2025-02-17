@@ -31,7 +31,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<Usuario> _fetchUser(int userId) async {
-    final response = await http.get(Uri.parse('${Config.backendUrl}/users/$userId'));
+    final response = await http.get(Uri.parse('${Config.backendUrl}/users/$userId/with-picture'));
 
     if (response.statusCode == 200) {
       String responseBody = utf8.decode(response.bodyBytes);
